@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBTis258 Financieros | Financieros</title>
+    <link rel="icon" href="../imgs/yameharte.png" type="image">
+    <link rel="stylesheet" href="tienda.css">
+</head>
+<body>
+    <!--Header xd-->
+    <header class="cab-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="../imgs/yameharte.png" alt="cblogoxdd" class="logo">
+            <div>
+                <h1>CBTis 258</h1>
+                <h2>Un motivo de orgullo</h2>
+            </div>
+            </div>
+        <button class="button-carrito">
+            <svg viewBox="0 0 16 16" class="bi bi-cart-check" height="24" width="24" xmlns="http://www.w3.org/2000/svg" fill="#fff">
+                <path d="M11.354 6.354a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z"></path>
+                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
+            </svg>
+            <p class="text">Ir al carrito</p>
+        </button>
+        </div>
+    </header>
+
+    <section class="tienda-layout">
+        <div class="productos-container">
+            <h2 class="section-title">Productos y Servicios</h2>
+            
+            <div class="productos-grid">
+                <!-- Card 1 - Uniformes -->
+                <div class="card" onclick="abrirModal('uniformes')">
+                    <div class="card2">
+                        <img src="../icons/shirt.png" alt="icono" class="iconito">
+                        <h3>Uniformes y credenciales</h3>
+                    </div>
+                </div>
+
+                <!-- Card 2 - Papelería -->
+                <div class="card" onclick="abrirModal('papeleria')">
+                    <div class="card2">
+                        <img src="../icons/libreta-de-contactos.png" alt="icono" class="iconito">
+                        <h3>Papeleria</h3>
+                    </div>
+                </div>
+
+                <!-- Card 4 - Trámites -->
+                <div class="card" onclick="abrirModal('tramites')">
+                    <div class="card2">
+                        <img src="../icons/pergamino.png" alt="icono" class="iconito">
+                        <h3>Tramites y Documentos</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar-derecha">
+            <h2 class="section-title">Productos Seleccionados</h2>
+
+            <div class="info-card" id="carritoContainer">
+                <p style="text-align: center; color: #999; padding: 20px;">No hay productos seleccionados</p>
+            </div>
+            
+            <button id="pay-button" class="pay-btn">
+                <span>Pagar</span>
+                <span class="icon">
+                    <svg width="40px" height="40px" viewBox="0 0 24 24" fill="#000" xmlns="http://www.w3.org/2000/svg">
+                        <g id="Interface / Credit_Card_01">
+                            <path id="Vector" d="M3 11V15.8002C3 16.9203 3 17.4801 3.21799 17.9079C3.40973 18.2842 3.71547 18.5905 4.0918 18.7822C4.5192 19 5.07899 19 6.19691 19H17.8031C18.921 19 19.48 19 19.9074 18.7822C20.2837 18.5905 20.5905 18.2842 20.7822 17.9079C21 17.4805 21 16.9215 21 15.8036V11M3 11V9M3 11H21M3 9V8.2002C3 7.08009 3 6.51962 3.21799 6.0918C3.40973 5.71547 3.71547 5.40973 4.0918 5.21799C4.51962 5 5.08009 5 6.2002 5H17.8002C18.9203 5 19.4796 5 19.9074 5.21799C20.2837 5.40973 20.5905 5.71547 20.7822 6.0918C21 6.5192 21 7.07899 21 8.19691V9M3 9H21M7 15H11M21 11V9" stroke="#ffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </g>
+                    </svg>
+                </span>
+                <div id="fingerprint-container">
+                    <svg style="width: 100%; height: 100%;" preserveAspectRatio="xMidYMid meet" height="430" width="430" viewBox="0 0 430 430" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+                        <g>
+                            <g opacity="1" transform="matrix(1, 0, 0, 1, 215, 215)">
+                                <path d="M0,167.5 C92.5,167.5 167.5,92.5 167.5,0 C167.5,-92.5 92.5,-167.5 0,-167.5 C-92.5,-167.5 -167.5,-92.5 -167.5,0 C-167.5,92.5 -92.5,167.5 0,167.5z" stroke-width="12" stroke-opacity="1" stroke="rgb(255,255,255)" class="primary" fill-opacity="0" stroke-linejoin="round" stroke-linecap="round"></path>
+                            </g>
+                            <g opacity="1" transform="matrix(1, 0, 0, 1, 215, 215)">
+                                <path d="M0,-30 C0,-30 0,30 0,30 M-30,0 C-30,0 -30,-30 -30,-30 C-30,-46.569000244140625 -16.569000244140625,-60 0,-60 C16.569000244140625,-60 30,-46.569000244140625 30,-30 M30,0 C30,0 30,30 30,30 C30,46.569000244140625 16.569000244140625,60 0,60 C-16.569000244140625,60 -30,46.569000244140625 -30,30 M20,-86.58599853515625 C13.744000434875488,-88.7969970703125 7.013000011444092,-90 0,-90 C-33.137001037597656,-90 -60,-63.137001037597656 -60,-30 C-60,-30 -60,30 -60,30 C-60,47.77000045776367 -52.275001525878906,63.736000061035156 -40,74.72200012207031 M-20,86.58599853515625 C-13.744000434875488,88.7969970703125 -7.013000011444092,90 0,90 C33.137001037597656,90 60,63.137001037597656 60,30 C60,30 60,-30 60,-30 C60,-47.77000045776367 52.275001525878906,-63.736000061035156 40,-74.72200012207031 M-70,-86.572998046875 C-82.50800323486328,-71.11599731445312 -90,-51.43299865722656 -90,-30 C-90,-30 -90,30 -90,30 C-90,79.70600128173828 -49.70600128173828,120 0,120 C18.500999450683594,120 35.69900131225586,114.41799926757812 50,104.84500122070312 M70,86.572998046875 C82.50800323486328,71.11599731445312 90,51.43299865722656 90,30 C90,30 90,-30 90,-30 C90,-79.70600128173828 49.70600128173828,-120 0,-120 C-18.500999450683594,-120 -35.69900131225586,-114.41799926757812 -50,-104.84500122070312" stroke-width="12" stroke-opacity="1" stroke="rgb(255,255,255)" class="secondary" fill-opacity="0" stroke-linejoin="round" stroke-linecap="round"></path>
+                            </g>
+                            <g opacity="1" transform="matrix(1, 0, 0, 1, 215, 215)">
+                                <path d="M0,167.5 C92.5,167.5 167.5,92.5 167.5,0 C167.5,-92.5 92.5,-167.5 0,-167.5 C-92.5,-167.5 -167.5,-92.5 -167.5,0 C-167.5,92.5 -92.5,167.5 0,167.5z" stroke-width="12" stroke-opacity="1" stroke="rgb(255,255,255)" class="primary_check" fill-opacity="0" stroke-linejoin="round" stroke-linecap="round"></path>
+                            </g>
+                            <g font-size="50" transform="translate(75, 75) scale(3)" opacity="0" class="checkmark">
+                                <path d="M20,50 L40,70 L70,30" stroke-linejoin="round" stroke-linecap="round" stroke-width="20" stroke="rgb(255,255,255)" fill="none"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </button>
+        </div>
+    </section>
+
+    <!-- MODAL SELECCIÓN DE MÉTODO DE PAGO -->
+<div class="modal-metodo-pago" id="modalMetodoPago">
+    <div class="modal-metodo-content">
+        <span class="close-modal-metodo" onclick="cerrarModalMetodo()">&times;</span>
+        
+        <div class="historial-header">
+            <h2>Selecciona tu método de pago</h2>
+        </div>
+        
+        <div class="metodos-grid">
+            <div class="metodo-card" onclick="seleccionarMetodo('tarjeta')">
+                <div class="metodo-icon">💳</div>
+                <h3>Tarjeta de Crédito/Débito</h3>
+                <p>Visa, Mastercard, American Express</p>
+            </div>
+            
+            <div class="metodo-card" onclick="seleccionarMetodo('efectivo')">
+                <div class="metodo-icon">💵</div>
+                <h3>Efectivo</h3>
+                <p>Paga en caja de la institución</p>
+            </div>
+            
+            <div class="metodo-card" onclick="seleccionarMetodo('transferencia')">
+                <div class="metodo-icon">🏦</div>
+                <h3>Transferencia Bancaria</h3>
+                <p>SPEI o transferencia interbancaria</p>
+            </div>
+            
+            <div class="metodo-card" onclick="seleccionarMetodo('oxxo')">
+                <div class="metodo-icon">🏪</div>
+                <h3>Pago en OXXO</h3>
+                <p>Genera tu código de pago</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">Ayuda</a>
+            <a href="#">Terminos y condiciones</a>
+            <a href="#">Politica de privacidad</a>
+        </div>
+        <button class="btn btn-logout" id="logout-btn">Cerrar sesion</button>
+    </footer>
+
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="cerrarModal()">&times;</span>
+            <h2 class="modal-title" id="modalTitle">Productos</h2>
+            <div class="productos-modal-grid" id="productosGrid">
+            </div>
+        </div>
+    </div>
+
+    <section class="add-card-page">
+  <form class="form">
+     <div class="historial-header">
+                <h2>Proceso de pago</h2>
+     </div>
+     <h3 style="padding: 0 30px; text-align: center; color: #97242c; font-size: 1.5em; margin: 10px 0;">Total a pagar: $0.00 MXN</h3>
+    <label for="name" class="label">
+      <span class="title">Nombre completo del titular</span>
+      <input
+        class="input-field"
+        type="text"
+        name="input-name"
+        title="Input title"
+        placeholder="Enter your full name"
+      />
+    </label>
+    <label for="serialCardNumber" class="label">
+      <span class="title">Numero de la tarjeta</span>
+      <input
+        id="serialCardNumber"
+        class="input-field"
+        type="number"
+        name="input-name"
+        title="Input title"
+        placeholder="0000 0000 0000 0000"
+      />
+    </label>
+    <div class="split">
+      <label for="ExDate" class="label">
+        <span class="title">Fecha de expiracion</span>
+        <input
+          id="ExDate"
+          class="input-field"
+          type="text"
+          name="input-name"
+          title="Expiry Date"
+          placeholder="MM/YY"
+        />
+      </label>
+      <label for="cvv" class="label">
+        <span class="title"> CVV</span>
+        <input
+          id="cvv"
+          class="input-field"
+          type="number"
+          name="cvv"
+          title="CVV"
+          placeholder="CVV"
+        />
+      </label>
+    </div>
+    <input class="checkout-btn" type="button" value="Verificar" />
+  </form>
+</section>
+
+
+    <script src="./tienda.js"></script>
+</body>
+</html>

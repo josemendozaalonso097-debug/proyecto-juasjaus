@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBTis258 Financieros | Principal</title>
+    <link rel="stylesheet" href="principal.css">
+    <link rel="icon" href="../imgs/yameharte.png" type="image">
+</head>
+<body>
+
+    <!--Header xd-->
+    <header class="cab-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="../imgs/yameharte.png" alt="cblogoxdd" class="logo">
+            <div>
+                <h1>CBTis 258</h1>
+                <h2>Un motivo de orgullo</h2>
+            </div>
+            </div>
+        </div>
+    </header>
+        <!--Main-->
+    <main class="main-content">
+        <section class="bienvenida">
+            <h2 class="titulodeBienvenida">Bienvenido, <span id="user-name">Usuario</span>!</h2>
+        </section>
+
+    <div class="dashboard"> 
+        <div class="card-main">
+            <h3 class="card-title">Estados de pago</h3>
+
+            <div class="alert-box">
+                <p class="alert-text">Tienes <strong id="pendientes">1</strong> pagos pendientes.</p>             
+            </div>
+
+            <div class="botones">
+                <button class="btn btn-primary" id="pay-btn">Pagar colegiatura</button>
+                <button class="btn btn-secondary">Historial de pagos</button>
+                <button class="btn btn-tercero" id="info-btn">Informacion</button>
+            </div> 
+        </div>
+
+        <div class="columna-derecha">
+            <div class="info-card">
+                <div class="status" id="status-badge">Cuenta activa</div>
+                <h3 class="info-title-s">Proximo vencimiento:</h3>
+                <p class="info-text">Colegiatura:<strong id="next-date">1 de Enero del 2026</strong></p>
+            </div>
+            
+            <div class="info-card">
+                <h3 class="info-title">Financieros</h3>
+                <p class="info-text">Comprar productos o subir papeleria</p>
+                <button class="btn btn-store" id="store-btn">Entrar</button>
+            </div>
+    </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">Ayuda</a>
+            <a href="#">Terminos y condiciones</a>
+            <a href="#">Politica de privacidad</a>
+        </div>
+        <button class="btn btn-logout" id="logout-btn">Cerrar sesion</button>
+    </footer>
+
+    <div class="modal-historial" id="modalHistorial">
+        <div class="modal-historial-content">
+            <span class="close-modal-historial" onclick="cerrarHistorial()">&times;</span>
+            
+            <div class="historial-header">
+                <h2>HISTORIAL DE COMPRAS</h2>
+            </div>
+
+            <div class="historial-layout">
+                <!-- Columna Izquierda: Historial -->
+                <div class="historial-compras">
+                    <!-- Compra 1 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">25/OCT/2023</div>
+                        <div class="compra-info">
+                            <h3>Paquete de Uniformes Deportivos</h3>
+                            <div class="compra-badges">
+                                <span class="badge-entregado">Entregado</span>
+                                <span class="badge-entregado">Entregado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$1,250.00 MXN</div>
+                    </div>
+
+                    <!-- Compra 2 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">10/AGO/2023</div>
+                        <div class="compra-info">
+                            <h3>Libros y Gelas de 3er Semestre</h3>
+                            <div class="compra-badges">
+                                <span class="badge-entregado">Entregado</span>
+                                <span class="badge-entregado">Entregado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$1,980.00 MXN</div>
+                    </div>
+
+                    <!-- Compra 3 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">15/JUL/2023</div>
+                        <div class="compra-info">
+                            <h3>Ficha Examen Extordinario (Física)</h3>
+                            <div class="compra-badges">
+                                <span class="badge-completado">Completado</span>
+                                <span class="badge-completado">Completado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$1,250.00 MXN</div>
+                    </div>
+
+                    <!-- Compra 4 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">02/JUN/2023</div>
+                        <div class="compra-info">
+                            <h3>Material de Laboratorio</h3>
+                            <div class="compra-badges">
+                                <span class="badge-entregado">Entregado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$850.00 MXN</div>
+                    </div>
+                </div>
+
+                <div class="resumen-cuenta">
+                    <h3>RESUMEN DE CUENTA</h3>
+                    
+                    <div class="resumen-info">
+                        <p class="resumen-item">
+                            <span>Compras Realizadas (2023)</span>
+                            <strong>4</strong>
+                        </p>
+                        <p class="resumen-item">
+                            <span>Total Gastado</span>
+                            <strong class="total-amount">$5,330.00 MXN</strong>
+                        </p>
+                    </div>
+
+                    <button class="btn-facturas">VER FACTURAS</button>
+
+                    <div class="info-adicional">
+                        <p><strong>Nota:</strong> Puedes descargar tus facturas en formato PDF.
+                <button class="Btn-pdf">
+                        <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+                        </svg>
+                        <span class="icon2"></span>
+                </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE INFORMACIÓN -->
+<div class="modal-informacion" id="modalInformacion">
+    <div class="modal-informacion-content">
+        <span class="close-modal-info" onclick="cerrarInformacion()">&times;</span>
+        
+        <div class="historial-header">
+            <h2>INFORMACIÓN CBTis 258</h2>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card-section" onclick="abrirSeccion('nuevoIngreso')">
+                <div class="info-icon">🎓</div>
+                <h3>Nuevo Ingreso</h3>
+                <p>Proceso de inscripción y requisitos</p>
+            </div>
+
+            <div class="info-card-section" onclick="abrirSeccion('becas')">
+                <div class="info-icon">💰</div>
+                <h3>Becas y Apoyos</h3>
+                <p>Información sobre becas disponibles</p>
+            </div>
+
+            <div class="info-card-section" onclick="abrirSeccion('contacto')">
+                <div class="info-icon">📞</div>
+                <h3>Contacto</h3>
+                <p>Teléfonos y correos importantes</p>
+            </div>
+
+            <div class="info-card-section" onclick="abrirSeccion('faq')">
+                <div class="info-icon">❓</div>
+                <h3>Preguntas Frecuentes</h3>
+                <p>Dudas comunes resueltas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-detalle" id="modalDetalle">
+    <div class="modal-detalle-content">
+        <span class="close-modal-detalle" onclick="cerrarDetalle()">&times;</span>
+        
+        <div class="historial-header">
+            <h2 id="detalleTitle">Información</h2>
+        </div>
+
+        <div class="detalle-contenido" id="detalleContenido">
+        </div>
+    </div>
+</div>
+
+    <section class="add-card-page">
+  <form class="form">
+     <div class="historial-header">
+                <h2>Proceso de pago</h2>
+     </div>
+     <h3> total a pagar:$3,000.00 MXN</h3>
+    <label for="name" class="label">
+      <span class="title">Nombre completo del titular</span>
+      <input
+        class="input-field"
+        type="text"
+        name="input-name"
+        title="Input title"
+        placeholder="Ingresa tu nombre completo"
+        required
+      />
+    </label>
+    <label for="serialCardNumber" class="label">
+      <span class="title">Numero de la tarjeta</span>
+      <input
+        id="serialCardNumber"
+        class="input-field"
+        type="text"
+        name="input-name"
+        maxlength="19"
+        pattern="\d{19}"
+        title="Input title"
+        placeholder="0000 0000 0000 0000"
+        required
+      />
+    </label>
+    <div class="split">
+      <label for="ExDate" class="label">
+        <span class="title">Fecha de expiracion</span>
+        <input
+          id="ExDate"
+          class="input-field"
+          type="text"
+          name="input-name"
+          title="Expiry Date"
+          placeholder="MM/YY"
+          required
+        />
+      </label>
+      <label for="cvv" class="label">
+        <span class="title"> CVV</span>
+        <input
+          id="cvv"
+          class="input-field"
+          type="number"
+          name="cvv"
+          title="CVV"
+          placeholder="CVV"
+          required
+        />
+      </label>
+    </div>
+    <input class="checkout-btn" type="button" value="Verificar" />
+  </form>
+</section>
+
+    <script src="principal.js"></script>
+</body> 
+</html>
