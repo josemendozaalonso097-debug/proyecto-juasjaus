@@ -126,9 +126,9 @@
             </div>
             
             <div class="metodo-card" onclick="seleccionarMetodo('oxxo')">
-                <div class="metodo-icon">🏪</div>
-                <h3>Pago en OXXO</h3>
-                <p>Genera tu código de pago</p>
+                <div class="metodo-icon">📥</div>
+                <h3>Deposito</h3>
+                <p>Deposita en tu tienda o local mas cercano</p>
             </div>
         </div>
     </div>
@@ -152,7 +152,7 @@
         </div>
     </div>
 
-    <section class="add-card-page">
+     <section class="add-card-page" style="display: none;">
   <form class="form">
      <div class="historial-header">
                 <h2>Proceso de pago</h2>
@@ -164,42 +164,41 @@
         class="input-field"
         type="text"
         name="input-name"
-        title="Input title"
-        placeholder="Enter your full name"
+        placeholder="Ingresa tu nombre completo"
       />
     </label>
     <label for="serialCardNumber" class="label">
-      <span class="title">Numero de la tarjeta</span>
+      <span class="title">Número de tarjeta</span>
       <input
-        id="serialCardNumber"
         class="input-field"
-        type="number"
-        name="input-name"
-        title="Input title"
+        type="text"
+        id="serialCardNumber"
+        name="serialCardNumber"
         placeholder="0000 0000 0000 0000"
+        maxlength="19"
       />
     </label>
     <div class="split">
       <label for="ExDate" class="label">
-        <span class="title">Fecha de expiracion</span>
+        <span class="title">Fecha de vencimiento</span>
         <input
-          id="ExDate"
           class="input-field"
           type="text"
-          name="input-name"
-          title="Expiry Date"
+          id="ExDate"
+          name="ExDate"
           placeholder="MM/YY"
+          maxlength="5"
         />
       </label>
       <label for="cvv" class="label">
-        <span class="title"> CVV</span>
+        <span class="title">CVV</span>
         <input
-          id="cvv"
           class="input-field"
-          type="number"
+          type="text"
+          id="cvv"
           name="cvv"
-          title="CVV"
-          placeholder="CVV"
+          placeholder="cvv"
+          maxlength="4"
         />
       </label>
     </div>
@@ -207,6 +206,81 @@
   </form>
 </section>
 
+<!-- MODAL DE DEPÓSITO -->
+<div class="modal-deposito" id="modalDeposito" style="display: none;">
+    <div class="modal-deposito-content">
+        <span class="close-modal-deposito" onclick="cerrarModalDeposito()">&times;</span>
+        
+        <div class="historial-header">
+            <h2>Pago por Depósito/Transferencia</h2>
+        </div>
+
+        <div class="deposito-container">
+            <!-- Información bancaria -->
+            <div class="info-bancaria">
+                <h3>📋 Datos para transferencia</h3>
+                <div class="dato-bancario">
+                    <span class="label-dato">Banco:</span>
+                    <span class="valor-dato">Banamex</span>
+                </div>
+                <div class="dato-bancario">
+                    <span class="label-dato">Número de cuenta:</span>
+                    <span class="valor-dato">1234 5678 9012 3456</span>
+                </div>
+                <div class="dato-bancario">
+                    <span class="label-dato">CLABE:</span>
+                    <span class="valor-dato">002180012345678901</span>
+                </div>
+                <div class="dato-bancario">
+                    <span class="label-dato">Titular:</span>
+                    <span class="valor-dato">CBTis 258 - Servicios Financieros</span>
+                </div>
+                <div class="dato-bancario total-pagar">
+                    <span class="label-dato">Monto a pagar:</span>
+                    <span class="valor-dato" id="montoDeposito">$0.00 MXN</span>
+                </div>
+            </div>
+
+            <!-- Formulario de comprobante -->
+            <div class="form-comprobante">
+                <h3>📤 Subir comprobante de pago</h3>
+                
+                <form id="formComprobante">
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="comprobanteFile" accept="image/*,application/pdf" style="display: none;">
+                        <div class="upload-icon">📄</div>
+                        <p class="upload-text">Click para seleccionar archivo</p>
+                        <p class="upload-hint">PNG, JPG o PDF (máx. 5MB)</p>
+                    </div>
+
+                    <div class="archivo-seleccionado" id="archivoInfo" style="display: none;">
+                        <span id="nombreArchivo"></span>
+                        <button type="button" class="btn-quitar" onclick="quitarArchivo()">✕</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número de referencia (opcional)</label>
+                        <input type="text" id="referenciaDeposito" placeholder="Ej: 123456789">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Banco desde el que pagaste (opcional)</label>
+                        <input type="text" id="bancoOrigen" placeholder="Ej: BBVA, Santander">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha del depósito (opcional)</label>
+                        <input type="date" id="fechaDeposito">
+                    </div>
+
+                    <button type="button" class="btn-enviar-comprobante" onclick="enviarComprobante()">
+                        Enviar comprobante
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script src="./tienda.js"></script>
 </body>

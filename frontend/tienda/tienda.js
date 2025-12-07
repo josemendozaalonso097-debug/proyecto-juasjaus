@@ -294,19 +294,25 @@ function cerrarModalMetodo() {
 // Seleccionar método de pago
 function seleccionarMetodo(metodo) {
     const total = calcularTotal();
+    const modalMetodo = document.getElementById('modalMetodoPago');
+    const modalPago = document.querySelector('.add-card-page');
     
     if (metodo === 'tarjeta') {
-        // Cerrar modal de método y abrir modal de tarjeta
-        cerrarModalMetodo();
+        // Cerrar modal de método
+        if (modalMetodo) {
+            modalMetodo.style.display = 'none';
+        }
         
+        // Actualizar total
         const totalElement = document.querySelector('.form h3');
         if (totalElement) {
             totalElement.textContent = `Total a pagar: $${total.toFixed(2)} MXN`;
         }
         
-        const modalPago = document.querySelector('.add-card-page');
+        // Abrir modal de tarjeta
         if (modalPago) {
             modalPago.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
         
     } else if (metodo === 'efectivo') {
@@ -319,8 +325,8 @@ function seleccionarMetodo(metodo) {
         
     } else if (metodo === 'oxxo') {
         cerrarModalMetodo();
-        alert(`🏪 Pago en OXXO\n\nTotal a pagar: $${total.toFixed(2)} MXN\n\nCódigo de pago: OXXO-${Math.floor(Math.random() * 1000000)}\n\nVálido por 3 días.`);
-    }
+       abrirModalDeposito(); 
+   }
 }
 
 // Cerrar modal de pago de tarjeta
@@ -393,40 +399,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const cvvInput = document.getElementById('cvv');
     const nameInput = document.querySelector('input[name="input-name"]');
     
-   if (cardNumberInput) {
-    cardNumberInput.addEventListener('input', function(e) {
-    let rawCursor = e.target.selectionStart; // Guardar la posición del cursor
-    let raw = e.target.value.replace(/\D/g, ''); // Solo números
-    raw = raw.slice(0, 16);
-
-    // Formatear: añadir espacio cada 4 dígitos
-    let formatted = raw.replace(/(.{4})/g, '$1 ').trim();
-
-    e.target.value = formatted;
-
-    if (raw.length ===16){
-        addValidationIcon(cardNumberInput,true);
-    } else {
-        addValidationIcon(cardNumberInput,false);
-    }
-
-e.target.value = formatted;
-
-    let newCursor = rawCursor;
-    if (rawCursor % 5 === 0 && raw.length < 16) {
-    newCursor++;
-}
-
-e.target.setSelectionRange(newCursor, newCursor);
-
-    detectCardType(raw);
-
-});
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function(e) {
+            let raw = e.target.value.replace(/\D/g, '');
+            raw = raw.slice(0, 16);
+            
+            let formatted = raw.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = formatted;
+            
+            if (raw.length === 16) {
+                addValidationIcon(cardNumberInput, true);
+            } else {
+                addValidationIcon(cardNumberInput, false);
+            }
+            
+            detectCardType(raw);
+        });
     }
     
     if (expiryInput) {
         expiryInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Solo números
+            let value = e.target.value.replace(/\D/g, '');
             
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -434,7 +427,6 @@ e.target.setSelectionRange(newCursor, newCursor);
             
             e.target.value = value;
             
-            // Validar fecha
             if (value.length === 5) {
                 const [month, year] = value.split('/');
                 if (parseInt(month) >= 1 && parseInt(month) <= 12) {
@@ -456,12 +448,10 @@ e.target.setSelectionRange(newCursor, newCursor);
     
     if (cvvInput) {
         cvvInput.addEventListener('input', function(e) {
-            // Limitar a 4 dígitos
             if (e.target.value.length > 4) {
                 e.target.value = e.target.value.slice(0, 4);
             }
             
-            // Validar
             if (e.target.value.length >= 3) {
                 addValidationIcon(cvvInput, true);
             } else {
@@ -485,7 +475,6 @@ function detectCardType(cardNumber) {
     const cardNumberInput = document.getElementById('serialCardNumber');
     let cardType = '';
     
-    // Remover logo anterior si existe
     const existingLogo = document.querySelector('.card-logo');
     if (existingLogo) {
         existingLogo.remove();
@@ -498,7 +487,7 @@ function detectCardType(cardNumber) {
     } else if (cardNumber.startsWith('37') || cardNumber.startsWith('34')) {
         cardType = 'amex';
     } else if (cardNumber.length < 1) {
-        return; // No mostrar nada si está vacío
+        return;
     } else {
         cardType = 'generic';
     }
@@ -508,7 +497,6 @@ function detectCardType(cardNumber) {
         logo.className = 'card-logo';
         logo.innerHTML = getCardLogo(cardType);
         
-        // Insertar después del input
         const label = cardNumberInput.closest('.label');
         label.style.position = 'relative';
         label.appendChild(logo);
@@ -567,3 +555,179 @@ function removeValidationIcon(input) {
     }
     input.style.borderColor = '#97242c';
 }
+
+(function(){
+  const payBtn = document.getElementById('pay-button');
+  if (payBtn && typeof abrirModalPago === 'function') {
+    payBtn.addEventListener('click', abrirModalPago);
+  }
+})();
+
+// ========== MODAL DE DEPÓSITO ==========
+
+let archivoComprobante = null;
+
+function abrirModalDeposito() {
+    const total = calcularTotal();
+    
+    // Actualizar el monto
+    document.getElementById('montoDeposito').textContent = `$${total.toFixed(2)} MXN`;
+    
+    // Mostrar modal
+    const modalDeposito = document.getElementById('modalDeposito');
+    if (modalDeposito) {
+        modalDeposito.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalDeposito() {
+    const modalDeposito = document.getElementById('modalDeposito');
+    if (modalDeposito) {
+        modalDeposito.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Limpiar formulario
+    limpiarFormularioDeposito();
+}
+
+// Funcionalidad de subida de archivo
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('comprobanteFile');
+    
+    if (uploadArea && fileInput) {
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validar tamaño (5MB máx)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('El archivo es demasiado grande. Máximo 5MB.');
+                    return;
+                }
+                
+                // Validar tipo
+                const tiposPermitidos = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+                if (!tiposPermitidos.includes(file.type)) {
+                    alert('Solo se permiten archivos PNG, JPG o PDF.');
+                    return;
+                }
+                
+                archivoComprobante = file;
+                mostrarArchivoSeleccionado(file.name);
+            }
+        });
+    }
+});
+
+function mostrarArchivoSeleccionado(nombre) {
+    document.getElementById('uploadArea').style.display = 'none';
+    document.getElementById('archivoInfo').style.display = 'flex';
+    document.getElementById('nombreArchivo').textContent = nombre;
+}
+
+function quitarArchivo() {
+    archivoComprobante = null;
+    document.getElementById('comprobanteFile').value = '';
+    document.getElementById('uploadArea').style.display = 'block';
+    document.getElementById('archivoInfo').style.display = 'none';
+}
+
+function enviarComprobante() {
+    if (!archivoComprobante) {
+        alert('Por favor selecciona un comprobante de pago.');
+        return;
+    }
+    
+    const referencia = document.getElementById('referenciaDeposito').value;
+    const banco = document.getElementById('bancoOrigen').value;
+    const fecha = document.getElementById('fechaDeposito').value;
+    const total = calcularTotal();
+    
+    console.log({
+        archivo: archivoComprobante.name,
+        referencia,
+        banco,
+        fecha,
+        monto: total
+    });
+    
+    // Mostrar confirmación
+    cerrarModalDeposito();
+    mostrarConfirmacionDeposito();
+    
+    // Opcional: Vaciar carrito
+    // carrito = [];
+    // actualizarCarrito();
+}
+
+function mostrarConfirmacionDeposito() {
+    const confirmacion = document.createElement('div');
+    confirmacion.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10003;
+        text-align: center;
+        max-width: 400px;
+        border: 3px solid #27ae60;
+    `;
+    
+    confirmacion.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
+        <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Comprobante recibido!</h2>
+        <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+            Tu comprobante fue recibido exitosamente.<br>
+            <strong>Estado: Pendiente de verificación</strong><br><br>
+            Te notificaremos una vez que sea validado.
+        </p>
+        <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+        ">Entendido</button>
+    `;
+    
+    document.body.appendChild(confirmacion);
+    document.body.style.overflow = 'hidden';
+}
+
+function limpiarFormularioDeposito() {
+    quitarArchivo();
+    document.getElementById('referenciaDeposito').value = '';
+    document.getElementById('bancoOrigen').value = '';
+    document.getElementById('fechaDeposito').value = '';
+}
+
+// Cerrar modal de depósito con ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modalDeposito = document.getElementById('modalDeposito');
+        if (modalDeposito && modalDeposito.style.display === 'block') {
+            cerrarModalDeposito();
+        }
+    }
+});
+
+// Cerrar al hacer click fuera
+window.addEventListener('click', function(event) {
+    const modalDeposito = document.getElementById('modalDeposito');
+    if (event.target === modalDeposito) {
+        cerrarModalDeposito();
+    }
+});
