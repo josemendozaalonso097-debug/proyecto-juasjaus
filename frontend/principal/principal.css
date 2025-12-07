@@ -240,8 +240,8 @@ body{
 
 .footer{
     background-color: #b8b8b8;
-    padding: 22px 40px;
-    margin-top: 40px;
+    padding: 19px 50px;
+    margin-top: 50px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -258,7 +258,6 @@ body{
     color: #94272C;
     transition: color 0.3s ease;
 }
-
 .btn-logout{
     background: linear-gradient(135deg, #8a3535 0%, #750616 100%);
     color: white;

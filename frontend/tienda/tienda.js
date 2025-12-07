@@ -28,7 +28,8 @@ const productosData = {
     tramites: [
         { id: 16, nombre: "Certificado", marca: "Documento", precio: 150, imagen: "", tallas: false },
         { id: 17, nombre: "Constancia", marca: "Documento", precio: 50, imagen: "", tallas: false },
-        { id: 18, nombre: "Cardex", marca: "Documento", precio: 30, imagen: "", tallas: false }
+        { id: 18, nombre: "Cardex", marca: "Documento", precio: 30, imagen: "", tallas: false },
+        { id: 19, nombre: "Colegiatura", marca: "Documento", precio: 3000, imagen: "", tallas: false }
     ],
 };
 
@@ -321,11 +322,11 @@ function seleccionarMetodo(metodo) {
         
     } else if (metodo === 'transferencia') {
         cerrarModalMetodo();
-        alert(`🏦 Transferencia Bancaria\n\nTotal a pagar: $${total.toFixed(2)} MXN\n\nDatos bancarios:\nBanco: Banamex\nCuenta: 1234567890\nCLABE: 002180012345678901`);
+        abrirModalTransferencia();
         
     } else if (metodo === 'oxxo') {
         cerrarModalMetodo();
-       abrirModalDeposito(); 
+        abrirModalDeposito(); 
    }
 }
 
@@ -729,5 +730,281 @@ window.addEventListener('click', function(event) {
     const modalDeposito = document.getElementById('modalDeposito');
     if (event.target === modalDeposito) {
         cerrarModalDeposito();
+    }
+});
+
+
+let archivoComprobanteTransferencia = null;
+
+// Abrir modal de transferencia
+function abrirModalTransferencia() {
+    const total = calcularTotal();
+    
+    // Actualizar el monto
+    const montoElement = document.getElementById('montoTransferencia');
+    if (montoElement) {
+        montoElement.textContent = `$${total.toFixed(2)} MXN`;
+    }
+    
+    // Mostrar modal
+    const modalTransferencia = document.getElementById('modalTransferencia');
+    if (modalTransferencia) {
+        modalTransferencia.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Cerrar modal de transferencia
+function cerrarModalTransferencia() {
+    const modalTransferencia = document.getElementById('modalTransferencia');
+    if (modalTransferencia) {
+        modalTransferencia.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Limpiar formulario
+    limpiarFormularioTransferencia();
+}
+
+// Función para copiar texto al portapapeles
+function copiarTexto(elementId) {
+    const elemento = document.getElementById(elementId);
+    if (!elemento) return;
+    
+    const texto = elemento.textContent;
+    
+    // Usar la API moderna del portapapeles
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(() => {
+            mostrarNotificacion('✓ Copiado al portapapeles');
+        }).catch(err => {
+            console.error('Error al copiar:', err);
+            copiarTextoFallback(texto);
+        });
+    } else {
+        // Fallback para navegadores antiguos
+        copiarTextoFallback(texto);
+    }
+}
+
+// Método fallback para copiar texto
+function copiarTextoFallback(texto) {
+    const textArea = document.createElement('textarea');
+    textArea.value = texto;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        mostrarNotificacion('✓ Copiado al portapapeles');
+    } catch (err) {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar automáticamente. Por favor copia manualmente.');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Inicializar funcionalidad de subida de archivo para TRANSFERENCIA
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadAreaTransferencia');
+    const fileInput = document.getElementById('comprobanteFileTransferencia');
+    
+    if (uploadArea && fileInput) {
+        // Click para abrir selector
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#6e0404';
+            this.style.background = '#fff3f3';
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#94272C';
+            this.style.background = '#f8f9fa';
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#94272C';
+            this.style.background = '#f8f9fa';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                procesarArchivoTransferencia(files[0]);
+            }
+        });
+        
+        // Cambio de archivo
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                procesarArchivoTransferencia(file);
+            }
+        });
+    }
+});
+
+// Procesar archivo de transferencia
+function procesarArchivoTransferencia(file) {
+    // Validar tamaño (5MB máx)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert('El archivo es demasiado grande. Máximo 5MB.');
+        return;
+    }
+    
+    // Validar tipo
+    const tiposPermitidos = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+    if (!tiposPermitidos.includes(file.type)) {
+        alert('Solo se permiten archivos PNG, JPG o PDF.');
+        return;
+    }
+    
+    // Archivo válido
+    archivoComprobanteTransferencia = file;
+    mostrarArchivoSeleccionadoTransferencia(file.name);
+}
+
+// Mostrar archivo seleccionado
+function mostrarArchivoSeleccionadoTransferencia(nombre) {
+    const uploadArea = document.getElementById('uploadAreaTransferencia');
+    const archivoInfo = document.getElementById('archivoInfoTransferencia');
+    const nombreArchivo = document.getElementById('nombreArchivoTransferencia');
+    
+    if (uploadArea && archivoInfo && nombreArchivo) {
+        uploadArea.style.display = 'none';
+        archivoInfo.style.display = 'flex';
+        nombreArchivo.textContent = nombre;
+    }
+}
+
+// Quitar archivo
+function quitarArchivoTransferencia() {
+    archivoComprobanteTransferencia = null;
+    const fileInput = document.getElementById('comprobanteFileTransferencia');
+    const uploadArea = document.getElementById('uploadAreaTransferencia');
+    const archivoInfo = document.getElementById('archivoInfoTransferencia');
+    
+    if (fileInput) fileInput.value = '';
+    if (uploadArea) uploadArea.style.display = 'block';
+    if (archivoInfo) archivoInfo.style.display = 'none';
+}
+
+// Enviar comprobante de transferencia
+function enviarComprobanteTransferencia() {
+    if (!archivoComprobanteTransferencia) {
+        alert('Por favor selecciona un comprobante de pago.');
+        return;
+    }
+    
+    const referencia = document.getElementById('referenciaTransferencia').value;
+    const banco = document.getElementById('bancoOrigenTransferencia').value;
+    const fecha = document.getElementById('fechaTransferencia').value;
+    const total = calcularTotal();
+    
+    // Aquí puedes enviar los datos al servidor
+    console.log({
+        tipo: 'TRANSFERENCIA',
+        archivo: archivoComprobanteTransferencia.name,
+        tipoArchivo: archivoComprobanteTransferencia.type,
+        tamaño: archivoComprobanteTransferencia.size,
+        referencia: referencia || 'No especificado',
+        banco: banco || 'No especificado',
+        fecha: fecha || 'No especificado',
+        monto: total,
+        productos: carrito
+    });
+    
+    // Cerrar modal y mostrar confirmación
+    cerrarModalTransferencia();
+    mostrarConfirmacionTransferencia();
+    
+    // Opcional: Vaciar carrito después de enviar
+    // carrito = [];
+    // actualizarCarrito();
+}
+
+// Mostrar confirmación
+function mostrarConfirmacionTransferencia() {
+    const confirmacion = document.createElement('div');
+    confirmacion.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10003;
+        text-align: center;
+        max-width: 400px;
+        border: 3px solid #27ae60;
+    `;
+    
+    confirmacion.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
+        <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Comprobante recibido!</h2>
+        <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+            Tu comprobante de transferencia fue recibido exitosamente.<br>
+            <strong>Estado: Pendiente de verificación</strong><br><br>
+            Te notificaremos una vez que sea validado.
+        </p>
+        <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">Entendido</button>
+    `;
+    
+    document.body.appendChild(confirmacion);
+    document.body.style.overflow = 'hidden';
+}
+
+// Limpiar formulario
+function limpiarFormularioTransferencia() {
+    quitarArchivoTransferencia();
+    const referencia = document.getElementById('referenciaTransferencia');
+    const banco = document.getElementById('bancoOrigenTransferencia');
+    const fecha = document.getElementById('fechaTransferencia');
+    
+    if (referencia) referencia.value = '';
+    if (banco) banco.value = '';
+    if (fecha) fecha.value = '';
+}
+
+// Cerrar con ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modalTransferencia = document.getElementById('modalTransferencia');
+        if (modalTransferencia && modalTransferencia.style.display === 'block') {
+            cerrarModalTransferencia();
+        }
+    }
+});
+
+// Cerrar al hacer click fuera
+window.addEventListener('click', function(event) {
+    const modalTransferencia = document.getElementById('modalTransferencia');
+    if (event.target === modalTransferencia) {
+        cerrarModalTransferencia();
     }
 });

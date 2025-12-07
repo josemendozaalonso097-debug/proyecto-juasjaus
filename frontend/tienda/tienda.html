@@ -212,13 +212,13 @@
         <span class="close-modal-deposito" onclick="cerrarModalDeposito()">&times;</span>
         
         <div class="historial-header">
-            <h2>Pago por Depósito/Transferencia</h2>
+            <h2>Pago por Depósito</h2>
         </div>
 
         <div class="deposito-container">
             <!-- Información bancaria -->
             <div class="info-bancaria">
-                <h3>📋 Datos para transferencia</h3>
+                <h3>📋 Datos para deposito</h3>
                 <div class="dato-bancario">
                     <span class="label-dato">Banco:</span>
                     <span class="valor-dato">Banamex</span>
@@ -274,6 +274,110 @@
                     </div>
 
                     <button type="button" class="btn-enviar-comprobante" onclick="enviarComprobante()">
+                        Enviar comprobante
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-transferencia" id="modalTransferencia" style="display: none;">
+    <div class="modal-transferencia-content">
+        <span class="close-modal-transferencia" onclick="cerrarModalTransferencia()">&times;</span>
+        
+        <div class="historial-header">
+            <h2>🏦 Transferencia Bancaria</h2>
+        </div>
+
+        <div class="transferencia-container">
+            <!-- Información bancaria para copiar -->
+            <div class="info-bancaria">
+                <h3>📋 Datos para transferencia</h3>
+                <p style="color: #666; margin-bottom: 20px;">Realiza tu transferencia con los siguientes datos:</p>
+                
+                <div class="dato-bancario">
+                    <span class="label-dato">Banco:</span>
+                    <div class="valor-container">
+                        <span class="valor-dato" id="bancoCopia">Banamex</span>
+                        <button class="btn-copiar" onclick="copiarTexto('bancoCopia')">📋</button>
+                    </div>
+                </div>
+                
+                <div class="dato-bancario">
+                    <span class="label-dato">Número de cuenta:</span>
+                    <div class="valor-container">
+                        <span class="valor-dato" id="cuentaCopia">1234 5678 9012 3456</span>
+                        <button class="btn-copiar" onclick="copiarTexto('cuentaCopia')">📋</button>
+                    </div>
+                </div>
+                
+                <div class="dato-bancario">
+                    <span class="label-dato">CLABE:</span>
+                    <div class="valor-container">
+                        <span class="valor-dato" id="clabeCopia">002180012345678901</span>
+                        <button class="btn-copiar" onclick="copiarTexto('clabeCopia')">📋</button>
+                    </div>
+                </div>
+                
+                <div class="dato-bancario">
+                    <span class="label-dato">Titular:</span>
+                    <div class="valor-container">
+                        <span class="valor-dato" id="titularCopia">CBTis 258 - Servicios Financieros</span>
+                        <button class="btn-copiar" onclick="copiarTexto('titularCopia')">📋</button>
+                    </div>
+                </div>
+                
+                <div class="dato-bancario total-pagar">
+                    <span class="label-dato">Monto a pagar:</span>
+                    <span class="valor-dato" id="montoTransferencia">$0.00 MXN</span>
+                </div>
+            </div>
+
+            <!-- Instrucciones -->
+            <div class="instrucciones-transferencia">
+                <h3>📱 Instrucciones</h3>
+                <ol>
+                    <li>Copia los datos bancarios usando los botones 📋</li>
+                    <li>Realiza la transferencia desde tu banco</li>
+                    <li>Guarda tu comprobante</li>
+                    <li>Sube el comprobante en el formulario de abajo</li>
+                </ol>
+            </div>
+
+            <!-- Formulario de comprobante -->
+            <div class="form-comprobante">
+                <h3>📤 Subir comprobante de pago</h3>
+                
+                <form id="formComprobanteTransferencia">
+                    <div class="upload-area" id="uploadAreaTransferencia">
+                        <input type="file" id="comprobanteFileTransferencia" accept="image/*,application/pdf" style="display: none;">
+                        <div class="upload-icon">📄</div>
+                        <p class="upload-text">Click para seleccionar archivo</p>
+                        <p class="upload-hint">PNG, JPG o PDF (máx. 5MB)</p>
+                    </div>
+
+                    <div class="archivo-seleccionado" id="archivoInfoTransferencia" style="display: none;">
+                        <span id="nombreArchivoTransferencia"></span>
+                        <button type="button" class="btn-quitar" onclick="quitarArchivoTransferencia()">✕</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número de referencia (opcional)</label>
+                        <input type="text" id="referenciaTransferencia" placeholder="Ej: 123456789">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Banco desde el que transferiste (opcional)</label>
+                        <input type="text" id="bancoOrigenTransferencia" placeholder="Ej: BBVA, Santander">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de la transferencia (opcional)</label>
+                        <input type="date" id="fechaTransferencia">
+                    </div>
+
+                    <button type="button" class="btn-enviar-comprobante" onclick="enviarComprobanteTransferencia()">
                         Enviar comprobante
                     </button>
                 </form>
