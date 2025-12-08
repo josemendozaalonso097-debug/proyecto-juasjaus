@@ -570,3 +570,101 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+// ======== FUNCIONES DE HISTORIAL ========
+
+// Cargar historial desde localStorage
+function cargarHistorial() {
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) return [];
+
+    const historial = JSON.parse(localStorage.getItem('historial_' + currentUser.id)) || [];
+    return historial;
+}
+
+// Guardar historial en localStorage
+function guardarHistorial(historial) {
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) return;
+
+    localStorage.setItem('historial_' + currentUser.id, JSON.stringify(historial));
+}
+
+// Renderizar historial en el modal
+function renderizarHistorial() {
+    const historial = cargarHistorial();
+    const historialContainer = document.querySelector('.historial-compras');
+    const totalComprasElem = document.querySelector('.resumen-item strong');
+    const totalGastadoElem = document.querySelector('.total-amount');
+
+    if (!historialContainer) return;
+
+    historialContainer.innerHTML = ''; // Limpiar historial
+
+    let totalGastado = 0;
+
+    historial.forEach(compra => {
+        totalGastado += compra.precio;
+
+        const compraCard = document.createElement('div');
+        compraCard.className = 'compra-card';
+        compraCard.innerHTML = `
+            <div class="compra-fecha">${compra.fecha}</div>
+            <div class="compra-info">
+                <h3>${compra.nombre}</h3>
+                <div class="compra-badges">
+                    <span class="badge-entregado">Entregado</span>
+                </div>
+            </div>
+            <div class="compra-precio">$${compra.precio.toFixed(2)} MXN</div>
+        `;
+        historialContainer.appendChild(compraCard);
+    });
+
+    // Actualizar resumen
+    if (totalComprasElem) totalComprasElem.textContent = historial.length;
+    if (totalGastadoElem) totalGastadoElem.textContent = '$' + totalGastado.toFixed(2) + ' MXN';
+}
+
+// Agregar una compra nueva
+function agregarCompra(nombre, precio) {
+    const historial = cargarHistorial();
+    const fecha = new Date();
+    const fechaFormato = fecha.getDate().toString().padStart(2, '0') + '/' +
+                         (fecha.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                         fecha.getFullYear();
+
+    historial.push({
+        nombre: nombre,
+        precio: parseFloat(precio),
+        fecha: fechaFormato
+    });
+
+    guardarHistorial(historial);
+    renderizarHistorial();
+}
+
+// ======== INTEGRACIÓN CON BOTÓN DE PAGO ========
+// ======== INTEGRACIÓN DEL BOTÓN DE PAGO CON HISTORIAL ========
+const checkoutBtn2 = document.querySelector('.checkout-btn');
+if (checkoutBtn2) {
+    checkoutBtn2.addEventListener('click', function() {
+        // Aquí puedes obtener los detalles del pago real desde tus inputs si quieres
+        const producto = "Colegiatura Mensual"; // Nombre del producto
+        const precio = 1250; // Precio real
+
+        // Guardar la compra en historial
+        agregarCompra(producto, precio);
+
+        // Cerrar modal
+        cerrarModalPago();
+
+        // Mensaje de confirmación
+        alert('Pago procesado correctamente y agregado al historial.');
+    });
+}
+
+
+// Cargar historial automáticamente al abrir modal
+
+document.addEventListener('DOMContentLoaded', renderizarHistorial);

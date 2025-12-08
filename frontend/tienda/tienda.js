@@ -162,7 +162,10 @@ function agregarAlCarrito(productoId, categoria) {
 
 function actualizarCarrito() {
     const carritoContainer = document.getElementById('carritoContainer');
-    
+
+    // Guardar en localStorage
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+
     if (carrito.length === 0) {
         carritoContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No hay productos seleccionados</p>';
         return;
@@ -201,6 +204,16 @@ function actualizarCarrito() {
     
     carritoContainer.innerHTML = html;
 }
+
+// Recuperar carrito guardado si existe
+const carritoGuardado = localStorage.getItem('carrito');
+if (carritoGuardado) {
+    carrito = JSON.parse(carritoGuardado);
+    actualizarCarrito();
+}
+
+
+
 
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
@@ -378,19 +391,122 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// Botón de verificar pago
+function generarComprobanteTarjeta() {
+    const total = calcularTotal();
+    const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
+    const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
+    
+    let contenido = `
+COMPROBANTE DE PAGO
+-----------------------------
+Tipo de pago: Tarjeta
+Titular: ${nombreTarjeta}
+Número de tarjeta: ${numeroTarjeta}
+Monto: $${total.toFixed(2)} MXN
+-----------------------------
+Productos:
+${carrito.map(item => `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
+`;
+
+    const blob = new Blob([contenido], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'comprobante_tarjeta.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+
+// ================== GENERAR COMPROBANTE TARJETA ==================
+function generarComprobanteTarjeta() {
+    const total = calcularTotal();
+    const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
+    const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
+    
+    let contenido = `
+COMPROBANTE DE PAGO
+-----------------------------
+Tipo de pago: Tarjeta
+Titular: ${nombreTarjeta}
+Número de tarjeta: ${numeroTarjeta}
+Monto: $${total.toFixed(2)} MXN
+-----------------------------
+Productos:
+${carrito.map(item => `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
+`;
+
+    const blob = new Blob([contenido], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'comprobante_tarjeta.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ================== BOTÓN DE VERIFICAR PAGO ==================
 const checkoutBtn = document.querySelector('.checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function() {
         const total = calcularTotal();
-        alert(`Procesando pago de $${total.toFixed(2)} MXN...`);
+
+        // Mostrar alerta bonita
+        const confirmacion = document.createElement('div');
+        confirmacion.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 10003;
+            text-align: center;
+            max-width: 400px;
+            border: 3px solid #27ae60;
+        `;
         
-        // Aquí podrías vaciar el carrito después del pago exitoso
-        // carrito = [];
-        // actualizarCarrito();
-        // cerrarModalPago();
+        confirmacion.innerHTML = `
+            <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
+            <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Pago realizado con éxito!</h2>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+                Total pagado: $${total.toFixed(2)} MXN<br><br>
+                Gracias por tu compra.
+            </p>
+            <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
+                background: #27ae60;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 10px;
+                font-size: 1em;
+                font-weight: 600;
+                cursor: pointer;
+            ">Entendido</button>
+        `;
+        
+        document.body.appendChild(confirmacion);
+        document.body.style.overflow = 'hidden';
+
+        // Generar comprobante descargable
+        generarComprobanteTarjeta();
+
+        // Vaciar carrito y cerrar modal
+        carrito = [];
+        actualizarCarrito();
+        cerrarModalPago();
     });
 }
+
+// Después de validar y procesar el pago
+agregarHistorial({
+    productos: [...carrito],   // tu array de productos
+    metodoPago: 'Tarjeta',
+    fecha: new Date().toLocaleString()
+});
+
 
 // ========== VALIDACIÓN Y FORMATEO DE TARJETA ==========
 
@@ -707,7 +823,7 @@ function mostrarConfirmacionDeposito() {
         <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
         <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Comprobante recibido!</h2>
         <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
-            Tu comprobante fue recibido exitosamente.<br>
+            Tu comprobante de depósito fue recibido exitosamente.<br>
             <strong>Estado: Pendiente de verificación</strong><br><br>
             Te notificaremos una vez que sea validado.
         </p>
@@ -720,12 +836,21 @@ function mostrarConfirmacionDeposito() {
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
         ">Entendido</button>
     `;
-    
+
     document.body.appendChild(confirmacion);
     document.body.style.overflow = 'hidden';
 }
+
+// Después de subir comprobante y dar clic en enviar
+agregarHistorial({
+    productos: [...carrito],
+    metodoPago: 'Depósito',
+    fecha: new Date().toLocaleString()
+});
+
 
 function limpiarFormularioDeposito() {
     quitarArchivo();
@@ -1024,6 +1149,13 @@ function mostrarConfirmacionTransferencia() {
     document.body.style.overflow = 'hidden';
 }
 
+agregarHistorial({
+    productos: [...carrito],
+    metodoPago: 'Transferencia',
+    fecha: new Date().toLocaleString()
+});
+
+
 // Limpiar formulario
 function limpiarFormularioTransferencia() {
     quitarArchivoTransferencia();
@@ -1053,3 +1185,53 @@ window.addEventListener('click', function(event) {
         cerrarModalTransferencia();
     }
 });
+
+function agregarHistorial(compra) {
+    // Recuperar historial del usuario del localStorage
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) return;
+
+    const historialKey = `historial_${currentUser.nombre}`;
+    let historial = JSON.parse(localStorage.getItem(historialKey)) || [];
+
+    historial.push(compra);
+
+    localStorage.setItem(historialKey, JSON.stringify(historial));
+
+    // Actualizar visualmente el historial
+    renderizarHistorial();
+}
+
+function renderizarHistorial() {
+    const historialContainer = document.getElementById('historialContainer');
+    if (!historialContainer) return;
+
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) return;
+
+    const historialKey = `historial_${currentUser.nombre}`;
+    const historial = JSON.parse(localStorage.getItem(historialKey)) || [];
+
+    if (historial.length === 0) {
+        historialContainer.innerHTML = '<p style="text-align:center; color:#999;">No hay compras aún.</p>';
+        return;
+    }
+
+    let html = '';
+    historial.forEach((compra, index) => {
+        html += `
+            <div class="historial-item" style="border-bottom:1px solid #eee; padding:10px 0;">
+                <strong>Compra #${index + 1}</strong> - ${compra.fecha}<br>
+                Método de pago: ${compra.metodoPago}<br>
+                Productos:
+                <ul>
+                    ${compra.productos.map(p => `<li>${p.nombre} x ${p.cantidad} ${p.tallaSeleccionada ? `(Talla: ${p.tallaSeleccionada})` : ''} - $${(p.precio*p.cantidad).toFixed(2)}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    });
+
+    historialContainer.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', renderizarHistorial);
