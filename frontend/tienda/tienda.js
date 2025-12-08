@@ -661,11 +661,30 @@ function enviarComprobante() {
     // Mostrar confirmación
     cerrarModalDeposito();
     mostrarConfirmacionDeposito();
-    
-    // Opcional: Vaciar carrito
-    // carrito = [];
-    // actualizarCarrito();
+
+    // ===== Generar comprobante descargable =====
+    const contenido = `
+COMPROBANTE DE PAGO
+-----------------------------
+Tipo de pago: Depósito
+Referencia: ${referencia || 'No especificado'}
+Banco: ${banco || 'No especificado'}
+Fecha: ${fecha || 'No especificado'}
+Monto: $${total.toFixed(2)} MXN
+-----------------------------
+Productos:
+${carrito.map(item => `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
+`;
+
+    const blob = new Blob([contenido], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'comprobante_deposito.txt';
+    a.click();
+    URL.revokeObjectURL(url);
 }
+
 
 function mostrarConfirmacionDeposito() {
     const confirmacion = document.createElement('div');
@@ -905,35 +924,61 @@ function quitarArchivoTransferencia() {
 // Enviar comprobante de transferencia
 function enviarComprobanteTransferencia() {
     if (!archivoComprobanteTransferencia) {
-        alert('Por favor selecciona un comprobante de pago.');
+        alert('Por favor selecciona un comprobante de transferencia.');
         return;
     }
-    
-    const referencia = document.getElementById('referenciaTransferencia').value;
-    const banco = document.getElementById('bancoOrigenTransferencia').value;
-    const fecha = document.getElementById('fechaTransferencia').value;
+
+    const referencia = document.getElementById('referenciaTransferencia').value || 'No especificado';
+    const banco = document.getElementById('bancoOrigenTransferencia').value || 'No especificado';
+    const fecha = document.getElementById('fechaTransferencia').value || 'No especificado';
     const total = calcularTotal();
-    
-    // Aquí puedes enviar los datos al servidor
+
     console.log({
-        tipo: 'TRANSFERENCIA',
         archivo: archivoComprobanteTransferencia.name,
-        tipoArchivo: archivoComprobanteTransferencia.type,
-        tamaño: archivoComprobanteTransferencia.size,
-        referencia: referencia || 'No especificado',
-        banco: banco || 'No especificado',
-        fecha: fecha || 'No especificado',
-        monto: total,
-        productos: carrito
+        referencia,
+        banco,
+        fecha,
+        monto: total
     });
-    
-    // Cerrar modal y mostrar confirmación
+
+    // Mostrar confirmación
     cerrarModalTransferencia();
     mostrarConfirmacionTransferencia();
-    
-    // Opcional: Vaciar carrito después de enviar
-    // carrito = [];
-    // actualizarCarrito();
+
+    // ===== Generar comprobante descargable =====
+    generarComprobanteTransferencia();
+}
+
+function generarComprobanteTransferencia() {
+    const referencia = document.getElementById('referenciaTransferencia').value || 'No especificado';
+    const banco = document.getElementById('bancoOrigenTransferencia').value || 'No especificado';
+    const fecha = document.getElementById('fechaTransferencia').value || 'No especificado';
+    const total = calcularTotal();
+
+    let contenido = `
+        COMPROBANTE DE PAGO\n
+        -----------------------------\n
+        Tipo de pago: Transferencia\n
+        Referencia: ${referencia}\n
+        Banco: ${banco}\n
+        Fecha: ${fecha}\n
+        Monto: $${total.toFixed(2)} MXN\n
+        -----------------------------\n
+        Productos:\n
+    `;
+
+    carrito.forEach(item => {
+        contenido += `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${item.precio * item.cantidad}\n`;
+    });
+
+    // Descargar como archivo .txt
+    const blob = new Blob([contenido], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'comprobante_transferencia.txt';
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // Mostrar confirmación
