@@ -1,7 +1,12 @@
+// Configuración del backend
+const API_URL = 'http://localhost:5000/api/auth';
+
+// Elementos del DOM
 const container = document.getElementById('container');
 const registerBtn = document.getElementById('register');
 const loginBtn = document.getElementById('login');
 
+// Toggle entre Login y Registro
 registerBtn.addEventListener('click', () => {
     container.classList.add("active");
 });
@@ -10,23 +15,21 @@ loginBtn.addEventListener('click', () => {
     container.classList.remove("active");
 });
 
-
 // ============================================
 // FUNCIONALIDAD DE REGISTRO CON EMAIL/PASSWORD
 // ============================================
 
-// Obtener el formulario de registro
 const signUpForm = document.querySelector('.sign-up form');
 const signUpInputs = signUpForm.querySelectorAll('.input');
 
-signUpForm.addEventListener('submit', (e) => {
+signUpForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const nombre = signUpInputs[0].value.trim();
     const email = signUpInputs[1].value.trim();
     const password = signUpInputs[2].value.trim();
     
-    // Validaciones
+    // Validaciones básicas
     if (!nombre || !email || !password) {
         alert('Por favor llena todos los campos');
         return;
@@ -44,147 +47,160 @@ signUpForm.addEventListener('submit', (e) => {
         return;
     }
     
-    // Obtener usuarios existentes
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Verificar si el email ya existe
-    if (users.find(u => u.email === email)) {
-        alert('Este correo ya está registrado. Por favor inicia sesión.');
-        return;
+    try {
+        const response = await fetch(`${API_URL}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ nombre, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(data.message);
+            // Pequeño delay antes de redirigir
+            setTimeout(() => {
+                window.location.href = 'principal/index.html';
+            }, 100);
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión con el servidor');
     }
-    
-    // Crear nuevo usuario
-    const newUser = {
-        id: Date.now(),
-        nombre: nombre,
-        email: email,
-        password: password,
-        createdAt: new Date().toISOString()
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    // Guardar sesión automáticamente
-    sessionStorage.setItem('currentUser', JSON.stringify({
-        id: newUser.id,
-        nombre: newUser.nombre,
-        email: newUser.email
-    }));
-    
-    alert('¡Cuenta creada exitosamente!');
-    
-    // Redirigir a la página principal
-    window.location.href = 'principal/index.html';
 });
-
 
 // ============================================
 // FUNCIONALIDAD DE LOGIN CON EMAIL/PASSWORD
 // ============================================
 
-// Obtener el formulario de login
 const signInForm = document.querySelector('.sign-in form');
 const signInInputs = signInForm.querySelectorAll('.input');
 
-signInForm.addEventListener('submit', (e) => {
+signInForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const email = signInInputs[0].value.trim();
     const password = signInInputs[1].value.trim();
     
-    // Validaciones
     if (!email || !password) {
         alert('Por favor llena todos los campos');
         return;
     }
     
-    // Obtener usuarios registrados
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Buscar usuario
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-        // Guardar sesión
-        sessionStorage.setItem('currentUser', JSON.stringify({
-            id: user.id,
-            nombre: user.nombre,
-            email: user.email
-        }));
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ email, password })
+        });
         
-        alert(`¡Bienvenido ${user.nombre}!`);
+        const data = await response.json();
         
-        // Redirigir a la página principal
-        window.location.href = 'principal/index.html';
-    } else {
-        alert('Email o contraseña incorrectos');
+        if (data.success) {
+            alert(data.message);
+            // Pequeño delay antes de redirigir
+            setTimeout(() => {
+                window.location.href = 'principal/index.html';
+            }, 100);
+        } else {
+            alert(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión con el servidor');
     }
 });
 
+// ============================================
+// LOGIN CON GOOGLE
+// ============================================
 
-// Login de google
-
-function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
     const id_token = response.credential;
     
-    // Aquí es donde envías el token a tu servidor Node.js
-    fetch('/api/login/google', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: id_token }),
-    })
-    .then(res => res.json())
-    .then(data => {
+    try {
+        const res = await fetch(`${API_URL}/login/google`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ token: id_token }),
+        });
+        
+        const data = await res.json();
+        
         if (data.success) {
-            window.location.href = 'principal/index.html'; 
+            alert(data.message);
+            // Pequeño delay antes de redirigir
+            setTimeout(() => {
+                window.location.href = 'principal/index.html';
+            }, 100);
         } else {
             alert('Error de autenticación con Google: ' + data.message);
         }
-    })
-    .catch(error => console.error('Error de red:', error));
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión con el servidor');
+    }
 }
 
+// ============================================
+// INICIALIZACIÓN AL CARGAR LA PÁGINA
+// ============================================
 
-window.onload = function () {
+window.onload = async function () {
     // Verificar si ya hay una sesión activa
-    const currentUser = sessionStorage.getItem('currentUser');
-    if (currentUser) {
-        // Si ya está logueado, redirigir a principal
-        window.location.href = 'principal/index.html';
-        return;
+    try {
+        const response = await fetch(`${API_URL}/check-session`, {
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.authenticated) {
+            window.location.href = 'principal/index.html';
+            return;
+        }
+    } catch (error) {
+        console.log('No hay sesión activa');
     }
     
     // Inicializar Google Identity Services
     if (typeof google !== 'undefined' && google.accounts) {
         google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: 'TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com', // CAMBIAR ESTO
             callback: handleCredentialResponse,
-            ux_mode: 'popup' 
+            ux_mode: 'popup'
         });
 
-        // Asignar el click al botón de Registro con Google
+        // Botón de Registro con Google
         const signupBtn = document.getElementById('google-signup-btn');
         if (signupBtn) {
-            signupBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            signupBtn.onclick = function() {
                 google.accounts.id.prompt();
-            });
+                return false;
+            };
         }
 
-        // Asignar el click al botón de Login con Google
+        // Botón de Login con Google
         const signinBtn = document.getElementById('google-signin-btn');
         if (signinBtn) {
-            signinBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            signinBtn.onclick = function() {
                 google.accounts.id.prompt();
-            });
+                return false;
+            };
         }
     }
 };
-
 
 // ============================================
 // MODAL FORGOT PASSWORD
@@ -205,49 +221,62 @@ if (forgotLink) {
 }
 
 // Cerrar modal al hacer click fuera
-modalForgot.addEventListener('click', function(e) {
-    if (e.target === modalForgot) {
-        modalForgot.classList.remove('active');
-        emailForgotInput.value = '';
-    }
-});
+if (modalForgot) {
+    modalForgot.addEventListener('click', function(e) {
+        if (e.target === modalForgot) {
+            modalForgot.classList.remove('active');
+            if (emailForgotInput) emailForgotInput.value = '';
+        }
+    });
+}
 
 // Ir a Sign up (cambiar a vista de registro)
 if (goToSignup) {
     goToSignup.addEventListener('click', function(e) {
         e.preventDefault();
         modalForgot.classList.remove('active');
-        emailForgotInput.value = '';
-        // Activar la vista de registro
+        if (emailForgotInput) emailForgotInput.value = '';
         container.classList.add('active');
     });
 }
 
-// Enviar email
+// Enviar email de recuperación
 if (sendForgotBtn) {
-    sendForgotBtn.addEventListener('click', function() {
+    sendForgotBtn.addEventListener('click', async function() {
         const email = emailForgotInput.value.trim();
         
         if (!email) {
-            alert('Please enter your email');
+            alert('Por favor ingresa tu email');
             return;
         }
         
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address');
+            alert('Por favor ingresa un email válido');
             return;
         }
         
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userExists = users.find(u => u.email === email);
-        
-        if (userExists) {
-            alert(`✅ Password reset link sent to ${email}\n\n(This is a simulation)`);
-            modalForgot.classList.remove('active');
-            emailForgotInput.value = '';
-        } else {
-            alert('❌ No account found with that email address');
+        try {
+            const response = await fetch(`${API_URL}/forgot-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Si el correo existe, recibirás un email con instrucciones para recuperar tu contraseña');
+                modalForgot.classList.remove('active');
+                emailForgotInput.value = '';
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error de conexión con el servidor');
         }
     });
 }
@@ -260,6 +289,10 @@ if (emailForgotInput) {
         }
     });
 }
+
+// ============================================
+// TOGGLE PASSWORD VISIBILITY
+// ============================================
 
 document.querySelectorAll('.toggle-password').forEach(icon => {
     icon.addEventListener('click', () => {

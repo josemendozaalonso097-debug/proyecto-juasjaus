@@ -18,18 +18,29 @@ const productosData = {
         { id: 4, nombre: "Paquete completo", marca: "CBTis 258", precio: 600, imagen: "", tallas: true },
         { id: 5, nombre: "Credencial", marca: "Credencial", precio: 100, imagen: "", tallas: false }
     ],
-    papeleria: [
-        { id: 6, nombre: "Libreta 100 hojas", marca: "Profesional", precio: 45, imagen: "", tallas: false },
-        { id: 7, nombre: "Libreta 200 hojas", marca: "Profesional", precio: 75, imagen: "", tallas: false },
-        { id: 8, nombre: "Juego de Plumas", marca: "Colores", precio: 55, imagen: "", tallas: false },
-        { id: 9, nombre: "Kit Escolar", marca: "Básico", precio: 35, imagen: "", tallas: false }
+
+    Libros: [
+        { id: 6, nombre: "Pensamiento matematico", marca: "Libro", precio: 90, imagen: "", tallas: true },
+        { id: 7, nombre: "Lengua y comunicacion", marca: "Libro", precio: 200, imagen: "", tallas: true },
+        { id: 8, nombre: "Humanidades", marca: "Libro", precio: 100, imagen: "", tallas: true },
+        { id: 9, nombre: "Socio emocional", marca: "Libro", precio: 90, imagen: "", tallas: true },
+        { id: 10, nombre: "Ingles", marca: "Libro", precio: 90, imagen: "", tallas: true },
+        { id: 11, nombre: "Sociales", marca: "Libro", precio: 100, imagen: "", tallas: true },
+        { id: 12, nombre: "Conservacion de la energia", marca: "Libro 2do", precio: 140, imagen: "", tallas: false },
+        { id: 13, nombre: "La materia y sus interacciones", marca: "Libro 1ro", precio: 150, imagen: "", tallas: false },
+        { id: 14, nombre: "Ecosistemas", marca: "Libro 3ro", precio: 150, imagen: "", tallas: false },
+        { id: 15, nombre: "Conciencia historica", marca: "Libros 4to y 5to", precio: 200, imagen: "", tallas: true },
+        { id: 16, nombre: "Reacciones quimicas", marca: "Libro 4to", precio: 200, imagen: "", tallas: false },
+        { id: 17, nombre: "Temas selectos de matematicas", marca: "Libro 4to y 5to", precio: 200, imagen: "", tallas: true },
+        { id: 18, nombre: "La energia en los procesos de la vida diaria", marca: "Libro 5to", precio: 170, imagen: "", tallas: false },
+        { id: 19, nombre: "Temas de filosofia", marca: "Libro 6to", precio: 160, imagen: "", tallas: false }
     ],
     
     tramites: [
-        { id: 16, nombre: "Certificado", marca: "Documento", precio: 150, imagen: "", tallas: false },
-        { id: 17, nombre: "Constancia", marca: "Documento", precio: 50, imagen: "", tallas: false },
-        { id: 18, nombre: "Cardex", marca: "Documento", precio: 30, imagen: "", tallas: false },
-        { id: 19, nombre: "Colegiatura", marca: "Documento", precio: 3000, imagen: "", tallas: false }
+        { id: 20, nombre: "Certificado", marca: "Documento", precio: 150, imagen: "", tallas: false },
+        { id: 21, nombre: "Constancia", marca: "Documento", precio: 50, imagen: "", tallas: false },
+        { id: 22, nombre: "Cardex", marca: "Documento", precio: 30, imagen: "", tallas: false },
+        { id: 23, nombre: "Colegiatura", marca: "Documento", precio: 3000, imagen: "", tallas: false }
     ],
 };
 
@@ -37,14 +48,14 @@ const productosData = {
 let carrito = [];
 
 // Función para abrir el modal
-function abrirModal(categoria) {
+function abrirModal(categoria) { 
     const modal = document.getElementById('productModal');
     const modalTitle = document.getElementById('modalTitle');
     const productosGrid = document.getElementById('productosGrid');
     
     const titulos = {
         uniformes: 'Uniformes y Credenciales',
-        papeleria: 'Papelería',
+        libros: 'Papelería',
         material: 'Material Escolar',
         tramites: 'Trámites y Documentos',
         informacion: 'Información',
