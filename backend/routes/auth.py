@@ -69,11 +69,12 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        print(f"✅ Usuario registrado: {email}")  # Debug
-        
         # Crear sesión
         session.permanent = True
         session['user_id'] = user.id
+        
+        print(f"✅ Usuario registrado: {email}")
+        print(f"   Session guardada: user_id={user.id}")
         
         # Enviar email de bienvenida (no bloquea si falla)
         try:
@@ -139,7 +140,8 @@ def login():
         session.permanent = True
         session['user_id'] = user.id
         
-        print(f"✅ Login exitoso: {email}")  # Debug
+        print(f"✅ Login exitoso: {email}")
+        print(f"   Session guardada: user_id={user.id}")
         
         return jsonify({
             'success': True,
@@ -377,21 +379,31 @@ def check_session():
     if request.method == 'OPTIONS':
         return '', 204
     
+    print(f"🔍 Verificando sesión...")
+    print(f"   Session data: {dict(session)}")
+    print(f"   Cookies: {request.cookies}")
+    
     user_id = session.get('user_id')
     
     if not user_id:
+        print("❌ No hay user_id en la sesión")
         return jsonify({
             'success': False,
-            'authenticated': False
+            'authenticated': False,
+            'message': 'No hay sesión activa'
         }), 401
     
     user = User.query.get(user_id)
     if not user:
         session.pop('user_id', None)
+        print(f"❌ Usuario {user_id} no encontrado en DB")
         return jsonify({
             'success': False,
-            'authenticated': False
+            'authenticated': False,
+            'message': 'Usuario no encontrado'
         }), 401
+    
+    print(f"✅ Sesión válida para: {user.email}")
     
     return jsonify({
         'success': True,

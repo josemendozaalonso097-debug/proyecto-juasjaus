@@ -23,11 +23,12 @@ def create_app():
     # Configurar CORS - MUY IMPORTANTE
     CORS(app, 
          resources={r"/api/*": {
-             "origins": ["http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:*"],
+             "origins": ["http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:*", "*"],
              "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "allow_headers": ["Content-Type"],
+             "allow_headers": ["Content-Type", "Authorization"],
              "supports_credentials": True,
-             "expose_headers": ["Content-Type"]
+             "expose_headers": ["Content-Type", "Set-Cookie"],
+             "max_age": 3600
          }})
     
     # Registrar Blueprints
@@ -38,6 +39,17 @@ def create_app():
     @app.route('/api/test', methods=['GET'])
     def test():
         return {'success': True, 'message': 'Servidor funcionando correctamente'}
+    
+    # Configurar headers de respuesta
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        if origin:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
     
     # Crear tablas si no existen
     with app.app_context():

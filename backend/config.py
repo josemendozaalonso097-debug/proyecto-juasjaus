@@ -28,5 +28,7 @@ class Config:
     # Session Config
     SESSION_COOKIE_SECURE = False  # True en producción con HTTPS
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'None' if False else 'Lax'  # None para desarrollo local
+    SESSION_COOKIE_PATH = '/'
+    SESSION_COOKIE_DOMAIN = None
     PERMANENT_SESSION_LIFETIME = 86400  # 24 horas
