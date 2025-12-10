@@ -1,0 +1,30 @@
+NameError: name 'request' is not defined
+
+
+[{
+	"resource": "/home/josemendozaalonso097/proyecto juasjaus/backend/app.py",
+	"owner": "Pylance3",
+	"code": {
+		"value": "reportUndefinedVariable",
+		"target": {
+			"$mid": 1,
+			"path": "/microsoft/pylance-release/blob/main/docs/diagnostics/reportUndefinedVariable.md",
+			"scheme": "https",
+			"authority": "github.com"
+		}
+	},
+	"severity": 4,
+	"message": "\"request\" no está definido",
+	"source": "Pylance",
+	"startLineNumber": 46,
+	"startColumn": 18,
+	"endLineNumber": 46,
+	"endColumn": 25,
+	"origin": "extHost1"
+}]
+
+
+login.html:128 Live reload enabled.
+login.html:1 Access to fetch at 'http://localhost:5000/api/auth/check-session' from origin 'http://127.0.0.1:5500' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+localhost:5000/api/auth/check-session:1  Failed to load resource: net::ERR_FAILED
+login.js:174 No hay sesión activa

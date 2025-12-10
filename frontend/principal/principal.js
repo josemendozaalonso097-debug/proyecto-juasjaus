@@ -1,22 +1,41 @@
+/// Configuración del backend
+const API_URL = 'http://localhost:5000/api/auth';
+
 // Verificar si hay un usuario logueado
-window.onload = function() {
-    const currentUser = sessionStorage.getItem('currentUser');
-    if (!currentUser) {
-        alert('Debes iniciar sesión primero');
+window.onload = async function() {
+    try {
+        // Verificar sesión en el backend
+        const response = await fetch(`${API_URL}/check-session`, {
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+            alert('Debes iniciar sesión primero');
+            window.location.href = '../login.html';
+            return;
+        }
+        
+        // Usuario autenticado correctamente
+        const user = data.user;
+        
+        const userName = document.getElementById('user-name');
+        if (userName) {
+            userName.textContent = user.nombre;
+        }
+
+        const userMatricula = document.getElementById('user-matricula');
+        if (userMatricula) {
+            userMatricula.textContent = 'A' + String(user.id).padStart(7, '0');
+        }
+        
+        console.log('✅ Usuario autenticado:', user);
+        
+    } catch (error) {
+        console.error('Error verificando sesión:', error);
+        alert('Error de conexión. Redirigiendo al login...');
         window.location.href = '../login.html';
-        return;
-    }
-
-    const user = JSON.parse(currentUser);
-    
-    const userName = document.getElementById('user-name');
-    if (userName) {
-        userName.textContent = user.nombre;
-    }
-
-    const userMatricula = document.getElementById('user-matricula');
-    if (userMatricula) {
-        userMatricula.textContent = 'A' + String(user.id).padStart(7, '0');
     }
 };
 
@@ -31,11 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (cardNumberInput) {
     cardNumberInput.addEventListener('input', function(e) {
-    let rawCursor = e.target.selectionStart; // Guardar la posición del cursor
-    let raw = e.target.value.replace(/\D/g, ''); // Solo números
+    let rawCursor = e.target.selectionStart;
+    let raw = e.target.value.replace(/\D/g, '');
     raw = raw.slice(0, 16);
 
-    // Formatear: añadir espacio cada 4 dígitos
     let formatted = raw.replace(/(.{4})/g, '$1 ').trim();
 
     e.target.value = formatted;
@@ -62,7 +80,7 @@ e.target.setSelectionRange(newCursor, newCursor);
     
     if (expiryInput) {
         expiryInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Solo números
+            let value = e.target.value.replace(/\D/g, '');
             
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -70,7 +88,6 @@ e.target.setSelectionRange(newCursor, newCursor);
             
             e.target.value = value;
             
-            // Validar fecha
             if (value.length === 5) {
                 const [month, year] = value.split('/');
                 if (parseInt(month) >= 1 && parseInt(month) <= 12) {
@@ -92,12 +109,10 @@ e.target.setSelectionRange(newCursor, newCursor);
     
     if (cvvInput) {
         cvvInput.addEventListener('input', function(e) {
-            // Limitar a 4 dígitos
             if (e.target.value.length > 4) {
                 e.target.value = e.target.value.slice(0, 4);
             }
             
-            // Validar
             if (e.target.value.length >= 3) {
                 addValidationIcon(cvvInput, true);
             } else {
@@ -121,7 +136,6 @@ function detectCardType(cardNumber) {
     const cardNumberInput = document.getElementById('serialCardNumber');
     let cardType = '';
     
-    // Remover logo anterior si existe
     const existingLogo = document.querySelector('.card-logo');
     if (existingLogo) {
         existingLogo.remove();
@@ -134,7 +148,7 @@ function detectCardType(cardNumber) {
     } else if (cardNumber.startsWith('37') || cardNumber.startsWith('34')) {
         cardType = 'amex';
     } else if (cardNumber.length < 1) {
-        return; // No mostrar nada si está vacío
+        return;
     } else {
         cardType = 'generic';
     }
@@ -144,14 +158,12 @@ function detectCardType(cardNumber) {
         logo.className = 'card-logo';
         logo.innerHTML = getCardLogo(cardType);
         
-        // Insertar después del input
         const label = cardNumberInput.closest('.label');
         label.style.position = 'relative';
         label.appendChild(logo);
     }
 }
 
-// ===== OBTENER SVG DEL LOGO DE LA TARJETA =====
 function getCardLogo(type) {
     const logos = {
         visa: `<svg width="50" height="32" viewBox="0 0 50 32" fill="none">
@@ -179,7 +191,6 @@ function getCardLogo(type) {
 
 
 function addValidationIcon(input, isValid) {
-    // Remover icono anterior si existe
     removeValidationIcon(input);
     
     const icon = document.createElement('span');
@@ -195,7 +206,6 @@ function addValidationIcon(input, isValid) {
         input.style.borderColor = '#e74c3c';
     }
     
-    // Insertar después del input
     input.parentElement.style.position = 'relative';
     input.parentElement.appendChild(icon);
 }
@@ -209,7 +219,6 @@ function removeValidationIcon(input) {
 }
 
 
-// Función para abrir el modal de pago
 function abrirModalPago() {
     const modalPago = document.querySelector('.add-card-page');
     if (modalPago) {
@@ -257,18 +266,29 @@ const checkoutBtn = document.querySelector('.checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function() {
         alert('Procesando pago...');
-        // cerrarModalPago(); // Descomentar para cerrar después de procesar
     });
 }
 
+// Botón de logout con backend
 const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
+    logoutBtn.addEventListener('click', async function() {
         const confirmLogout = confirm('¿Estás seguro que deseas cerrar sesión?');
         if (confirmLogout) {
-            sessionStorage.removeItem('currentUser');
-            alert('Sesión cerrada correctamente');
-            window.location.href = '../login.html';
+            try {
+                // Cerrar sesión en el backend
+                await fetch(`${API_URL}/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                alert('Sesión cerrada correctamente');
+                window.location.href = '../login.html';
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+                // Aunque falle, redirigir al login
+                window.location.href = '../login.html';
+            }
         }
     });
 }
@@ -276,7 +296,7 @@ if (logoutBtn) {
 const secondaryBtn = document.querySelector('.btn-secondary');
 if (secondaryBtn) {
     secondaryBtn.addEventListener('click', function() {
-        abrirHistorial(); // Abre el modal
+        abrirHistorial();
     });
 }
 
@@ -320,7 +340,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnFacturas) {
         btnFacturas.addEventListener('click', function() {
             alert('Descargando facturas...');
-            // Aquí conectarás con tu backend Python más adelante
         });
     }
 });
@@ -337,9 +356,6 @@ styleAnimations.textContent = `
 `;
 document.head.appendChild(styleAnimations);
 
-// ========== MODAL DE INFORMACIÓN ==========
-
-// Datos de cada sección
 const informacionData = {
     nuevoIngreso: {
         titulo: "Nuevo Ingreso",
@@ -355,7 +371,6 @@ const informacionData = {
                     <li>Certificado medico con tipo de sangre, original y 2 copias</li>
                     <li>Certificado de secundaria original y 2 copias</li>
                     <li>Credencial del servivio medico 2 copias <p>(si no tiene, entonces, 2 copias de la hoja de asignacion de numero social</p></li>
-
                 </ul>
             </div>
             <div class="detalle-section">
@@ -405,14 +420,6 @@ const informacionData = {
                     <li>Renovación por desempeño</li>
                 </ul>
             </div>
-            <div class="detalle-section">
-                <h3>👨‍👩‍👧‍👦 Beca fundacion: Martinez Sada</h3>
-                <ul>
-                    <li>2 hermanos: 15% de descuento c/u</li>
-                    <li>3 o más hermanos: 20% de descuento c/u</li>
-                    <li>Aplica automáticamente</li>
-                </ul>
-            </div>
         `
     },
     contacto: {
@@ -427,33 +434,10 @@ const informacionData = {
                     </div>
                 </div>
                 <div class="contacto-item">
-                    <div class="contacto-icon">📞</div>
-                    <div class="contacto-info">
-                        <h4>Servicios Financieros</h4>
-                        <p>+52 (81) 8397 1666</p>
-                    </div>
-                </div>
-                <div class="contacto-item">
-                    <div class="contacto-icon">📞</div>
-                    <div class="contacto-info">
-                        <h4>Departamento de Becas</h4>
-                        <p>+52 (81) 8397 1666</p>
-                    </div>
-                </div>
-                <div class="contacto-item">
                     <div class="contacto-icon">📧</div>
                     <div class="contacto-info">
                         <h4>Correo Electrónico</h4>
                         <p>cbtis258.dir@dgeti.sems.gob.mx</p>
-                    </div>
-                </div>
-                <div class="contacto-item">
-                    <div class="contacto-icon">📧</div>
-                    <div class="contacto-info">
-                        <h4>Becas y Apoyos</h4>
-                        <p>Becarios de la Transformación:+52 (81) 8220-6100</p>
-                        <p>Secretaría de Educación de Nuevo León:+52 (81) 2020-5050</p>
-                        <p>Beca Benito Juarez:+52 (55) 1162-0300</p>
                     </div>
                 </div>
                 <div class="contacto-item">
@@ -467,7 +451,7 @@ const informacionData = {
                     <div class="contacto-icon">📍</div>
                     <div class="contacto-info">
                         <h4>Dirección</h4>
-                        <p>Calle Doctor Plinio D. Ordóñez. #801, Col. Hacienda del Topo, Ciudad General Escobedo, Nuevo León. </p>
+                        <p>Calle Doctor Plinio D. Ordóñez. #801, Col. Hacienda del Topo, Ciudad General Escobedo, Nuevo León.</p>
                     </div>
                 </div>
             </div>
@@ -478,31 +462,11 @@ const informacionData = {
         contenido: `
             <div class="faq-item">
                 <div class="faq-pregunta">¿Cuándo puedo solicitar una beca?</div>
-                <div class="faq-respuesta">Las solicitudes de beca se abren al inicio de cada semestre. Para alumnos de nuevo ingreso, pueden solicitarla desde el proceso de inscripción.</div>
+                <div class="faq-respuesta">Las solicitudes de beca se abren al inicio de cada semestre.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-pregunta">¿Cómo puedo pagar mi colegiatura?</div>
-                <div class="faq-respuesta">Puedes pagar en efectivo en escolares en la institucion, transferencia bancaria, o mediante esta plataforma con tarjeta de débito/crédito.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Qué pasa si no pago a tiempo?</div>
-                <div class="faq-respuesta">Aun puedes asistir a clases y formar parte de todas las actividades, sin embargon se ian acumulando conforme a los pagos incumplidos.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Puedo obtener más de una beca?</div>
-                <div class="faq-respuesta">Si, puedes tener mas de una beca, sin embargo, algunas pueden venir con limitantes.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Cómo obtengo mi constancia o cardex de estudios?</div>
-                <div class="faq-respuesta">Solicítalos en Escolares con 3 días de anticipación. El costo de la constancia es de $50 MXN y el precio del cardex es de $30 MXM.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Ofrecen planes de pago?</div>
-                <div class="faq-respuesta">Sí, ofrecemos planes de pago a 3, 6 y 12 meses sin intereses. Acude a Servicios Financieros para más información.</div>
-            </div>
-            <div class="faq-item">
-                <div class="faq-pregunta">¿Dónde descargo mis facturas?</div>
-                <div class="faq-respuesta">En esta plataforma, ve a "Historial de Pagos" y presiona el botón "Ver Facturas". También puedes solicitarlas por correo a finanzas@cbtis258.edu.mx</div>
+                <div class="faq-respuesta">Puedes pagar en efectivo en la institución, transferencia bancaria, o mediante esta plataforma.</div>
             </div>
         `
     }
@@ -515,7 +479,6 @@ if (infoBtn) {
     });
 }
 
-// Función para abrir el modal de información
 function abrirInformacion() {
     document.getElementById('modalInformacion').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -530,7 +493,6 @@ function abrirSeccion(seccion) {
     const data = informacionData[seccion];
     if (!data) return;
     
-    // Actualizar título y contenido
     document.getElementById('detalleTitle').textContent = data.titulo;
     document.getElementById('detalleContenido').innerHTML = data.contenido;
     
@@ -556,41 +518,15 @@ window.addEventListener('click', function(event) {
     }
 });
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        const modalInfo = document.getElementById('modalInformacion');
-        const modalDetalle = document.getElementById('modalDetalle');
-        
-        if (modalInfo && modalInfo.style.display === 'block') {
-            cerrarInformacion();
-        }
-        
-        if (modalDetalle && modalDetalle.style.display === 'block') {
-            cerrarDetalle();
-        }
-    }
-});
-
-// ======== FUNCIONES DE HISTORIAL ========
-
-// Cargar historial desde localStorage
 function cargarHistorial() {
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    if (!currentUser) return [];
-
-    const historial = JSON.parse(localStorage.getItem('historial_' + currentUser.id)) || [];
+    const historial = JSON.parse(localStorage.getItem('historial')) || [];
     return historial;
 }
 
-// Guardar historial en localStorage
 function guardarHistorial(historial) {
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    if (!currentUser) return;
-
-    localStorage.setItem('historial_' + currentUser.id, JSON.stringify(historial));
+    localStorage.setItem('historial', JSON.stringify(historial));
 }
 
-// Renderizar historial en el modal
 function renderizarHistorial() {
     const historial = cargarHistorial();
     const historialContainer = document.querySelector('.historial-compras');
@@ -599,7 +535,7 @@ function renderizarHistorial() {
 
     if (!historialContainer) return;
 
-    historialContainer.innerHTML = ''; // Limpiar historial
+    historialContainer.innerHTML = '';
 
     let totalGastado = 0;
 
@@ -621,12 +557,10 @@ function renderizarHistorial() {
         historialContainer.appendChild(compraCard);
     });
 
-    // Actualizar resumen
     if (totalComprasElem) totalComprasElem.textContent = historial.length;
     if (totalGastadoElem) totalGastadoElem.textContent = '$' + totalGastado.toFixed(2) + ' MXN';
 }
 
-// Agregar una compra nueva
 function agregarCompra(nombre, precio) {
     const historial = cargarHistorial();
     const fecha = new Date();
@@ -644,27 +578,16 @@ function agregarCompra(nombre, precio) {
     renderizarHistorial();
 }
 
-// ======== INTEGRACIÓN CON BOTÓN DE PAGO ========
-// ======== INTEGRACIÓN DEL BOTÓN DE PAGO CON HISTORIAL ========
 const checkoutBtn2 = document.querySelector('.checkout-btn');
 if (checkoutBtn2) {
     checkoutBtn2.addEventListener('click', function() {
-        // Aquí puedes obtener los detalles del pago real desde tus inputs si quieres
-        const producto = "Colegiatura Mensual"; // Nombre del producto
-        const precio = 1250; // Precio real
+        const producto = "Colegiatura Mensual";
+        const precio = 1250;
 
-        // Guardar la compra en historial
         agregarCompra(producto, precio);
-
-        // Cerrar modal
         cerrarModalPago();
-
-        // Mensaje de confirmación
         alert('Pago procesado correctamente y agregado al historial.');
     });
 }
-
-
-// Cargar historial automáticamente al abrir modal
 
 document.addEventListener('DOMContentLoaded', renderizarHistorial);
