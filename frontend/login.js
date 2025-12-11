@@ -1,12 +1,10 @@
-// Configuración del backend
-const API_URL = 'http://localhost:5000/api/auth';
+// Configuración del backend FastAPI
+const API_URL = 'http://localhost:8000/api/auth';
 
-// Elementos del DOM
 const container = document.getElementById('container');
 const registerBtn = document.getElementById('register');
 const loginBtn = document.getElementById('login');
 
-// Toggle entre Login y Registro
 registerBtn.addEventListener('click', () => {
     container.classList.add("active");
 });
@@ -40,33 +38,29 @@ signUpForm.addEventListener('submit', async (e) => {
         return;
     }
     
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        alert('Por favor ingresa un email válido');
-        return;
-    }
-    
     try {
         const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify({ nombre, email, password })
         });
         
         const data = await response.json();
         
-        if (data.success) {
-            alert(data.message);
-            // Pequeño delay antes de redirigir
-            setTimeout(() => {
-                window.location.href = 'principal/index.html';
-            }, 100);
+        if (response.ok) {
+            // Guardar token en localStorage
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            alert('¡Cuenta creada exitosamente!');
+            // ✅ AGREGAR ESTE TIMEOUT
+                setTimeout(() => {
+            window.location.href = 'principal/index.html';
+        }, 100);
         } else {
-            alert(data.message);
+            alert(data.detail || 'Error al crear cuenta');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -98,20 +92,20 @@ signInForm.addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify({ email, password })
         });
         
         const data = await response.json();
         
-        if (data.success) {
-            alert(data.message);
-            // Pequeño delay antes de redirigir
-            setTimeout(() => {
-                window.location.href = 'principal/index.html';
-            }, 100);
+        if (response.ok) {
+            // Guardar token en localStorage
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            alert(`¡Bienvenido ${data.user.nombre}!`);
+            window.location.href = 'principal/index.html';
         } else {
-            alert(data.message);
+            alert(data.detail || 'Email o contraseña incorrectos');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -132,20 +126,20 @@ async function handleCredentialResponse(response) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify({ token: id_token }),
         });
         
         const data = await res.json();
         
-        if (data.success) {
-            alert(data.message);
-            // Pequeño delay antes de redirigir
-            setTimeout(() => {
-                window.location.href = 'principal/index.html';
-            }, 100);
+        if (res.ok) {
+            // Guardar token en localStorage
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            alert(`¡Bienvenido ${data.user.nombre}!`);
+            window.location.href = 'principal/index.html';
         } else {
-            alert('Error de autenticación con Google: ' + data.message);
+            alert('Error de autenticación con Google: ' + data.detail);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -154,24 +148,31 @@ async function handleCredentialResponse(response) {
 }
 
 // ============================================
-// INICIALIZACIÓN AL CARGAR LA PÁGINA
+// INICIALIZACIÓN
 // ============================================
 
 window.onload = async function () {
     // Verificar si ya hay una sesión activa
-    try {
-        const response = await fetch(`${API_URL}/check-session`, {
-            credentials: 'include'
-        });
-        
-        const data = await response.json();
-        
-        if (data.authenticated) {
-            window.location.href = 'principal/index.html';
-            return;
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        try {
+            const response = await fetch(`${API_URL}/check-session`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                window.location.href = 'principal/index.html';
+                return;
+            } else {
+                // Token inválido, limpiar
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+            }
+        } catch (error) {
+            console.log('No hay sesión activa');
         }
-    } catch (error) {
-        console.log('No hay sesión activa');
     }
     
     // Inicializar Google Identity Services
@@ -182,7 +183,6 @@ window.onload = async function () {
             ux_mode: 'popup'
         });
 
-        // Botón de Registro con Google
         const signupBtn = document.getElementById('google-signup-btn');
         if (signupBtn) {
             signupBtn.onclick = function() {
@@ -191,7 +191,6 @@ window.onload = async function () {
             };
         }
 
-        // Botón de Login con Google
         const signinBtn = document.getElementById('google-signin-btn');
         if (signinBtn) {
             signinBtn.onclick = function() {
@@ -212,7 +211,6 @@ const sendForgotBtn = document.getElementById('send-forgot-btn');
 const emailForgotInput = document.getElementById('email-forgot');
 const goToSignup = document.getElementById('go-to-signup');
 
-// Abrir modal
 if (forgotLink) {
     forgotLink.addEventListener('click', function(e) {
         e.preventDefault();
@@ -220,7 +218,6 @@ if (forgotLink) {
     });
 }
 
-// Cerrar modal al hacer click fuera
 if (modalForgot) {
     modalForgot.addEventListener('click', function(e) {
         if (e.target === modalForgot) {
@@ -230,7 +227,6 @@ if (modalForgot) {
     });
 }
 
-// Ir a Sign up (cambiar a vista de registro)
 if (goToSignup) {
     goToSignup.addEventListener('click', function(e) {
         e.preventDefault();
@@ -240,19 +236,12 @@ if (goToSignup) {
     });
 }
 
-// Enviar email de recuperación
 if (sendForgotBtn) {
     sendForgotBtn.addEventListener('click', async function() {
         const email = emailForgotInput.value.trim();
         
         if (!email) {
             alert('Por favor ingresa tu email');
-            return;
-        }
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Por favor ingresa un email válido');
             return;
         }
         
@@ -267,13 +256,9 @@ if (sendForgotBtn) {
             
             const data = await response.json();
             
-            if (data.success) {
-                alert('✅ Si el correo existe, recibirás un email con instrucciones para recuperar tu contraseña');
-                modalForgot.classList.remove('active');
-                emailForgotInput.value = '';
-            } else {
-                alert(data.message);
-            }
+            alert('✅ Si el correo existe, recibirás un email con instrucciones');
+            modalForgot.classList.remove('active');
+            emailForgotInput.value = '';
         } catch (error) {
             console.error('Error:', error);
             alert('Error de conexión con el servidor');
@@ -281,7 +266,6 @@ if (sendForgotBtn) {
     });
 }
 
-// Enviar con Enter
 if (emailForgotInput) {
     emailForgotInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {

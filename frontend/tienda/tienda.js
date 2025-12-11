@@ -1,3 +1,41 @@
+// Configuración del backend
+const API_URL = 'http://localhost:8000/api';
+
+// Verificar si hay un usuario logueado
+window.onload = async function() {
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+        alert('Debes iniciar sesión primero');
+        window.location.href = '../login.html';
+        return;
+    }
+    
+    // Verificar que el token sea válido
+    try {
+        const response = await fetch(`${API_URL}/auth/check-session`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+            window.location.href = '../login.html';
+            return;
+        }
+        
+        console.log('✅ Usuario autenticado en la tienda');
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al verificar la sesión');
+        window.location.href = '../login.html';
+    }
+}
+
 // Verificar si hay un usuario logueado
 window.onload = function() {
     const currentUser = sessionStorage.getItem('currentUser');
