@@ -9,28 +9,33 @@ app = FastAPI(
     title="CBTis 258 - Sistema Financiero",
     description="API para gestión de pagos y tienda escolar",
     version="1.0.0",
-    docs_url="/docs",  # Swagger UI en /docs
-    redoc_url="/redoc"  # ReDoc en /redoc
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 # ============================================
-# CONFIGURACIÓN DE CORS
-# ============================================
+# CONFIGURACIÓN DE CORS - MUY IMPORTANTE
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        settings.FRONTEND_URL,
-        "http://localhost:5500",
-        "http://127.0.0.1:5500"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
+
+# Handler adicional para OPTIONS
+@app.options("/{rest_of_path:path}")
+async def preflight_handler(rest_of_path: str):
+    return {"message": "OK"}
 
 # ============================================
 # REGISTRAR ROUTERS
 # ============================================
+# Importar modelos para crear las tablas
+from .models import user
+
 app.include_router(auth.router, prefix="/api")
 app.include_router(index.router, prefix="/api")
 app.include_router(tienda.router, prefix="/api")

@@ -1,44 +1,51 @@
-/// Configuración del backend
-const API_URL = 'http://localhost:5000/api/auth';
+// Configuración del backend
+const API_URL = 'http://localhost:8000/api';
 
 // Verificar si hay un usuario logueado
 window.onload = async function() {
+    const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+        alert('Debes iniciar sesión primero');
+        window.location.href = '../login.html';
+        return;
+    }
+    
+    // Verificar que el token sea válido
     try {
-        // Verificar sesión en el backend
-        const response = await fetch(`${API_URL}/check-session`, {
-            credentials: 'include'
+        const response = await fetch(`${API_URL}/auth/check-session`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
         
-        const data = await response.json();
-        
-        if (!data.authenticated) {
-            alert('Debes iniciar sesión primero');
+        if (!response.ok) {
+            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
             window.location.href = '../login.html';
             return;
         }
         
-        // Usuario autenticado correctamente
-        const user = data.user;
+        const userData = await response.json();
         
+        // Actualizar UI con datos del usuario
         const userName = document.getElementById('user-name');
         if (userName) {
-            userName.textContent = user.nombre;
+            userName.textContent = userData.nombre;
         }
 
         const userMatricula = document.getElementById('user-matricula');
         if (userMatricula) {
-            userMatricula.textContent = 'A' + String(user.id).padStart(7, '0');
+            userMatricula.textContent = 'A' + String(userData.id).padStart(7, '0');
         }
         
-        console.log('✅ Usuario autenticado:', user);
-        
     } catch (error) {
-        console.error('Error verificando sesión:', error);
-        alert('Error de conexión. Redirigiendo al login...');
+        console.error('Error:', error);
+        alert('Error al verificar la sesión');
         window.location.href = '../login.html';
     }
 };
-
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -275,20 +282,12 @@ if (logoutBtn) {
     logoutBtn.addEventListener('click', async function() {
         const confirmLogout = confirm('¿Estás seguro que deseas cerrar sesión?');
         if (confirmLogout) {
-            try {
-                // Cerrar sesión en el backend
-                await fetch(`${API_URL}/logout`, {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-                
-                alert('Sesión cerrada correctamente');
-                window.location.href = '../login.html';
-            } catch (error) {
-                console.error('Error al cerrar sesión:', error);
-                // Aunque falle, redirigir al login
-                window.location.href = '../login.html';
-            }
+            // Limpiar localStorage
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+            
+            alert('Sesión cerrada correctamente');
+            window.location.href = '../login.html';
         }
     });
 }
