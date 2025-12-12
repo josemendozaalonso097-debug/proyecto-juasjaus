@@ -102,7 +102,7 @@ signInForm.addEventListener('submit', async (e) => {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
-            alert(`¡Bienvenido ${data.user.nombre}!`);
+            alert(`¡Bienvenid@ ${data.user.nombre}!`);
             window.location.href = 'principal/index.html';
         } else {
             alert(data.detail || 'Email o contraseña incorrectos');
