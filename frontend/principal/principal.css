@@ -1050,20 +1050,318 @@ body{
     line-height: 1.6;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .info-grid {
-        grid-template-columns: 1fr;
-        padding: 25px;
+/* ========== MODAL DE PAPELERÍA ========== */
+.modal-papeleria {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+    overflow-y: auto;
+}
+
+.modal-papeleria-content {
+    background: white;
+    margin: 30px auto;
+    padding: 0;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 900px;
+    animation: slideDown 0.3s ease;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.close-modal-papeleria {
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.close-modal-papeleria:hover {
+    color: #ddd;
+    transform: rotate(90deg);
+}
+
+.papeleria-container {
+    padding: 40px;
+    background: #f8f9fa;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* Secciones del formulario */
+.seccion-form {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 2px solid #e2e8f0;
+}
+
+.titulo-seccion {
+    color: #94272C;
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Grid de formulario */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group-pape {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group-pape label {
+    color: #4a5568;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.form-group-pape input,
+.form-group-pape select,
+.form-group-pape textarea {
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.form-group-pape input:focus,
+.form-group-pape select:focus,
+.form-group-pape textarea:focus {
+    outline: none;
+    border-color: #94272C;
+    box-shadow: 0 0 0 3px rgba(148, 39, 44, 0.1);
+}
+
+.form-group-pape textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Zona de subida de archivos */
+.upload-zone {
+    border: 3px dashed #94272C;
+    border-radius: 15px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.upload-zone:hover {
+    background: #fff;
+    border-color: #6e0404;
+    transform: translateY(-2px);
+}
+
+.upload-zone.dragover {
+    background: #fff3f3;
+    border-color: #6e0404;
+}
+
+.upload-icon-pape {
+    font-size: 4em;
+    margin-bottom: 15px;
+}
+
+.upload-text-pape {
+    color: #94272C;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.upload-hint-pape {
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* Lista de archivos */
+.archivos-lista {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.archivo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.archivo-item:hover {
+    border-color: #94272C;
+    box-shadow: 0 2px 8px rgba(148, 39, 44, 0.1);
+}
+
+.archivo-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.archivo-icon {
+    font-size: 2em;
+}
+
+.archivo-detalles {
+    flex: 1;
+}
+
+.archivo-nombre {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.archivo-tamano {
+    color: #999;
+    font-size: 0.85em;
+}
+
+.btn-eliminar-archivo {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-eliminar-archivo:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+/* Contador de archivos */
+.contador-archivos {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: #e8f5e9;
+    border-radius: 10px;
+    color: #27ae60;
+    font-weight: 600;
+}
+
+/* Botones del formulario */
+.botones-form {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-cancelar-pape,
+.btn-enviar-pape {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancelar-pape {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-cancelar-pape:hover {
+    background: #cbd5e0;
+}
+
+.btn-enviar-pape {
+    background: linear-gradient(135deg, #94272C 0%, #6e0404 100%);
+    color: white;
+}
+
+.btn-enviar-pape:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(148, 39, 44, 0.3);
+}
+
+/* ========================================================== */
+/* MEDIA QUERY: Optimización para ESCRITORIO        */
+/* ========================================================== */
+@media screen and (min-width: 768px) {
+    /* --- ENCABEZADO: Restaura el tamaño de desktop --- */
+    .cab-header {
+        padding: 10px 10px; 
+    }
+    .logo {
+        height: 80px; 
+    }
+    .logo-section h1 {
+        font-size: 30px; 
+    }
+    .logo-section h2 {
+        font-size: 18px; 
     }
     
-    .modal-informacion-content,
-    .modal-detalle-content {
-        margin: 20px;
-        width: calc(100% - 40px);
+    /* --- DASHBOARD: Vuelve a la vista en columnas --- */
+    .dashboard {
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        justify-content: space-between; 
     }
     
-    .detalle-contenido {
-        padding: 25px;
+    .card-main,
+    .card-secondary,
+    .card-tercero {
+        /* Permite dos tarjetas por fila */
+        width: calc(50% - 12.5px); 
+        margin-bottom: 25px; 
+    }
+
+    /* --- FORMULARIO DE PAGO (Split) --- */
+    .split {
+        flex-direction: row; 
+    }
+    .split label {
+        width: calc(50% - 7.5px); 
+    }
+
+    /* --- FOOTER: Si tienes footer, puedes ponerlo en línea aquí --- */
+    .footer-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
     }
 }

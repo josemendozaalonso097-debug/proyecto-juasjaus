@@ -27,7 +27,13 @@ window.onload = async function() {
             return;
         }
         
-        console.log('✅ Usuario autenticado en la tienda');
+        const userData = await response.json();
+        console.log('✅ Usuario autenticado en la tienda:', userData.nombre);
+        
+        // Renderizar historial si existe la función
+        if (typeof renderizarHistorial === 'function') {
+            renderizarHistorial();
+        }
         
     } catch (error) {
         console.error('Error:', error);
@@ -36,19 +42,9 @@ window.onload = async function() {
     }
 }
 
-// Verificar si hay un usuario logueado
-window.onload = function() {
-    const currentUser = sessionStorage.getItem('currentUser');
-    
-    if (!currentUser) {
-        alert('Debes iniciar sesión primero');
-        window.location.href = '../login.html';
-        return;
-    }
-}
-
 // Base de datos de productos
 const productosData = {
+    // ... resto del código
     uniformes: [
         { id: 1, nombre: "Playera Blanca ", marca: "CBTis 258", precio: 350, imagen: "", tallas: true },
         { id: 2, nombre: "Playera Gris", marca: "CBTis 258", precio: 350, imagen: "", tallas: true },
@@ -58,18 +54,18 @@ const productosData = {
     ],
 
     Libros: [
-        { id: 6, nombre: "Pensamiento matematico", marca: "Libro", precio: 90, imagen: "", tallas: true },
-        { id: 7, nombre: "Lengua y comunicacion", marca: "Libro", precio: 200, imagen: "", tallas: true },
-        { id: 8, nombre: "Humanidades", marca: "Libro", precio: 100, imagen: "", tallas: true },
-        { id: 9, nombre: "Socio emocional", marca: "Libro", precio: 90, imagen: "", tallas: true },
-        { id: 10, nombre: "Ingles", marca: "Libro", precio: 90, imagen: "", tallas: true },
-        { id: 11, nombre: "Sociales", marca: "Libro", precio: 100, imagen: "", tallas: true },
+        { id: 6, nombre: "Pensamiento matematico", marca: "Libro", precio: 90, imagen: "", semestre: true },
+        { id: 7, nombre: "Lengua y comunicacion", marca: "Libro", precio: 200, imagen: "", semestre: true },
+        { id: 8, nombre: "Humanidades", marca: "Libro", precio: 100, imagen: "", semestre: true },
+        { id: 9, nombre: "Socio emocional", marca: "Libro", precio: 90, imagen: "", semestre: true },
+        { id: 10, nombre: "Ingles", marca: "Libro", precio: 90, imagen: "", semestre: true },
+        { id: 11, nombre: "Sociales", marca: "Libro", precio: 100, imagen: "", semestre: true },
         { id: 12, nombre: "Conservacion de la energia", marca: "Libro 2do", precio: 140, imagen: "", tallas: false },
         { id: 13, nombre: "La materia y sus interacciones", marca: "Libro 1ro", precio: 150, imagen: "", tallas: false },
         { id: 14, nombre: "Ecosistemas", marca: "Libro 3ro", precio: 150, imagen: "", tallas: false },
-        { id: 15, nombre: "Conciencia historica", marca: "Libros 4to y 5to", precio: 200, imagen: "", tallas: true },
+        { id: 15, nombre: "Conciencia historica", marca: "Libros 4to y 5to", precio: 200, imagen: "", semestre: true },
         { id: 16, nombre: "Reacciones quimicas", marca: "Libro 4to", precio: 200, imagen: "", tallas: false },
-        { id: 17, nombre: "Temas selectos de matematicas", marca: "Libro 4to y 5to", precio: 200, imagen: "", tallas: true },
+        { id: 17, nombre: "Temas selectos de matematicas", marca: "Libro 4to y 5to", precio: 200, imagen: "", semestre: true },
         { id: 18, nombre: "La energia en los procesos de la vida diaria", marca: "Libro 5to", precio: 170, imagen: "", tallas: false },
         { id: 19, nombre: "Temas de filosofia", marca: "Libro 6to", precio: 160, imagen: "", tallas: false }
     ],
@@ -129,13 +125,27 @@ function abrirModal(categoria) {
                 
                 ${producto.tallas ? `
                 <div class="size-selector">
-                    <p class="size-label">SIZE</p>
+                    <p class="size-label">TALLA</p>
                     <div class="size-options">
                         <button class="size-btn" data-size="XS">XS</button>
                         <button class="size-btn active" data-size="S">S</button>
                         <button class="size-btn" data-size="M">M</button>
                         <button class="size-btn" data-size="L">L</button>
                         <button class="size-btn" data-size="XL">XL</button>
+                    </div>
+                </div>
+                ` : ''}
+
+                ${producto.semestre ? `
+                <div class="size-selector">
+                    <p class="size-label">SEMESTRE</p>
+                    <div class="size-options">
+                        <button class="size-btn" data-size="XS">I</button>
+                        <button class="size-btn active" data-size="S">II</button>
+                        <button class="size-btn" data-size="M">III</button>
+                        <button class="size-btn" data-size="L">IV</button>
+                        <button class="size-btn" data-size="XL">V</button>
+                        <button class="size-btn" data-size="XL">VI</button>
                     </div>
                 </div>
                 ` : ''}
@@ -1236,29 +1246,32 @@ window.addEventListener('click', function(event) {
 });
 
 function agregarHistorial(compra) {
-    // Recuperar historial del usuario del localStorage
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    if (!currentUser) return;
-
-    const historialKey = `historial_${currentUser.nombre}`;
+    // Recuperar usuario del localStorage (no sessionStorage)
+    const user = localStorage.getItem('user');
+    if (!user) return;
+    
+    const currentUser = JSON.parse(user);
+    const historialKey = `historial_${currentUser.email}`; // Mejor usar email que nombre
     let historial = JSON.parse(localStorage.getItem(historialKey)) || [];
 
     historial.push(compra);
-
     localStorage.setItem(historialKey, JSON.stringify(historial));
 
     // Actualizar visualmente el historial
-    renderizarHistorial();
+    if (typeof renderizarHistorial === 'function') {
+        renderizarHistorial();
+    }
 }
 
 function renderizarHistorial() {
     const historialContainer = document.getElementById('historialContainer');
     if (!historialContainer) return;
 
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-    if (!currentUser) return;
-
-    const historialKey = `historial_${currentUser.nombre}`;
+    const user = localStorage.getItem('user');
+    if (!user) return;
+    
+    const currentUser = JSON.parse(user);
+    const historialKey = `historial_${currentUser.email}`;
     const historial = JSON.parse(localStorage.getItem(historialKey)) || [];
 
     if (historial.length === 0) {

@@ -393,7 +393,7 @@ const informacionData = {
     becas: {
         titulo: "Becas y Apoyos",
         contenido: `
-            <div class="detalle-section">
+<div class="detalle-section">
                 <h3>🎓 Becarios de la transformacion</h3>
                 <ul>
                     <li>Requisito: Promedio mínimo de 9.0</li>
@@ -417,6 +417,14 @@ const informacionData = {
                     <li>Beneficio: 30% de descuento</li>
                     <li>Aplica para: Deportes y actividades culturales</li>
                     <li>Renovación por desempeño</li>
+                </ul>
+            </div>
+            <div class="detalle-section">
+                <h3>👨‍👩‍👧‍👦 Beca fundacion: Martinez Sada</h3>
+                <ul>
+                    <li>2 hermanos: 15% de descuento c/u</li>
+                    <li>3 o más hermanos: 20% de descuento c/u</li>
+                    <li>Aplica automáticamente</li>
                 </ul>
             </div>
         `
@@ -459,13 +467,33 @@ const informacionData = {
     faq: {
         titulo: "Preguntas Frecuentes",
         contenido: `
-            <div class="faq-item">
+ <div class="faq-item">
                 <div class="faq-pregunta">¿Cuándo puedo solicitar una beca?</div>
-                <div class="faq-respuesta">Las solicitudes de beca se abren al inicio de cada semestre.</div>
+                <div class="faq-respuesta">Las solicitudes de beca se abren al inicio de cada semestre. Para alumnos de nuevo ingreso, pueden solicitarla desde el proceso de inscripción.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-pregunta">¿Cómo puedo pagar mi colegiatura?</div>
-                <div class="faq-respuesta">Puedes pagar en efectivo en la institución, transferencia bancaria, o mediante esta plataforma.</div>
+                <div class="faq-respuesta">Puedes pagar en efectivo en escolares en la institucion, transferencia bancaria, o mediante esta plataforma con tarjeta de débito/crédito.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-pregunta">¿Qué pasa si no pago a tiempo?</div>
+                <div class="faq-respuesta">Aun puedes asistir a clases y formar parte de todas las actividades, sin embargon se ian acumulando conforme a los pagos incumplidos.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-pregunta">¿Puedo obtener más de una beca?</div>
+                <div class="faq-respuesta">Si, puedes tener mas de una beca, sin embargo, algunas pueden venir con limitantes.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-pregunta">¿Cómo obtengo mi constancia o cardex de estudios?</div>
+                <div class="faq-respuesta">Solicítalos en Escolares con 3 días de anticipación. El costo de la constancia es de $50 MXN y el precio del cardex es de $30 MXM.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-pregunta">¿Ofrecen planes de pago?</div>
+                <div class="faq-respuesta">Sí, ofrecemos planes de pago a 3, 6 y 12 meses sin intereses. Acude a Servicios Financieros para más información.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-pregunta">¿Dónde descargo mis facturas?</div>
+                <div class="faq-respuesta">En esta plataforma, ve a "Historial de Pagos" y presiona el botón "Ver Facturas". También puedes solicitarlas por correo a finanzas@cbtis258.edu.mx</div>
             </div>
         `
     }
@@ -590,3 +618,314 @@ if (checkoutBtn2) {
 }
 
 document.addEventListener('DOMContentLoaded', renderizarHistorial);
+
+// ========== MODAL DE PAPELERÍA ==========
+
+let archivosSubidos = [];
+
+// Abrir modal de papelería
+function abrirModalPapeleria() {
+    const modalPapeleria = document.getElementById('modalPapeleria');
+    if (modalPapeleria) {
+        modalPapeleria.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Pre-llenar nombre y matrícula si están disponibles
+        const userName = document.getElementById('user-name')?.textContent;
+        const userMatricula = document.getElementById('user-matricula')?.textContent;
+        
+        if (userName && userName !== 'Usuario') {
+            document.getElementById('nombreAlumno').value = userName;
+        }
+        if (userMatricula) {
+            document.getElementById('matriculaAlumno').value = userMatricula;
+        }
+    }
+}
+
+// Cerrar modal de papelería
+function cerrarModalPapeleria() {
+    const modalPapeleria = document.getElementById('modalPapeleria');
+    if (modalPapeleria) {
+        modalPapeleria.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Limpiar formulario
+    document.getElementById('formPapeleria').reset();
+    archivosSubidos = [];
+    actualizarListaArchivos();
+}
+
+// Mostrar campo "Otro" cuando se selecciona
+function mostrarCampoOtro() {
+    const tipoDocumento = document.getElementById('tipoDocumento').value;
+    const campoOtro = document.getElementById('campoOtro');
+    const inputOtro = document.getElementById('otroDocumento');
+    
+    if (tipoDocumento === 'Otro') {
+        campoOtro.style.display = 'block';
+        inputOtro.required = true;
+    } else {
+        campoOtro.style.display = 'none';
+        inputOtro.required = false;
+    }
+}
+
+// Configurar zona de subida de archivos
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadZone = document.getElementById('uploadZone');
+    const archivosInput = document.getElementById('archivosInput');
+    
+    if (uploadZone && archivosInput) {
+        // Click para abrir selector
+        uploadZone.addEventListener('click', function() {
+            archivosInput.click();
+        });
+        
+        // Drag & Drop
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            agregarArchivos(files);
+        });
+        
+        // Cambio de archivo
+        archivosInput.addEventListener('change', function(e) {
+            agregarArchivos(e.target.files);
+        });
+    }
+});
+
+// Agregar archivos a la lista
+function agregarArchivos(files) {
+    if (archivosSubidos.length >= 10) {
+        alert('Ya has alcanzado el máximo de 10 archivos.');
+        return;
+    }
+    
+    Array.from(files).forEach(file => {
+        if (archivosSubidos.length >= 10) {
+            alert('Solo puedes subir un máximo de 10 archivos.');
+            return;
+        }
+        
+        // Validar tamaño (5MB máx)
+        if (file.size > 5 * 1024 * 1024) {
+            alert(`El archivo "${file.name}" es demasiado grande. Máximo 5MB.`);
+            return;
+        }
+        
+        // Validar tipo
+        const tiposPermitidos = [
+            'image/png', 'image/jpeg', 'image/jpg', 
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        if (!tiposPermitidos.includes(file.type)) {
+            alert(`El archivo "${file.name}" no tiene un formato permitido.`);
+            return;
+        }
+        
+        // Agregar archivo
+        archivosSubidos.push(file);
+    });
+    
+    actualizarListaArchivos();
+}
+
+// Actualizar la lista visual de archivos
+function actualizarListaArchivos() {
+    const archivosLista = document.getElementById('archivosLista');
+    const contador = document.getElementById('contadorArchivos');
+    
+    if (!archivosLista || !contador) return;
+    
+    // Actualizar contador
+    contador.textContent = `${archivosSubidos.length} / 10 archivos`;
+    
+    // Limpiar lista
+    archivosLista.innerHTML = '';
+    
+    // Agregar cada archivo
+    archivosSubidos.forEach((file, index) => {
+        const archivoItem = document.createElement('div');
+        archivoItem.className = 'archivo-item';
+        
+        const icono = obtenerIconoArchivo(file.type);
+        const tamano = formatearTamano(file.size);
+        
+        archivoItem.innerHTML = `
+            <div class="archivo-info">
+                <div class="archivo-icon">${icono}</div>
+                <div class="archivo-detalles">
+                    <div class="archivo-nombre">${file.name}</div>
+                    <div class="archivo-tamano">${tamano}</div>
+                </div>
+            </div>
+            <button type="button" class="btn-eliminar-archivo" onclick="eliminarArchivo(${index})">✕ Eliminar</button>
+        `;
+        
+        archivosLista.appendChild(archivoItem);
+    });
+}
+
+// Obtener icono según tipo de archivo
+function obtenerIconoArchivo(tipo) {
+    if (tipo.includes('image')) return '🖼️';
+    if (tipo.includes('pdf')) return '📄';
+    if (tipo.includes('word') || tipo.includes('document')) return '📝';
+    return '📎';
+}
+
+// Formatear tamaño de archivo
+function formatearTamano(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+// Eliminar archivo de la lista
+function eliminarArchivo(index) {
+    archivosSubidos.splice(index, 1);
+    actualizarListaArchivos();
+}
+
+// Enviar formulario de papelería
+document.addEventListener('DOMContentLoaded', function() {
+    const formPapeleria = document.getElementById('formPapeleria');
+    
+    if (formPapeleria) {
+        formPapeleria.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar que haya al menos un archivo
+            if (archivosSubidos.length === 0) {
+                alert('Debes subir al menos un archivo.');
+                return;
+            }
+            
+            // Recopilar datos
+            const datos = {
+                alumno: {
+                    nombre: document.getElementById('nombreAlumno').value,
+                    matricula: document.getElementById('matriculaAlumno').value,
+                    gradoGrupo: document.getElementById('gradoGrupo').value,
+                    telefono: document.getElementById('telefonoAlumno').value
+                },
+                padre: {
+                    nombre: document.getElementById('nombrePadre').value,
+                    telefono: document.getElementById('telefonoPadre').value,
+                    email: document.getElementById('emailPadre').value,
+                    parentesco: document.getElementById('parentesco').value
+                },
+                tipoDocumento: document.getElementById('tipoDocumento').value,
+                otroDocumento: document.getElementById('otroDocumento').value,
+                observaciones: document.getElementById('observaciones').value,
+                archivos: archivosSubidos.map(f => f.name),
+                fecha: new Date().toLocaleString()
+            };
+            
+            console.log('Datos a enviar:', datos);
+            
+            // Aquí harías el fetch al backend
+            // Por ahora solo mostramos confirmación
+            mostrarConfirmacionPapeleria(datos);
+        });
+    }
+});
+
+// Mostrar confirmación de envío
+function mostrarConfirmacionPapeleria(datos) {
+    const confirmacion = document.createElement('div');
+    confirmacion.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        text-align: center;
+        max-width: 450px;
+        border: 3px solid #27ae60;
+    `;
+    
+    confirmacion.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
+        <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Documentos enviados!</h2>
+        <p style="color: #666; margin-bottom: 15px; line-height: 1.6;">
+            Tu papelería ha sido recibida exitosamente.<br>
+            <strong>Tipo:</strong> ${datos.tipoDocumento}<br>
+            <strong>Archivos:</strong> ${datos.archivos.length}<br><br>
+            <strong>Estado: Pendiente de revisión</strong>
+        </p>
+        <p style="color: #999; font-size: 0.9em; margin-bottom: 20px;">
+            Recibirás una notificación cuando sea validada.
+        </p>
+        <button onclick="cerrarConfirmacion(this)" style="
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">Entendido</button>
+    `;
+    
+    document.body.appendChild(confirmacion);
+    cerrarModalPapeleria();
+}
+
+function cerrarConfirmacion(button) {
+    button.parentElement.remove();
+    document.body.style.overflow = 'auto';
+}
+
+// Conectar botón de papelería
+const papeBtn = document.getElementById('pape-btn');
+if (papeBtn) {
+    papeBtn.addEventListener('click', function() {
+        abrirModalPapeleria();
+    });
+}
+
+// Cerrar modal al hacer clic fuera
+window.addEventListener('click', function(event) {
+    const modalPapeleria = document.getElementById('modalPapeleria');
+    if (event.target === modalPapeleria) {
+        cerrarModalPapeleria();
+    }
+});
+
+// Cerrar con tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modalPapeleria = document.getElementById('modalPapeleria');
+        if (modalPapeleria && modalPapeleria.style.display === 'block') {
+            cerrarModalPapeleria();
+        }
+    }
+});

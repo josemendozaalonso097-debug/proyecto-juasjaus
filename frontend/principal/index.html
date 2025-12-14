@@ -271,6 +271,128 @@
   </form>
 </section>
 
+    <!-- MODAL DE PAPELERÍA -->
+<div class="modal-papeleria" id="modalPapeleria">
+    <div class="modal-papeleria-content">
+        <span class="close-modal-papeleria" onclick="cerrarModalPapeleria()">&times;</span>
+        
+        <div class="historial-header">
+            <h2>📄 Subir Papelería</h2>
+        </div>
+
+        <div class="papeleria-container">
+            <form id="formPapeleria">
+                <!-- DATOS DEL ALUMNO -->
+                <div class="seccion-form">
+                    <h3 class="titulo-seccion">👤 Datos del Alumno</h3>
+                    <div class="form-grid">
+                        <div class="form-group-pape">
+                            <label>Nombre Completo *</label>
+                            <input type="text" id="nombreAlumno" required placeholder="Ej: Juan Pérez García">
+                        </div>
+                        <div class="form-group-pape">
+                            <label>Matrícula *</label>
+                            <input type="text" id="matriculaAlumno" required placeholder="Ej: A0001234">
+                        </div>
+                        <div class="form-group-pape">
+                            <label>Grado y Grupo *</label>
+                            <input type="text" id="gradoGrupo" required placeholder="Ej: 3°A Programacion">
+                        </div>
+                        <div class="form-group-pape">
+                            <label>Teléfono del Alumno</label>
+                            <input type="tel" id="telefonoAlumno" placeholder="Ej: 8112345678">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATOS DEL PADRE/TUTOR -->
+                <div class="seccion-form">
+                    <h3 class="titulo-seccion">👨‍👩‍👦 Datos del Padre/Tutor</h3>
+                    <div class="form-grid">
+                        <div class="form-group-pape">
+                            <label>Nombre del Padre/Tutor *</label>
+                            <input type="text" id="nombrePadre" required placeholder="Ej: María García López">
+                        </div>
+                        <div class="form-group-pape">
+                            <label>Teléfono de Contacto *</label>
+                            <input type="tel" id="telefonoPadre" required placeholder="Ej: 8187654321">
+                        </div>
+                        <div class="form-group-pape">
+                            <label>Email</label>
+                            <input type="email" id="emailPadre" placeholder="Ej: maria.garcia@email.com">
+                        </div>
+                        <div class="form-group-pape">
+                            <label>Parentesco *</label>
+                            <select id="parentesco" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Madre">Madre</option>
+                                <option value="Padre">Padre</option>
+                                <option value="Tutor">Tutor Legal</option>
+                                <option value="Abuelo/a">Abuelo/a</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIPO DE DOCUMENTO -->
+                <div class="seccion-form">
+                    <h3 class="titulo-seccion">📋 Tipo de Documento</h3>
+                    <div class="form-group-pape">
+                        <label>Selecciona el tipo de documento *</label>
+                        <select id="tipoDocumento" required onchange="mostrarCampoOtro()">
+                            <option value="">Seleccionar...</option>
+                            <option value="Inscripción">Inscripción</option>
+                            <option value="Reinscripción">Reinscripción</option>
+                            <option value="Club">Club Deportivo/Cultural</option>
+                            <option value="Beca">Solicitud de Beca</option>
+                            <option value="Certificado Médico">Certificado Médico</option>
+                            <option value="Seguro Escolar">Seguro Escolar</option>
+                            <option value="Permiso">Permiso/Autorización</option>
+                            <option value="Otro">Otro (Especificar)</option>
+                        </select>
+                    </div>
+                    <div class="form-group-pape" id="campoOtro" style="display: none;">
+                        <label>Especifica el tipo de documento</label>
+                        <input type="text" id="otroDocumento" placeholder="Ej: Constancia de buena conducta">
+                    </div>
+                </div>
+
+                <!-- SUBIR ARCHIVOS -->
+                <div class="seccion-form">
+                    <h3 class="titulo-seccion">📎 Archivos (máximo 10)</h3>
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="archivosInput" multiple accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                        <div class="upload-icon-pape">📁</div>
+                        <p class="upload-text-pape">Arrastra archivos aquí o haz clic para seleccionar</p>
+                        <p class="upload-hint-pape">Formatos: PDF, JPG, PNG, Word (máx. 5MB c/u)</p>
+                    </div>
+
+                    <div class="archivos-lista" id="archivosLista"></div>
+
+                    <div class="contador-archivos">
+                        <span id="contadorArchivos">0 / 10 archivos</span>
+                    </div>
+                </div>
+
+                <!-- OBSERVACIONES -->
+                <div class="seccion-form">
+                    <h3 class="titulo-seccion">💬 Observaciones</h3>
+                    <div class="form-group-pape">
+                        <textarea id="observaciones" rows="4" placeholder="Agrega cualquier comentario o información adicional..."></textarea>
+                    </div>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="botones-form">
+                    <button type="button" class="btn-cancelar-pape" onclick="cerrarModalPapeleria()">Cancelar</button>
+                    <button type="submit" class="btn-enviar-pape">Enviar Documentos</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <script src="principal.js"></script>
 </body> 
 </html>
