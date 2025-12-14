@@ -1245,55 +1245,41 @@ window.addEventListener('click', function(event) {
     }
 });
 
-function agregarHistorial(compra) {
-    // Recuperar usuario del localStorage (no sessionStorage)
-    const user = localStorage.getItem('user');
-    if (!user) return;
-    
-    const currentUser = JSON.parse(user);
-    const historialKey = `historial_${currentUser.email}`; // Mejor usar email que nombre
-    let historial = JSON.parse(localStorage.getItem(historialKey)) || [];
+// ========== SISTEMA DE HISTORIAL UNIFICADO ==========
 
+function agregarAlHistorialUnificado(metodoPago) {
+    const fecha = new Date();
+    const fechaFormato = `${fecha.getDate().toString().padStart(2, '0')}/${
+        (fecha.getMonth() + 1).toString().padStart(2, '0')}/${
+        fecha.getFullYear()}`;
+    
+    // Calcular total
+    const total = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+    
+    // Crear el objeto de compra
+    const compra = {
+        fecha: fechaFormato,
+        nombre: `Compra en Tienda - ${carrito.length} producto(s)`,
+        precio: total,
+        metodoPago: metodoPago,
+        productos: carrito.map(item => ({
+            nombre: item.nombre,
+            cantidad: item.cantidad,
+            precio: item.precio,
+            tallaSeleccionada: item.tallaSeleccionada || null
+        }))
+    };
+    
+    // Obtener historial existente
+    let historial = JSON.parse(localStorage.getItem('historial')) || [];
+    
+    // Agregar nueva compra
     historial.push(compra);
-    localStorage.setItem(historialKey, JSON.stringify(historial));
-
-    // Actualizar visualmente el historial
-    if (typeof renderizarHistorial === 'function') {
-        renderizarHistorial();
-    }
-}
-
-function renderizarHistorial() {
-    const historialContainer = document.getElementById('historialContainer');
-    if (!historialContainer) return;
-
-    const user = localStorage.getItem('user');
-    if (!user) return;
     
-    const currentUser = JSON.parse(user);
-    const historialKey = `historial_${currentUser.email}`;
-    const historial = JSON.parse(localStorage.getItem(historialKey)) || [];
-
-    if (historial.length === 0) {
-        historialContainer.innerHTML = '<p style="text-align:center; color:#999;">No hay compras aún.</p>';
-        return;
-    }
-
-    let html = '';
-    historial.forEach((compra, index) => {
-        html += `
-            <div class="historial-item" style="border-bottom:1px solid #eee; padding:10px 0;">
-                <strong>Compra #${index + 1}</strong> - ${compra.fecha}<br>
-                Método de pago: ${compra.metodoPago}<br>
-                Productos:
-                <ul>
-                    ${compra.productos.map(p => `<li>${p.nombre} x ${p.cantidad} ${p.tallaSeleccionada ? `(Talla: ${p.tallaSeleccionada})` : ''} - $${(p.precio*p.cantidad).toFixed(2)}</li>`).join('')}
-                </ul>
-            </div>
-        `;
-    });
-
-    historialContainer.innerHTML = html;
+    // Guardar en localStorage
+    localStorage.setItem('historial', JSON.stringify(historial));
+    
+    console.log('✅ Compra agregada al historial:', compra);
 }
 
 document.addEventListener('DOMContentLoaded', renderizarHistorial);
