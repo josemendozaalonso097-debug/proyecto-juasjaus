@@ -309,6 +309,7 @@ if (storeBtn) {
 // historial
 
 function abrirHistorial() {
+    renderizarHistorial(); // Actualizar antes de abrir
     document.getElementById('modalHistorial').style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
@@ -545,65 +546,67 @@ window.addEventListener('click', function(event) {
     }
 });
 
-function cargarHistorial() {
-    const historial = JSON.parse(localStorage.getItem('historial')) || [];
-    return historial;
-}
-
-function guardarHistorial(historial) {
-    localStorage.setItem('historial', JSON.stringify(historial));
-}
 
 function renderizarHistorial() {
-    const historial = cargarHistorial();
     const historialContainer = document.querySelector('.historial-compras');
     const totalComprasElem = document.querySelector('.resumen-item strong');
     const totalGastadoElem = document.querySelector('.total-amount');
 
     if (!historialContainer) return;
 
+    const historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+
     historialContainer.innerHTML = '';
+
+    if (historial.length === 0) {
+        historialContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #999;">
+                <p>No hay compras registradas aún</p>
+            </div>
+        `;
+        if (totalComprasElem) totalComprasElem.textContent = '0';
+        if (totalGastadoElem) totalGastadoElem.textContent = '$0.00 MXN';
+        return;
+    }
 
     let totalGastado = 0;
 
-    historial.forEach(compra => {
-        totalGastado += compra.precio;
+    historial.reverse().forEach(compra => {
+        totalGastado += compra.total;
 
         const compraCard = document.createElement('div');
         compraCard.className = 'compra-card';
+        
+        const productosHTML = compra.productos.map(prod => 
+            `${prod.nombre} x${prod.cantidad}${prod.tallaSeleccionada ? ` (${prod.tallaSeleccionada})` : ''}`
+        ).join(' + ');
+
+        let badgeHTML = '';
+        if (compra.estado === 'Completado') {
+            badgeHTML = '<span class="badge-completado">Completado</span>';
+        } else {
+            badgeHTML = '<span class="badge-pendiente">Pendiente</span>';
+        }
+
         compraCard.innerHTML = `
             <div class="compra-fecha">${compra.fecha}</div>
             <div class="compra-info">
-                <h3>${compra.nombre}</h3>
+                <h3>${productosHTML}</h3>
                 <div class="compra-badges">
-                    <span class="badge-entregado">Entregado</span>
+                    ${badgeHTML}
+                    <span class="badge-metodo">${compra.metodoPago}</span>
                 </div>
             </div>
-            <div class="compra-precio">$${compra.precio.toFixed(2)} MXN</div>
+            <div class="compra-precio">$${compra.total.toFixed(2)} MXN</div>
         `;
+        
         historialContainer.appendChild(compraCard);
     });
 
     if (totalComprasElem) totalComprasElem.textContent = historial.length;
-    if (totalGastadoElem) totalGastadoElem.textContent = '$' + totalGastado.toFixed(2) + ' MXN';
+    if (totalGastadoElem) totalGastadoElem.textContent = `$${totalGastado.toFixed(2)} MXN`;
 }
 
-function agregarCompra(nombre, precio) {
-    const historial = cargarHistorial();
-    const fecha = new Date();
-    const fechaFormato = fecha.getDate().toString().padStart(2, '0') + '/' +
-                         (fecha.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                         fecha.getFullYear();
-
-    historial.push({
-        nombre: nombre,
-        precio: parseFloat(precio),
-        fecha: fechaFormato
-    });
-
-    guardarHistorial(historial);
-    renderizarHistorial();
-}
 
 const checkoutBtn2 = document.querySelector('.checkout-btn');
 if (checkoutBtn2) {
@@ -617,7 +620,6 @@ if (checkoutBtn2) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', renderizarHistorial);
 
 // ========== MODAL DE PAPELERÍA ==========
 
@@ -929,3 +931,5 @@ document.addEventListener('keydown', function(event) {
         }
     }
 });
+
+document.addEventListener('DOMContentLoaded', renderizarHistorial);
