@@ -1284,296 +1284,72 @@ header.cab-header { z-index: 1; }
     }
 }
 
-/* Responsive para móviles */
 @media (max-width: 768px) {
-    .modal-transferencia-content {
-        width: 95%;
-        margin: 20px auto;
-    }
-    
-    .transferencia-container {
-        padding: 20px;
-    }
-    
-    .dato-bancario {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
-    }
-    
-    .valor-container {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .btn-copiar {
-        padding: 6px 12px;
-        font-size: 0.9em;
-    }
-    
-    .instrucciones-transferencia {
-        padding: 20px;
-    }
-    
-    .instrucciones-transferencia ol {
-        font-size: 0.95em;
-    }
-}
 
-@media (max-width: 480px) {
-    .close-modal-transferencia {
-        right: 15px;
-        top: 15px;
-        font-size: 30px;
-    }
-    
-    .transferencia-container {
-        padding: 15px;
-    }
-    
-    .info-bancaria,
-    .instrucciones-transferencia {
-        padding: 15px;
-    }
-}
+  .tienda-layout {
+    grid-template-columns: 1fr;
+    margin: 15px;
+    padding: 0;
+  }
 
-/* ========== RESPONSIVE TIENDA ========== */
-
-@media (max-width: 1200px) {
-    .tienda-layout {
-        grid-template-columns: 1fr;
-    }
-    
-    .sidebar-derecha {
-        order: -1;
-    }
+  .sidebar-derecha {
+    order: -1; /* carrito arriba */
+  }
 }
 
 @media (max-width: 768px) {
-    /* Header */
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .logo-section {
-        margin-left: 0;
-    }
-    
-    .logo {
-        height: 150px;
-    }
-    
-    .logo-section h1 {
-        font-size: 32px;
-    }
-    
-    .logo-section h2 {
-        font-size: 16px;
-    }
-    
-    .button-carrito {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    /* Productos */
-    .productos-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .card {
-        height: 250px;
-    }
-    
-    .card2 h3 {
-        font-size: 18px;
-    }
-    
-    .iconito {
-        width: 50px;
-    }
-    
-    /* Modal productos */
-    .modal-content {
-        width: 95%;
-        margin: 20px auto;
-        padding: 20px;
-    }
-    
-    .close-modal {
-        font-size: 32px;
-        right: 15px;
-        top: 15px;
-    }
-    
-    .modal-title {
-        font-size: 1.5em;
-    }
-    
-    .productos-modal-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .product-card {
-        max-width: 100%;
-    }
-    
-    /* Sidebar */
-    .info-card {
-        padding: 15px;
-    }
-    
-    .pay-btn {
-        width: 100%;
-        padding: 15px 20px;
-        font-size: 20px;
-    }
-    
-    /* Modales de pago */
-    .modal-metodo-content {
-        width: 95%;
-        margin: 20px auto;
-    }
-    
-    .metodos-grid {
-        grid-template-columns: 1fr;
-        padding: 20px;
-    }
-    
-    .metodo-card {
-        padding: 30px 20px;
-    }
-    
-    .metodo-icon {
-        font-size: 3em;
-    }
-    
-    .metodo-card h3 {
-        font-size: 1.2em;
-    }
-    
-    /* Modal transferencia */
-    .modal-transferencia-content {
-        width: 95%;
-        margin: 20px auto;
-    }
-    
-    .transferencia-container {
-        padding: 20px;
-    }
-    
-    .dato-bancario {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
-    }
-    
-    .valor-container {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .btn-copiar {
-        padding: 6px 12px;
-        font-size: 0.9em;
-    }
-    
-    /* Modal depósito */
-    .modal-deposito-content {
-        width: 95%;
-        margin: 20px auto;
-    }
-    
-    .deposito-container {
-        padding: 20px;
-    }
-    
-    .upload-area {
-        padding: 30px 20px;
-    }
-    
-    .upload-icon {
-        font-size: 3em;
-    }
-    
-    /* Footer */
-    .footer {
-        padding: 15px 20px;
-    }
-    
-    .footer-links {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
+
+  .productos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    height: auto;
+  }
 }
 
-@media (max-width: 480px) {
-    .logo {
-        height: 120px;
-    }
-    
-    .logo-section h1 {
-        font-size: 28px;
-    }
-    
-    .logo-section h2 {
-        font-size: 14px;
-    }
-    
-    .section-title {
-        font-size: 22px;
-    }
-    
-    .modal-title {
-        font-size: 1.3em;
-    }
-    
-    .product-title {
-        font-size: 1.1em;
-    }
-    
-    .size-btn {
-        padding: 5px 12px;
-        font-size: 0.85em;
-    }
-    
-    .btn-add-cart {
-        font-size: 0.9em;
-        padding: 12px;
-    }
-}
-
-/* Prevenir zoom en inputs en iOS */
 @media (max-width: 768px) {
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="number"],
-    input[type="date"],
-    select,
-    textarea {
-        font-size: 16px !important;
-    }
+
+  .card2 {
+    padding: 15px;
+  }
+
+  .card2 h3 {
+    font-size: 18px;
+  }
+
+  .card2 p {
+    font-size: 13px;
+  }
+
+  .iconito {
+    width: 45px;
+  }
 }
 
-/* Mejoras táctiles */
-@media (hover: none) and (pointer: coarse) {
-    .btn,
-    .btn-add-cart,
-    .btn-icon,
-    .btn-copiar,
-    .btn-eliminar-archivo,
-    .btn-enviar-comprobante,
-    .btn-entendido {
-        min-height: 44px;
-    }
-    
-    .size-btn {
-        min-width: 44px;
-        min-height: 44px;
-    }
+@media (max-width: 768px) {
+
+  .pay-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .modal-content,
+  .modal-metodo-content,
+  .modal-deposito-content,
+  .modal-transferencia-content {
+    width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 15px;
+  }
+}
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
 }

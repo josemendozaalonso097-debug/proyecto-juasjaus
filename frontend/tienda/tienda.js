@@ -509,8 +509,58 @@ const checkoutBtn = document.querySelector('.checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function() {
         const total = calcularTotal();
+        
+        // Guardar en historial
+        const fecha = new Date();
+        const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+        const fechaFormato = `${fecha.getDate().toString().padStart(2, '0')}/${meses[fecha.getMonth()]}/${fecha.getFullYear()}`;
+        
+        const compra = {
+            fecha: fechaFormato,
+            metodoPago: 'Tarjeta',
+            productos: carrito.map(item => ({
+                nombre: item.nombre,
+                precio: item.precio,
+                cantidad: item.cantidad,
+                tallaSeleccionada: item.tallaSeleccionada
+            })),
+            total: total,
+            estado: 'Completado'
+        };
+        
+        let historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+        historial.push(compra);
+        localStorage.setItem('historialCompras', JSON.stringify(historial));
 
-        // Mostrar alerta bonita
+        // ===== DESCARGAR COMPROBANTE =====
+        const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
+        const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
+        
+        const contenido = `
+COMPROBANTE DE PAGO
+-----------------------------
+Tipo de pago: Tarjeta
+Titular: ${nombreTarjeta}
+Número de tarjeta: ${numeroTarjeta}
+Fecha: ${fechaFormato}
+Monto: $${total.toFixed(2)} MXN
+-----------------------------
+Productos:
+${carrito.map(item => `- ${item.nombre} x ${item.cantidad}${item.tallaSeleccionada ? ' (Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
+
+Total: $${total.toFixed(2)} MXN
+-----------------------------
+Gracias por tu compra.
+        `;
+
+        const blob = new Blob([contenido], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'comprobante_tarjeta.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+
         const confirmacion = document.createElement('div');
         confirmacion.style.cssText = `
             position: fixed;
@@ -532,7 +582,7 @@ if (checkoutBtn) {
             <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Pago realizado con éxito!</h2>
             <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
                 Total pagado: $${total.toFixed(2)} MXN<br><br>
-                Gracias por tu compra.
+                Tu comprobante ha sido descargado automáticamente.
             </p>
             <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
                 background: #27ae60;
@@ -547,25 +597,12 @@ if (checkoutBtn) {
         `;
         
         document.body.appendChild(confirmacion);
-        document.body.style.overflow = 'hidden';
-
-        // Generar comprobante descargable
-        generarComprobanteTarjeta();
-
-        // Vaciar carrito y cerrar modal
         carrito = [];
+        localStorage.removeItem('carrito');
         actualizarCarrito();
         cerrarModalPago();
     });
 }
-
-// Después de validar y procesar el pago
-agregarHistorial({
-    productos: [...carrito],   // tu array de productos
-    metodoPago: 'Tarjeta',
-    fecha: new Date().toLocaleString()
-});
-
 
 // ========== VALIDACIÓN Y FORMATEO DE TARJETA ==========
 
@@ -820,36 +857,50 @@ function enviarComprobante() {
         return;
     }
     
+    const total = calcularTotal();
     const referencia = document.getElementById('referenciaDeposito').value;
     const banco = document.getElementById('bancoOrigen').value;
-    const fecha = document.getElementById('fechaDeposito').value;
-    const total = calcularTotal();
+    const fechaInput = document.getElementById('fechaDeposito').value;
     
-    console.log({
-        archivo: archivoComprobante.name,
-        referencia,
-        banco,
-        fecha,
-        monto: total
-    });
+    // Guardar en historial
+    const fecha = new Date();
+    const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    const fechaFormato = `${fecha.getDate().toString().padStart(2, '0')}/${meses[fecha.getMonth()]}/${fecha.getFullYear()}`;
     
-    // Mostrar confirmación
-    cerrarModalDeposito();
-    mostrarConfirmacionDeposito();
-
-    // ===== Generar comprobante descargable =====
+    const compra = {
+        fecha: fechaFormato,
+        metodoPago: 'Depósito',
+        productos: carrito.map(item => ({
+            nombre: item.nombre,
+            precio: item.precio,
+            cantidad: item.cantidad,
+            tallaSeleccionada: item.tallaSeleccionada
+        })),
+        total: total,
+        estado: 'Pendiente'
+    };
+    
+    let historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+    historial.push(compra);
+    localStorage.setItem('historialCompras', JSON.stringify(historial));
+    
+    // ===== DESCARGAR COMPROBANTE =====
     const contenido = `
 COMPROBANTE DE PAGO
 -----------------------------
 Tipo de pago: Depósito
 Referencia: ${referencia || 'No especificado'}
 Banco: ${banco || 'No especificado'}
-Fecha: ${fecha || 'No especificado'}
+Fecha: ${fechaInput || 'No especificado'}
 Monto: $${total.toFixed(2)} MXN
 -----------------------------
 Productos:
-${carrito.map(item => `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
-`;
+${carrito.map(item => `- ${item.nombre} x ${item.cantidad}${item.tallaSeleccionada ? ' (Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
+
+Total: $${total.toFixed(2)} MXN
+-----------------------------
+Estado: Pendiente de verificación
+    `;
 
     const blob = new Blob([contenido], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -858,6 +909,50 @@ ${carrito.map(item => `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccion
     a.download = 'comprobante_deposito.txt';
     a.click();
     URL.revokeObjectURL(url);
+    
+    cerrarModalDeposito();
+    
+    const confirmacion = document.createElement('div');
+    confirmacion.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10003;
+        text-align: center;
+        max-width: 400px;
+        border: 3px solid #27ae60;
+    `;
+    
+    confirmacion.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
+        <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Comprobante recibido!</h2>
+        <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
+            Tu comprobante fue recibido exitosamente.<br>
+            <strong>Estado: Pendiente de verificación</strong><br><br>
+            Tu comprobante ha sido descargado automáticamente.
+        </p>
+        <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+        ">Entendido</button>
+    `;
+    
+    document.body.appendChild(confirmacion);
+
+    carrito = [];
+    localStorage.removeItem('carrito');
+    actualizarCarrito();
 }
 
 
@@ -937,25 +1032,38 @@ window.addEventListener('click', function(event) {
 });
 
 
-let archivoComprobanteTransferencia = null;
+
+//let archivoComprobanteTransferencia = null;
 
 // Abrir modal de transferencia
 function abrirModalTransferencia() {
     const total = calcularTotal();
-    
-    // Actualizar el monto
-    const montoElement = document.getElementById('montoTransferencia');
-    if (montoElement) {
-        montoElement.textContent = `$${total.toFixed(2)} MXN`;
+
+    document.getElementById('montoTransferencia').textContent =
+        `$${total.toFixed(2)} MXN`;
+
+    const modal = document.getElementById('modalTransferencia');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    // 🔥 SUBIDA DE ARCHIVO TRANSFERENCIA (AQUÍ Y SOLO AQUÍ)
+    const uploadArea = document.getElementById('uploadAreaTransferencia');
+    const fileInput = document.getElementById('comprobanteFileTransferencia');
+
+    if (!uploadArea || !fileInput) {
+        console.error('❌ IDs de transferencia no existen');
+        return;
     }
-    
-    // Mostrar modal
-    const modalTransferencia = document.getElementById('modalTransferencia');
-    if (modalTransferencia) {
-        modalTransferencia.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
+
+    uploadArea.onclick = () => fileInput.click();
+
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) procesarArchivoTransferencia(file);
+    };
 }
+
+
 
 // Cerrar modal de transferencia
 function cerrarModalTransferencia() {
@@ -1011,53 +1119,44 @@ function copiarTextoFallback(texto) {
     document.body.removeChild(textArea);
 }
 
-// Inicializar funcionalidad de subida de archivo para TRANSFERENCIA
+// Inicializar funcionalidad de subida de archivo para deposito
 document.addEventListener('DOMContentLoaded', function() {
-    const uploadArea = document.getElementById('uploadAreaTransferencia');
-    const fileInput = document.getElementById('comprobanteFileTransferencia');
+    // TAMBIÉN inicializar subida para DEPÓSITO
+    const uploadAreaDeposito = document.getElementById('uploadArea');
+    const fileInputDeposito = document.getElementById('comprobanteFile');
     
-    if (uploadArea && fileInput) {
-        // Click para abrir selector
-        uploadArea.addEventListener('click', function() {
-            fileInput.click();
-        });
-        
-        // Drag & Drop
-        uploadArea.addEventListener('dragover', function(e) {
+    if (uploadAreaDeposito && fileInputDeposito) {
+        uploadAreaDeposito.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            this.style.borderColor = '#6e0404';
-            this.style.background = '#fff3f3';
+            fileInputDeposito.click();
         });
         
-        uploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.style.borderColor = '#94272C';
-            this.style.background = '#f8f9fa';
-        });
-        
-        uploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.style.borderColor = '#94272C';
-            this.style.background = '#f8f9fa';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                procesarArchivoTransferencia(files[0]);
-            }
-        });
-        
-        // Cambio de archivo
-        fileInput.addEventListener('change', function(e) {
+        fileInputDeposito.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                procesarArchivoTransferencia(file);
+                // Validar tamaño (5MB máx)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('El archivo es demasiado grande. Máximo 5MB.');
+                    return;
+                }
+                
+                // Validar tipo
+                const tiposPermitidos = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+                if (!tiposPermitidos.includes(file.type)) {
+                    alert('Solo se permiten archivos PNG, JPG o PDF.');
+                    return;
+                }
+                
+                archivoComprobante = file;
+                mostrarArchivoSeleccionado(file.name);
             }
         });
     }
 });
+
+let archivoComprobanteTransferencia = null;
+
 
 // Procesar archivo de transferencia
 function procesarArchivoTransferencia(file) {
@@ -1107,62 +1206,35 @@ function quitarArchivoTransferencia() {
 
 // Enviar comprobante de transferencia
 function enviarComprobanteTransferencia() {
+    console.log('Función llamada'); // Debug
+    console.log('Archivo:', archivoComprobanteTransferencia); // Debug
+    
     if (!archivoComprobanteTransferencia) {
-        alert('Por favor selecciona un comprobante de transferencia.');
+        alert('Por favor selecciona un comprobante de pago.');
         return;
     }
-
-    const referencia = document.getElementById('referenciaTransferencia').value || 'No especificado';
-    const banco = document.getElementById('bancoOrigenTransferencia').value || 'No especificado';
-    const fecha = document.getElementById('fechaTransferencia').value || 'No especificado';
+    
+    const referencia = document.getElementById('referenciaTransferencia').value;
+    const banco = document.getElementById('bancoOrigenTransferencia').value;
+    const fecha = document.getElementById('fechaTransferencia').value;
     const total = calcularTotal();
-
+    
     console.log({
+        tipo: 'TRANSFERENCIA',
         archivo: archivoComprobanteTransferencia.name,
-        referencia,
-        banco,
-        fecha,
+        referencia: referencia || 'No especificado',
+        banco: banco || 'No especificado',
+        fecha: fecha || 'No especificado',
         monto: total
     });
-
-    // Mostrar confirmación
+    
     cerrarModalTransferencia();
-    mostrarConfirmacionTransferencia();
-
-    // ===== Generar comprobante descargable =====
-    generarComprobanteTransferencia();
-}
-
-function generarComprobanteTransferencia() {
-    const referencia = document.getElementById('referenciaTransferencia').value || 'No especificado';
-    const banco = document.getElementById('bancoOrigenTransferencia').value || 'No especificado';
-    const fecha = document.getElementById('fechaTransferencia').value || 'No especificado';
-    const total = calcularTotal();
-
-    let contenido = `
-        COMPROBANTE DE PAGO\n
-        -----------------------------\n
-        Tipo de pago: Transferencia\n
-        Referencia: ${referencia}\n
-        Banco: ${banco}\n
-        Fecha: ${fecha}\n
-        Monto: $${total.toFixed(2)} MXN\n
-        -----------------------------\n
-        Productos:\n
-    `;
-
-    carrito.forEach(item => {
-        contenido += `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${item.precio * item.cantidad}\n`;
-    });
-
-    // Descargar como archivo .txt
-    const blob = new Blob([contenido], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'comprobante_transferencia.txt';
-    a.click();
-    URL.revokeObjectURL(url);
+    
+    alert('¡Comprobante recibido! Estado: Pendiente de verificación');
+    
+    // Opcional: Vaciar carrito
+    carrito = [];
+    actualizarCarrito();
 }
 
 // Mostrar confirmación

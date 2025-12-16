@@ -31,15 +31,15 @@
         <div class="card-main">
             <h3 class="card-title">Estados de pago</h3>
 
-            <div class="alert-box">
-                <p class="alert-text">Tienes <strong id="pendientes">1</strong> pagos pendientes.</p>             
-            </div>
+            <div class="alert-box"> 
+                <p class="alert-text">Tienes <strong id="pendientes">1</strong> pagos pendientes.</p>           
+            </div> 
 
             <div class="botones">
                 <button class="btn btn-secondary">Historial de pagos</button>
                 <button class="btn btn-tercero" id="info-btn">Informacion</button>
                 <button class="btn btn-tercero" id="pape-btn">Papeleria</button>
-            </div> 
+            </div>
         </div>
 
         <div class="columna-derecha">
@@ -134,7 +134,7 @@
                     
                     <div class="resumen-info">
                         <p class="resumen-item">
-                            <span>Compras Realizadas (2023)</span>
+                            <span>Compras Realizadas</span>
                             <strong>4</strong>
                         </p>
                         <p class="resumen-item">
@@ -146,15 +146,16 @@
                     <button class="btn-facturas">VER FACTURAS</button>
 
                     <div class="info-adicional">
-                        <p><strong>Nota:</strong> Puedes descargar tus facturas en formato PDF.
-                <button class="Btn-pdf">
-                        <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
-                        </svg>
-                        <span class="icon2"></span>
-                </button>
-                        </p>
-                    </div>
+    <p><strong>Nota:</strong> Puedes visualizar o descargar tus facturas en formato PDF.
+        <button class="Btn-pdf" onclick="descargarPDFHistorial()" title="Descargar PDF">
+            <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+            </svg>
+            <span class="icon2"></span>
+        </button>
+    </p>
+</div>
+
                 </div>
             </div>
         </div>
@@ -392,7 +393,7 @@
         </div>
     </div>
 </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="principal.js"></script>
 </body> 
 </html>
