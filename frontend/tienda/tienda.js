@@ -1,6 +1,9 @@
 // Configuración del backend
 const API_URL = 'http://localhost:8000/api';
 
+let archivoComprobanteTransferencia = null;
+
+
 // Verificar si hay un usuario logueado
 window.onload = async function() {
     const token = localStorage.getItem('access_token');
@@ -1032,9 +1035,6 @@ window.addEventListener('click', function(event) {
 });
 
 
-
-//let archivoComprobanteTransferencia = null;
-
 // Abrir modal de transferencia
 function abrirModalTransferencia() {
     const total = calcularTotal();
@@ -1155,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-let archivoComprobanteTransferencia = null;
+//let archivoComprobanteTransferencia = null;
 
 
 // Procesar archivo de transferencia
