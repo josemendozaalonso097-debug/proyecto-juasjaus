@@ -336,12 +336,11 @@ document.addEventListener('keydown', function(event) {
 });
 document.addEventListener('DOMContentLoaded', function() {
     const btnFacturas = document.querySelector('.btn-facturas');
-    
     if (btnFacturas) {
-        btnFacturas.addEventListener('click', function() {
-            alert('Descargando facturas...');
-        });
-    }
+    btnFacturas.addEventListener('click', function() {
+        generarPDFHistorial();
+    });
+}
 });
 const styleAnimations = document.createElement('style');
 styleAnimations.textContent = `
@@ -933,3 +932,68 @@ document.addEventListener('keydown', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', renderizarHistorial);
+
+function generarPDFHistorial() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+    
+    if (historial.length === 0) {
+        alert('No hay compras en el historial');
+        return;
+    }
+    
+    // Encabezado
+    doc.setFillColor(148, 39, 44);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.text('CBTis 258', 105, 20, { align: 'center' });
+    doc.setFontSize(14);
+    doc.text('HISTORIAL DE FACTURAS', 105, 32, { align: 'center' });
+    
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text(`Generado: ${new Date().toLocaleDateString('es-MX')}`, 105, 50, { align: 'center' });
+    
+    let y = 65;
+    let totalGastado = 0;
+    
+    historial.forEach((compra, i) => {
+        if (y > 250) {
+            doc.addPage();
+            y = 20;
+        }
+        
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Compra #${i + 1} - ${compra.fecha}`, 20, y);
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        doc.text(`Método: ${compra.metodoPago}`, 20, y + 7);
+        doc.text(`Estado: ${compra.estado}`, 20, y + 14);
+        
+        compra.productos.forEach((prod, j) => {
+            doc.text(`• ${prod.nombre} x${prod.cantidad} - $${(prod.precio * prod.cantidad).toFixed(2)}`, 25, y + 21 + (j * 6));
+        });
+        
+        doc.setFont(undefined, 'bold');
+        doc.text(`Subtotal: $${compra.total.toFixed(2)} MXN`, 20, y + 21 + (compra.productos.length * 6) + 5);
+        
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, y + 28 + (compra.productos.length * 6), 190, y + 28 + (compra.productos.length * 6));
+        
+        totalGastado += compra.total;
+        y += 35 + (compra.productos.length * 6);
+    });
+    
+    // Total final
+    doc.setFillColor(240, 240, 240);
+    doc.rect(0, y, 210, 20, 'F');
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(148, 39, 44);
+    doc.text(`TOTAL GASTADO: $${totalGastado.toFixed(2)} MXN`, 105, y + 13, { align: 'center' });
+    
+    doc.save('historial_facturas.pdf');
+}
