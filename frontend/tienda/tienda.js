@@ -1035,6 +1035,9 @@ window.addEventListener('click', function(event) {
 });
 
 
+
+//let archivoComprobanteTransferencia = null;
+
 // Abrir modal de transferencia
 function abrirModalTransferencia() {
     const total = calcularTotal();
@@ -1206,36 +1209,69 @@ function quitarArchivoTransferencia() {
 
 // Enviar comprobante de transferencia
 function enviarComprobanteTransferencia() {
-    console.log('Función llamada'); // Debug
-    console.log('Archivo:', archivoComprobanteTransferencia); // Debug
-    
     if (!archivoComprobanteTransferencia) {
         alert('Por favor selecciona un comprobante de pago.');
         return;
     }
-    
-    const referencia = document.getElementById('referenciaTransferencia').value;
-    const banco = document.getElementById('bancoOrigenTransferencia').value;
-    const fecha = document.getElementById('fechaTransferencia').value;
+
+    const referencia = document.getElementById('referenciaTransferencia').value || 'N/A';
+    const banco = document.getElementById('bancoOrigenTransferencia').value || 'N/A';
+    const fecha = document.getElementById('fechaTransferencia').value || new Date().toISOString().split('T')[0];
     const total = calcularTotal();
-    
-    console.log({
-        tipo: 'TRANSFERENCIA',
-        archivo: archivoComprobanteTransferencia.name,
-        referencia: referencia || 'No especificado',
-        banco: banco || 'No especificado',
-        fecha: fecha || 'No especificado',
-        monto: total
-    });
-    
+
+    // ================== 1️⃣ GENERAR TXT ==================
+    const contenidoTXT = `
+TIPO DE PAGO: TRANSFERENCIA
+MONTO: $${total} MXN
+REFERENCIA: ${referencia}
+BANCO: ${banco}
+FECHA: ${fecha}
+ARCHIVO: ${archivoComprobanteTransferencia.name}
+`;
+
+    const blob = new Blob([contenidoTXT], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `comprobante_transferencia_${Date.now()}.txt`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    // ===== GUARDAR EN HISTORIAL (MISMO QUE DEPÓSITO) =====
+const fechaObj = new Date();
+const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const fechaFormato = `${fechaObj.getDate().toString().padStart(2, '0')}/${meses[fechaObj.getMonth()]}/${fechaObj.getFullYear()}`;
+
+const compra = {
+    fecha: fechaFormato,
+    metodoPago: 'Transferencia',
+    productos: carrito.map(item => ({
+        nombre: item.nombre,
+        precio: item.precio,
+        cantidad: item.cantidad,
+        tallaSeleccionada: item.tallaSeleccionada
+    })),
+    total: total,
+    estado: 'Pendiente'
+};
+
+let historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+historial.push(compra);
+localStorage.setItem('historialCompras', JSON.stringify(historial));
+
+
+    // ================== 3️⃣ CERRAR + CONFIRMACIÓN ==================
     cerrarModalTransferencia();
-    
-    alert('¡Comprobante recibido! Estado: Pendiente de verificación');
-    
-    // Opcional: Vaciar carrito
-    carrito = [];
-    actualizarCarrito();
+    mostrarConfirmacionTransferencia();
+
+    // ================== 4️⃣ VACIAR CARRITO ==================
+carrito = [];
+actualizarCarrito();
+
 }
+
 
 // Mostrar confirmación
 function mostrarConfirmacionTransferencia() {
