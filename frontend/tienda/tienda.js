@@ -454,29 +454,59 @@ document.addEventListener('keydown', function(event) {
 });
 
 function generarComprobanteTarjeta() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
     const total = calcularTotal();
     const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
     const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
     
-    let contenido = `
-COMPROBANTE DE PAGO
------------------------------
-Tipo de pago: Tarjeta
-Titular: ${nombreTarjeta}
-Número de tarjeta: ${numeroTarjeta}
-Monto: $${total.toFixed(2)} MXN
------------------------------
-Productos:
-${carrito.map(item => `- ${item.nombre} x ${item.cantidad} ${item.tallaSeleccionada ? '(Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
-`;
-
-    const blob = new Blob([contenido], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'comprobante_tarjeta.txt';
-    a.click();
-    URL.revokeObjectURL(url);
+    // Encabezado
+    doc.setFillColor(148, 39, 44);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(24);
+    doc.text('CBTis 258', 105, 20, { align: 'center' });
+    doc.setFontSize(14);
+    doc.text('COMPROBANTE DE PAGO', 105, 32, { align: 'center' });
+    
+    // Información
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.text(`Método: Tarjeta de Crédito/Débito`, 20, 55);
+    doc.text(`Titular: ${nombreTarjeta}`, 20, 65);
+    doc.text(`Tarjeta: ${numeroTarjeta}`, 20, 75);
+    doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, 20, 85);
+    
+    // Tabla de productos
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('PRODUCTOS:', 20, 100);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(11);
+    
+    let y = 110;
+    carrito.forEach(item => {
+        const linea = `• ${item.nombre} x${item.cantidad}${item.tallaSeleccionada ? ` (${item.tallaSeleccionada})` : ''} - $${(item.precio * item.cantidad).toFixed(2)}`;
+        doc.text(linea, 25, y);
+        y += 8;
+    });
+    
+    // Total
+    doc.setDrawColor(148, 39, 44);
+    doc.setLineWidth(0.5);
+    doc.line(20, y + 5, 190, y + 5);
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text(`TOTAL: $${total.toFixed(2)} MXN`, 105, y + 15, { align: 'center' });
+    
+    // Pie
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text('Gracias por tu compra', 105, y + 30, { align: 'center' });
+    doc.text('CBTis 258 - Un motivo de orgullo', 105, y + 37, { align: 'center' });
+    
+    doc.save('comprobante_tarjeta.pdf');
 }
 
 
@@ -536,76 +566,60 @@ if (checkoutBtn) {
         localStorage.setItem('historialCompras', JSON.stringify(historial));
 
         // ===== DESCARGAR COMPROBANTE =====
-        const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
-        const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
-        
-        const contenido = `
-COMPROBANTE DE PAGO
------------------------------
-Tipo de pago: Tarjeta
-Titular: ${nombreTarjeta}
-Número de tarjeta: ${numeroTarjeta}
-Fecha: ${fechaFormato}
-Monto: $${total.toFixed(2)} MXN
------------------------------
-Productos:
-${carrito.map(item => `- ${item.nombre} x ${item.cantidad}${item.tallaSeleccionada ? ' (Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
 
-Total: $${total.toFixed(2)} MXN
------------------------------
-Gracias por tu compra.
-        `;
+        // Generar PDF
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
+const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
 
-        const blob = new Blob([contenido], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'comprobante_tarjeta.txt';
-        a.click();
-        URL.revokeObjectURL(url);
+doc.setFillColor(148, 39, 44);
+doc.rect(0, 0, 210, 40, 'F');
+doc.setTextColor(255, 255, 255);
+doc.setFontSize(24);
+doc.text('CBTis 258', 105, 20, { align: 'center' });
+doc.setFontSize(14);
+doc.text('COMPROBANTE DE PAGO', 105, 32, { align: 'center' });
 
-        const confirmacion = document.createElement('div');
-        confirmacion.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            z-index: 10003;
-            text-align: center;
-            max-width: 400px;
-            border: 3px solid #27ae60;
-        `;
-        
-        confirmacion.innerHTML = `
-            <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
-            <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Pago realizado con éxito!</h2>
-            <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
-                Total pagado: $${total.toFixed(2)} MXN<br><br>
-                Tu comprobante ha sido descargado automáticamente.
-            </p>
-            <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
-                background: #27ae60;
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 10px;
-                font-size: 1em;
-                font-weight: 600;
-                cursor: pointer;
-            ">Entendido</button>
-        `;
-        
-        document.body.appendChild(confirmacion);
+doc.setTextColor(0, 0, 0);
+doc.setFontSize(12);
+doc.text(`Método: Tarjeta`, 20, 55);
+doc.text(`Titular: ${nombreTarjeta}`, 20, 65);
+doc.text(`Tarjeta: ${numeroTarjeta}`, 20, 75);
+doc.text(`Fecha: ${fechaFormato}`, 20, 85);
+
+doc.setFontSize(14);
+doc.setFont(undefined, 'bold');
+doc.text('PRODUCTOS:', 20, 100);
+doc.setFont(undefined, 'normal');
+doc.setFontSize(11);
+
+let y = 110;
+carrito.forEach(item => {
+    doc.text(`• ${item.nombre} x${item.cantidad}${item.tallaSeleccionada ? ` (${item.tallaSeleccionada})` : ''} - $${(item.precio * item.cantidad).toFixed(2)}`, 25, y);
+    y += 8;
+});
+
+doc.setLineWidth(0.5);
+doc.line(20, y + 5, 190, y + 5);
+doc.setFontSize(16);
+doc.setFont(undefined, 'bold');
+doc.text(`TOTAL: $${total.toFixed(2)} MXN`, 105, y + 15, { align: 'center' });
+
+doc.setFontSize(10);
+doc.setFont(undefined, 'normal');
+doc.setTextColor(100, 100, 100);
+doc.text('Gracias por tu compra', 105, y + 30, { align: 'center' });
+
+doc.save('comprobante_tarjeta.pdf');
+
         carrito = [];
         localStorage.removeItem('carrito');
         actualizarCarrito();
-        cerrarModalPago();
-    });
-}
+    }); // ← cierra addEventListener
+} // ← cierra if (checkoutBtn)
+
+    
 
 // ========== VALIDACIÓN Y FORMATEO DE TARJETA ==========
 
@@ -888,32 +902,52 @@ function enviarComprobante() {
     localStorage.setItem('historialCompras', JSON.stringify(historial));
     
     // ===== DESCARGAR COMPROBANTE =====
-    const contenido = `
-COMPROBANTE DE PAGO
------------------------------
-Tipo de pago: Depósito
-Referencia: ${referencia || 'No especificado'}
-Banco: ${banco || 'No especificado'}
-Fecha: ${fechaInput || 'No especificado'}
-Monto: $${total.toFixed(2)} MXN
------------------------------
-Productos:
-${carrito.map(item => `- ${item.nombre} x ${item.cantidad}${item.tallaSeleccionada ? ' (Talla: ' + item.tallaSeleccionada + ')' : ''} - $${(item.precio * item.cantidad).toFixed(2)}`).join('\n')}
+   
+    // Generar PDF
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
+const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
 
-Total: $${total.toFixed(2)} MXN
------------------------------
-Estado: Pendiente de verificación
-    `;
+doc.setFillColor(148, 39, 44);
+doc.rect(0, 0, 210, 40, 'F');
+doc.setTextColor(255, 255, 255);
+doc.setFontSize(24);
+doc.text('CBTis 258', 105, 20, { align: 'center' });
+doc.setFontSize(14);
+doc.text('COMPROBANTE DE PAGO', 105, 32, { align: 'center' });
 
-    const blob = new Blob([contenido], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'comprobante_deposito.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    cerrarModalDeposito();
+doc.setTextColor(0, 0, 0);
+doc.setFontSize(12);
+doc.text(`Método: Depósito`, 20, 55);
+doc.text(`Titular: ${nombreTarjeta}`, 20, 65);
+doc.text(`Tarjeta: ${numeroTarjeta}`, 20, 75);
+doc.text(`Fecha: ${fechaFormato}`, 20, 85);
+
+doc.setFontSize(14);
+doc.setFont(undefined, 'bold');
+doc.text('PRODUCTOS:', 20, 100);
+doc.setFont(undefined, 'normal');
+doc.setFontSize(11);
+
+let y = 110;
+carrito.forEach(item => {
+    doc.text(`• ${item.nombre} x${item.cantidad}${item.tallaSeleccionada ? ` (${item.tallaSeleccionada})` : ''} - $${(item.precio * item.cantidad).toFixed(2)}`, 25, y);
+    y += 8;
+});
+
+doc.setLineWidth(0.5);
+doc.line(20, y + 5, 190, y + 5);
+doc.setFontSize(16);
+doc.setFont(undefined, 'bold');
+doc.text(`TOTAL: $${total.toFixed(2)} MXN`, 105, y + 15, { align: 'center' });
+
+doc.setFontSize(10);
+doc.setFont(undefined, 'normal');
+doc.setTextColor(100, 100, 100);
+doc.text('Gracias por tu compra', 105, y + 30, { align: 'center' });
+
+doc.save('comprobante_Deposito.pdf');
     
     const confirmacion = document.createElement('div');
     confirmacion.style.cssText = `
@@ -1220,24 +1254,51 @@ function enviarComprobanteTransferencia() {
     const total = calcularTotal();
 
     // ================== 1️⃣ GENERAR TXT ==================
-    const contenidoTXT = `
-TIPO DE PAGO: TRANSFERENCIA
-MONTO: $${total} MXN
-REFERENCIA: ${referencia}
-BANCO: ${banco}
-FECHA: ${fecha}
-ARCHIVO: ${archivoComprobanteTransferencia.name}
-`;
+   // Generar PDF
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
+const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
 
-    const blob = new Blob([contenidoTXT], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
+doc.setFillColor(148, 39, 44);
+doc.rect(0, 0, 210, 40, 'F');
+doc.setTextColor(255, 255, 255);
+doc.setFontSize(24);
+doc.text('CBTis 258', 105, 20, { align: 'center' });
+doc.setFontSize(14);
+doc.text('COMPROBANTE DE PAGO', 105, 32, { align: 'center' });
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `comprobante_transferencia_${Date.now()}.txt`;
-    a.click();
+doc.setTextColor(0, 0, 0);
+doc.setFontSize(12);
+doc.text(`Método: Transferencia`, 20, 55);
+doc.text(`Titular: ${nombreTarjeta}`, 20, 65);
+doc.text(`Tarjeta: ${numeroTarjeta}`, 20, 75);
+doc.text(`Fecha: ${fechaFormato}`, 20, 85);
 
-    URL.revokeObjectURL(url);
+doc.setFontSize(14);
+doc.setFont(undefined, 'bold');
+doc.text('PRODUCTOS:', 20, 100);
+doc.setFont(undefined, 'normal');
+doc.setFontSize(11);
+
+let y = 110;
+carrito.forEach(item => {
+    doc.text(`• ${item.nombre} x${item.cantidad}${item.tallaSeleccionada ? ` (${item.tallaSeleccionada})` : ''} - $${(item.precio * item.cantidad).toFixed(2)}`, 25, y);
+    y += 8;
+});
+
+doc.setLineWidth(0.5);
+doc.line(20, y + 5, 190, y + 5);
+doc.setFontSize(16);
+doc.setFont(undefined, 'bold');
+doc.text(`TOTAL: $${total.toFixed(2)} MXN`, 105, y + 15, { align: 'center' });
+
+doc.setFontSize(10);
+doc.setFont(undefined, 'normal');
+doc.setTextColor(100, 100, 100);
+doc.text('Gracias por tu compra', 105, y + 30, { align: 'center' });
+
+doc.save('comprobante_transferencia.pdf');
 
     // ===== GUARDAR EN HISTORIAL (MISMO QUE DEPÓSITO) =====
 const fechaObj = new Date();
