@@ -56,15 +56,23 @@ signUpForm.addEventListener('submit', async (e) => {
             
             alert('¡Cuenta creada exitosamente!');
             // ✅ AGREGAR ESTE TIMEOUT
-                setTimeout(() => {
+
+            await new Promise(resolve => setTimeout(resolve, 300));
             window.location.href = 'principal/index.html';
-        }, 100);
+
+                //setTimeout(() => {
+            //window.location.href = 'principal/index.html';
+        //}, 100);
         } else {
             alert(data.detail || 'Error al crear cuenta');
+            submitBtn.disable = false;
+            submitBtn.textContent = originalText;
         }
     } catch (error) {
         console.error('Error:', error);
         alert('Error de conexión con el servidor');
+        submitBtn.disable = false;
+        submitBtn.textContent = originalText;
     }
 });
 
@@ -178,7 +186,7 @@ window.onload = async function () {
     // Inicializar Google Identity Services
     if (typeof google !== 'undefined' && google.accounts) {
         google.accounts.id.initialize({
-            client_id: 'TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com', // CAMBIAR ESTO
+            client_id: '518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com', // CAMBIAR ESTO
             callback: handleCredentialResponse,
             ux_mode: 'popup'
         });
