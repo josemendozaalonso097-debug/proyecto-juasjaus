@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import secrets
@@ -34,7 +35,7 @@ async def ping():
 # REGISTRO
 # ============================================
 
-@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     """Registrar nuevo usuario con email y contraseña"""
     
@@ -69,16 +70,28 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     # Crear token JWT
     access_token = create_access_token(data={"sub": new_user.email})
     
-    return Token(
-        access_token=access_token,
-        user=UserResponse.from_orm(new_user)
-    )
+    # Crear respuesta con headers CORS explícitos
+    response_data = {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": new_user.id,
+            "nombre": new_user.nombre,
+            "email": new_user.email,
+            "profile_picture": new_user.profile_picture,
+            "is_verified": new_user.is_verified,
+            "created_at": new_user.created_at.isoformat()
+        }
+    }
+    
+    return response_data
+
 
 # ============================================
 # LOGIN
 # ============================================
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     """Login con email y contraseña"""
     
@@ -100,16 +113,28 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     # Crear token JWT
     access_token = create_access_token(data={"sub": user.email})
     
-    return Token(
-        access_token=access_token,
-        user=UserResponse.from_orm(user)
-    )
+    # Crear respuesta con headers CORS explícitos
+    response_data = {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "nombre": user.nombre,
+            "email": user.email,
+            "profile_picture": user.profile_picture,
+            "is_verified": user.is_verified,
+            "created_at": user.created_at.isoformat()
+        }
+    }
+    
+    return response_data
+
 
 # ============================================
 # LOGIN CON GOOGLE
 # ============================================
 
-@router.post("/login/google", response_model=Token)
+@router.post("/login/google")
 async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
     """Login con Google OAuth"""
     
@@ -164,10 +189,21 @@ async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
         # Crear token JWT
         access_token = create_access_token(data={"sub": user.email})
         
-        return Token(
-            access_token=access_token,
-            user=UserResponse.from_orm(user)
-        )
+        response_data = {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "nombre": user.nombre,
+                "email": user.email,
+                "profile_picture": user.profile_picture,
+                "is_verified": user.is_verified,
+                "created_at": user.created_at.isoformat()
+            }
+        }
+        
+        return response_data
+
         
     except ValueError as e:
         raise HTTPException(

@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .database import init_db
@@ -14,8 +15,11 @@ app = FastAPI(
 )
 
 # ============================================
-# CONFIGURACIÓN DE CORS - MUY IMPORTANTE
+# CONFIGURACIÓN DE CORS - ULTRA PERMISIVA
+# ============================================
 
+
+# También mantener el middleware estándar
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,15 +29,9 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-# Handler adicional para OPTIONS
-@app.options("/{rest_of_path:path}")
-async def preflight_handler(rest_of_path: str):
-    return {"message": "OK"}
-
 # ============================================
 # REGISTRAR ROUTERS
 # ============================================
-# Importar modelos para crear las tablas
 from .models import user
 
 app.include_router(auth.router, prefix="/api")
@@ -56,7 +54,7 @@ async def startup_event():
     print(f"📍 API URL: http://localhost:8000")
     print(f"📚 Docs: http://localhost:8000/docs")
     print(f"🌐 Frontend: {settings.FRONTEND_URL}")
-    print(f"🔐 CORS configurado correctamente")
+    print(f"🔐 CORS: PERMITIDO PARA TODOS LOS ORÍGENES (desarrollo)")
     print("="*60 + "\n")
 
 @app.on_event("shutdown")
@@ -88,4 +86,13 @@ async def test():
     return {
         "success": True,
         "message": "✅ API funcionando correctamente"
+    }
+
+# Health check
+@app.get("/health")
+async def health_check():
+    """Verificar estado del servidor"""
+    return {
+        "status": "healthy",
+        "message": "Server is running"
     }
