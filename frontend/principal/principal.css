@@ -1347,115 +1347,62 @@ body{
 }
 
 /* =========================
-   MODO APP - SOLO CEL
-========================= */
+   FIX REAL SOLO CELULARES
+   ========================= */
 @media (max-width: 768px) {
 
-  html, body {
-    height: 100%;
-    overflow: hidden; /* NO SCROLL */
-  }
-
+  /* 1️⃣ ARREGLAR EL BODY */
   body {
-    display: flex;
-    flex-direction: column;
+    min-width: 100% !important;
+    overflow-x: hidden;
   }
 
-  /* HEADER COMPACTO */
-  .cab-header {
-    padding: 10px;
+  /* 2️⃣ HEADER Y LOGO */
+  .header-content {
+    flex-direction: column;
+    text-align: center;
   }
 
   .logo {
-    height: 70px;
-  }
-
-  .logo-section {
-    flex-direction: row;
-    gap: 10px;
+    height: 70px !important; /* antes 250px */
   }
 
   .logo-section h1 {
-    font-size: 20px;
+    font-size: 24px;
   }
 
   .logo-section h2 {
-    font-size: 12px;
-  }
-
-  /* MAIN OCUPA TODA LA PANTALLA */
-  .main-content {
-    flex: 1;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  /* BIENVENIDA */
-  .titulodeBienvenida {
-    font-size: 18px;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-
-  /* DASHBOARD EN UNA SOLA COLUMNA */
-  .dashboard {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  /* CARD PRINCIPAL */
-  .card-main {
-    padding: 15px;
-  }
-
-  .card-title {
-    font-size: 16px;
-  }
-
-  .alert-box {
-    padding: 10px;
-  }
-
-  /* BOTONES GRANDES TIPO APP */
-  .botones {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .btn {
-    padding: 14px;
-    font-size: 15px;
-    width: 100%;
-  }
-
-  /* INFO DERECHA ABAJO */
-  .columna-derecha {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .info-card {
-    padding: 12px;
-  }
-
-  .info-title,
-  .info-title-s {
     font-size: 14px;
   }
 
-  .info-text {
-    font-size: 12px;
+  /* 3️⃣ DASHBOARD A UNA COLUMNA */
+  .dashboard {
+    grid-template-columns: 1fr !important;
   }
 
-  /* OCULTAMOS TODO LO QUE ROMPE */
-  .footer,
-  .modal-historial,
-  .modal-detalle,
-  .add-card-page {
-    display: none !important;
+  /* 4️⃣ QUITAR ESPACIOS GIGANTES */
+  .main-content {
+    padding: 15px 10px;
   }
+
+  /* 5️⃣ TARJETAS FULL WIDTH */
+  .card-main,
+  .info-card {
+    width: 100%;
+  }
+
+  /* 6️⃣ BOTONES GRANDES */
+  .btn {
+    width: 100%;
+  }
+
+  /* 7️⃣ STATUS NO GIGANTE */
+  .status {
+    padding: 6px 20px;
+    font-size: 11px;
+  }
+
 }
+
+
 

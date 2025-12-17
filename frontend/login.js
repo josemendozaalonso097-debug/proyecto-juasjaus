@@ -1,5 +1,11 @@
-// Configuración del backend FastAPI
-const API_URL = 'http://localhost:8000/api/auth';
+// ============================================
+// CONFIGURACIÓN
+// ============================================
+
+const API_BASE = 'http://127.0.0.1:8000';
+const API_URL = `${API_BASE}/api/auth`;
+
+console.log('🔗 API URL:', API_URL);
 
 const container = document.getElementById('container');
 const registerBtn = document.getElementById('register');
@@ -14,7 +20,7 @@ loginBtn.addEventListener('click', () => {
 });
 
 // ============================================
-// FUNCIONALIDAD DE REGISTRO CON EMAIL/PASSWORD
+// FUNCIONALIDAD DE REGISTRO
 // ============================================
 
 const signUpForm = document.querySelector('.sign-up form');
@@ -23,22 +29,37 @@ const signUpInputs = signUpForm.querySelectorAll('.input');
 signUpForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    console.log('🎯 === INICIO DE REGISTRO ===');
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Registrando...';
+    
     const nombre = signUpInputs[0].value.trim();
     const email = signUpInputs[1].value.trim();
     const password = signUpInputs[2].value.trim();
     
-    // Validaciones básicas
+    console.log('📝 Datos:', { nombre, email });
+    
+    // Validaciones
     if (!nombre || !email || !password) {
         alert('Por favor llena todos los campos');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         return;
     }
     
     if (password.length < 6) {
         alert('La contraseña debe tener al menos 6 caracteres');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         return;
     }
     
     try {
+        console.log('📡 Enviando a:', `${API_URL}/register`);
+        
         const response = await fetch(`${API_URL}/register`, {
             method: 'POST',
             headers: {
@@ -47,37 +68,45 @@ signUpForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ nombre, email, password })
         });
         
+        console.log('📥 Status:', response.status);
+        
         const data = await response.json();
+        console.log('📦 Respuesta:', data);
         
         if (response.ok) {
-            // Guardar token en localStorage
+            console.log('✅ ¡REGISTRO EXITOSO!');
+            
+            // Guardar token
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
-            alert('¡Cuenta creada exitosamente!');
-            // ✅ AGREGAR ESTE TIMEOUT
-
-            await new Promise(resolve => setTimeout(resolve, 300));
+            console.log('💾 Token guardado');
+            
+            alert('¡Cuenta creada exitosamente! 🎉');
+            
+            console.log('🔄 Redirigiendo...');
+            
+            localStorage.setItem('just_registered', 'true');
+            // Redirigir
             window.location.href = 'principal/index.html';
-
-                //setTimeout(() => {
-            //window.location.href = 'principal/index.html';
-        //}, 100);
+            
         } else {
+            console.log('❌ Error:', data.detail);
             alert(data.detail || 'Error al crear cuenta');
-            submitBtn.disable = false;
+            submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
+        
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error de conexión con el servidor');
-        submitBtn.disable = false;
+        console.error('❌ Error:', error);
+        alert('Error de conexión. Verifica que el backend esté corriendo en http://127.0.0.1:8000');
+        submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
 });
 
 // ============================================
-// FUNCIONALIDAD DE LOGIN CON EMAIL/PASSWORD
+// FUNCIONALIDAD DE LOGIN
 // ============================================
 
 const signInForm = document.querySelector('.sign-in form');
@@ -86,15 +115,28 @@ const signInInputs = signInForm.querySelectorAll('.input');
 signInForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    console.log('🎯 === INICIO DE LOGIN ===');
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Iniciando...';
+    
     const email = signInInputs[0].value.trim();
     const password = signInInputs[1].value.trim();
     
+    console.log('📝 Email:', email);
+    
     if (!email || !password) {
         alert('Por favor llena todos los campos');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         return;
     }
     
     try {
+        console.log('📡 Enviando login...');
+        
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
@@ -103,21 +145,33 @@ signInForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password })
         });
         
+        console.log('📥 Status:', response.status);
+        
         const data = await response.json();
+        console.log('📦 Respuesta:', data);
         
         if (response.ok) {
-            // Guardar token en localStorage
+            console.log('✅ ¡LOGIN EXITOSO!');
+            
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
-            alert(`¡Bienvenid@ ${data.user.nombre}!`);
+            alert(`¡Bienvenid@ ${data.user.nombre}! 🎉`);
+            
             window.location.href = 'principal/index.html';
+            
         } else {
+            console.log('❌ Error:', data.detail);
             alert(data.detail || 'Email o contraseña incorrectos');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
+        
     } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error:', error);
         alert('Error de conexión con el servidor');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
 });
 
@@ -125,8 +179,12 @@ signInForm.addEventListener('submit', async (e) => {
 // LOGIN CON GOOGLE
 // ============================================
 
+let googleInitialized = false;
+
 async function handleCredentialResponse(response) {
     const id_token = response.credential;
+    
+    console.log('🔐 Token de Google recibido');
     
     try {
         const res = await fetch(`${API_URL}/login/google`, {
@@ -134,24 +192,67 @@ async function handleCredentialResponse(response) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token: id_token }),
+            body: JSON.stringify({ token: id_token })
         });
         
         const data = await res.json();
         
         if (res.ok) {
-            // Guardar token en localStorage
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             
             alert(`¡Bienvenido ${data.user.nombre}!`);
             window.location.href = 'principal/index.html';
         } else {
+            console.error('❌ Error:', data);
             alert('Error de autenticación con Google: ' + data.detail);
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error:', error);
         alert('Error de conexión con el servidor');
+    }
+}
+
+function initializeGoogleSignIn() {
+    if (typeof google === 'undefined' || !google.accounts) {
+        console.log('⏳ Google SDK no cargado, reintentando...');
+        setTimeout(initializeGoogleSignIn, 500);
+        return;
+    }
+    
+    if (googleInitialized) return;
+    
+    try {
+        google.accounts.id.initialize({
+            client_id: '518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com',
+            callback: handleCredentialResponse,
+            ux_mode: 'popup',
+            auto_select: false
+        });
+        
+        googleInitialized = true;
+        console.log('✅ Google Sign-In inicializado');
+        
+        const signupBtn = document.getElementById('google-signup-btn');
+        if (signupBtn) {
+            signupBtn.onclick = function(e) {
+                e.preventDefault();
+                google.accounts.id.prompt();
+                return false;
+            };
+        }
+        
+        const signinBtn = document.getElementById('google-signin-btn');
+        if (signinBtn) {
+            signinBtn.onclick = function(e) {
+                e.preventDefault();
+                google.accounts.id.prompt();
+                return false;
+            };
+        }
+        
+    } catch (error) {
+        console.error('❌ Error inicializando Google:', error);
     }
 }
 
@@ -160,9 +261,21 @@ async function handleCredentialResponse(response) {
 // ============================================
 
 window.onload = async function () {
-    // Verificar si ya hay una sesión activa
+    console.log('🚀 Página cargada');
+    
+        // 🚩 EVITAR CHECK-SESSION JUSTO DESPUÉS DE REGISTRO
+    if (localStorage.getItem('just_registered')) {
+        console.log('🆕 Usuario recién registrado, saltando check-session');
+        localStorage.removeItem('just_registered');
+        initializeGoogleSignIn();
+        return;
+    }
+
+
+    // Verificar sesión activa
     const token = localStorage.getItem('access_token');
     if (token) {
+        console.log('🔑 Token encontrado, verificando...');
         try {
             const response = await fetch(`${API_URL}/check-session`, {
                 headers: {
@@ -171,41 +284,34 @@ window.onload = async function () {
             });
             
             if (response.ok) {
+                console.log('✅ Sesión válida, redirigiendo...');
                 window.location.href = 'principal/index.html';
                 return;
             } else {
-                // Token inválido, limpiar
+                console.log('⚠️ Token inválido');
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('user');
             }
         } catch (error) {
-            console.log('No hay sesión activa');
+            console.log('⚠️ Error verificando sesión');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
         }
     }
     
-    // Inicializar Google Identity Services
-    if (typeof google !== 'undefined' && google.accounts) {
-        google.accounts.id.initialize({
-            client_id: '518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com', // CAMBIAR ESTO
-            callback: handleCredentialResponse,
-            ux_mode: 'popup'
-        });
-
-        const signupBtn = document.getElementById('google-signup-btn');
-        if (signupBtn) {
-            signupBtn.onclick = function() {
-                google.accounts.id.prompt();
-                return false;
-            };
+    // Inicializar Google
+    initializeGoogleSignIn();
+    
+    // Verificar backend
+    console.log('🔍 Verificando backend...');
+    try {
+        const response = await fetch(`${API_BASE}/health`);
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Backend conectado:', data);
         }
-
-        const signinBtn = document.getElementById('google-signin-btn');
-        if (signinBtn) {
-            signinBtn.onclick = function() {
-                google.accounts.id.prompt();
-                return false;
-            };
-        }
+    } catch (error) {
+        console.error('❌ Backend NO responde:', error);
     }
 };
 
@@ -253,6 +359,9 @@ if (sendForgotBtn) {
             return;
         }
         
+        sendForgotBtn.disabled = true;
+        sendForgotBtn.textContent = 'Enviando...';
+        
         try {
             const response = await fetch(`${API_URL}/forgot-password`, {
                 method: 'POST',
@@ -268,8 +377,11 @@ if (sendForgotBtn) {
             modalForgot.classList.remove('active');
             emailForgotInput.value = '';
         } catch (error) {
-            console.error('Error:', error);
+            console.error('❌ Error:', error);
             alert('Error de conexión con el servidor');
+        } finally {
+            sendForgotBtn.disabled = false;
+            sendForgotBtn.textContent = 'Enviar Email';
         }
     });
 }
