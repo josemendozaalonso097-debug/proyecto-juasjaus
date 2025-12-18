@@ -3,6 +3,55 @@ const API_URL = 'http://localhost:8000/api';
 
 let archivoComprobanteTransferencia = null;
 
+// ========================================
+// SISTEMA DE HISTORIAL POR USUARIO
+// ========================================
+
+function obtenerUsuarioActual() {
+    const userData = localStorage.getItem('user');
+    if (!userData) return null;
+    
+    try {
+        const user = JSON.parse(userData);
+        return user.id || user.email;
+    } catch (e) {
+        console.error('Error al obtener usuario:', e);
+        return null;
+    }
+}
+
+function obtenerClaveHistorial() {
+    const userId = obtenerUsuarioActual();
+    if (!userId) return null;
+    return `historialCompras_${userId}`;
+}
+
+function guardarEnHistorial(compra) {
+    const claveHistorial = obtenerClaveHistorial();
+    if (!claveHistorial) {
+        console.error('No hay usuario logueado');
+        return false;
+    }
+    
+    let historial = JSON.parse(localStorage.getItem(claveHistorial)) || [];
+    historial.push(compra);
+    localStorage.setItem(claveHistorial, JSON.stringify(historial));
+    
+    console.log('✅ Compra guardada en historial del usuario:', obtenerUsuarioActual());
+    return true;
+}
+
+function obtenerHistorial() {
+    const claveHistorial = obtenerClaveHistorial();
+    if (!claveHistorial) {
+        console.warn('No hay usuario logueado');
+        return [];
+    }
+    
+    const historial = localStorage.getItem(claveHistorial);
+    return historial ? JSON.parse(historial) : [];
+}
+
 
 // Verificar si hay un usuario logueado
 window.onload = async function() {
@@ -561,9 +610,7 @@ if (checkoutBtn) {
             estado: 'Completado'
         };
         
-        let historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
-        historial.push(compra);
-        localStorage.setItem('historialCompras', JSON.stringify(historial));
+        guardarEnHistorial(compra);
 
         // ===== DESCARGAR COMPROBANTE =====
 
@@ -1318,9 +1365,8 @@ const compra = {
     estado: 'Pendiente'
 };
 
-let historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
-historial.push(compra);
-localStorage.setItem('historialCompras', JSON.stringify(historial));
+guardarEnHistorial(compra);
+
 
 
     // ================== 3️⃣ CERRAR + CONFIRMACIÓN ==================

@@ -1,5 +1,71 @@
+// ========================================
+// SISTEMA DE HISTORIAL POR USUARIO
+// ========================================
+
+(function() {
+    // Obtener ID del usuario actual
+    function obtenerUsuarioActual() {
+        const userData = localStorage.getItem('user');
+        if (!userData) return null;
+        
+        try {
+            const user = JSON.parse(userData);
+            return user.id || user.email;
+        } catch (e) {
+            console.error('Error al obtener usuario:', e);
+            return null;
+        }
+    }
+
+    // Obtener clave de historial del usuario
+    function obtenerClaveHistorial() {
+        const userId = obtenerUsuarioActual();
+        if (!userId) return null;
+        return 'historialCompras_' + userId;
+    }
+
+    // Guardar compra en historial del usuario
+    function guardarEnHistorial(compra) {
+        const claveHistorial = obtenerClaveHistorial();
+        if (!claveHistorial) {
+            console.error('No hay usuario logueado');
+            return false;
+        }
+        
+        let historial = JSON.parse(localStorage.getItem(claveHistorial)) || [];
+        historial.push(compra);
+        localStorage.setItem(claveHistorial, JSON.stringify(historial));
+        
+        console.log('✅ Compra guardada para usuario:', obtenerUsuarioActual());
+        return true;
+    }
+
+    // Obtener historial del usuario actual
+    function obtenerHistorial() {
+        const claveHistorial = obtenerClaveHistorial();
+        if (!claveHistorial) {
+            console.warn('No hay usuario logueado');
+            return [];
+        }
+        
+        const historial = localStorage.getItem(claveHistorial);
+        return historial ? JSON.parse(historial) : [];
+    }
+
+    // Exponer funciones globalmente
+    window.obtenerUsuarioActual = obtenerUsuarioActual;
+    window.obtenerClaveHistorial = obtenerClaveHistorial;
+    window.guardarEnHistorial = guardarEnHistorial;
+    window.obtenerHistorial = obtenerHistorial;
+})();
+
+// ========================================
+// FIN SISTEMA HISTORIAL
+// ========================================
+
 // Configuración del backend
 const API_URL = 'http://localhost:8000/api';
+
 
 // Verificar si hay un usuario logueado
 window.onload = async function() {
@@ -553,7 +619,11 @@ function renderizarHistorial() {
 
     if (!historialContainer) return;
 
-    const historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+    // 🔥 CAMBIO IMPORTANTE: Usar la función nueva
+    const historial = obtenerHistorial();
+
+    console.log('🔍 Historial del usuario actual:', historial);
+    console.log('👤 Usuario actual:', obtenerUsuarioActual());
 
     historialContainer.innerHTML = '';
 
@@ -936,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', renderizarHistorial);
 function generarPDFHistorial() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const historial = JSON.parse(localStorage.getItem('historialCompras')) || [];
+const historial = obtenerHistorial();
     
     if (historial.length === 0) {
         alert('No hay compras en el historial');

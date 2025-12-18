@@ -1,18 +1,28 @@
 #!/bin/bash
 
+echo "🧹 Limpiando procesos viejos..."
+pkill -f uvicorn 2>/dev/null
+pkill -f http.server 2>/dev/null
+
 echo "🚀 Iniciando backend..."
-cd backend
 source .venv/bin/activate
-uvicorn app.main:app --reload &
-BACK_PID=$!
+cd backend
+uvicorn app.main:app &
+BACKEND_PID=$!
+
+echo "⏳ Esperando backend..."
+sleep 2
+
+cd ..
 
 echo "🌐 Iniciando frontend..."
-cd ../frontend
+cd frontend
 python3 -m http.server 5501 &
-FRONT_PID=$!
+FRONTEND_PID=$!
 
 echo "✅ Todo corriendo"
-echo "Backend PID: $BACK_PID"
-echo "Frontend PID: $FRONT_PID"
+echo "Backend PID: $BACKEND_PID"
+echo "Frontend PID: $FRONTEND_PID"
 
 wait
+
