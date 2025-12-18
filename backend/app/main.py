@@ -55,6 +55,7 @@ async def startup_event():
     print(f"📚 Docs: http://localhost:8000/docs")
     print(f"🌐 Frontend: {settings.FRONTEND_URL}")
     print(f"🔐 CORS: PERMITIDO PARA TODOS LOS ORÍGENES (desarrollo)")
+    print(f"!!!!!!!!!!SERVIDOR CORRECTO NUEVO: http://127.0.0.1:5501/login.html")
     print("="*60 + "\n")
 
 @app.on_event("shutdown")
