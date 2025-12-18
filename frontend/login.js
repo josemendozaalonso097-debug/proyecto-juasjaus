@@ -78,7 +78,10 @@ signUpForm.addEventListener('submit', async (e) => {
             
             // Guardar token
             localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('user', JSON.stringify({
+    id: data.user.id,
+    email: data.user.email
+}));
             
             console.log('💾 Token guardado');
             

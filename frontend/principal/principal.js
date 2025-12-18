@@ -10,7 +10,7 @@
         
         try {
             const user = JSON.parse(userData);
-            return user.id || user.email;
+            return user.id;
         } catch (e) {
             console.error('Error al obtener usuario:', e);
             return null;
