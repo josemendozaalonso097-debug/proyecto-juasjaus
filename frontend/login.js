@@ -8,20 +8,39 @@ const API_URL = `${API_BASE}/api/auth`;
 console.log('🔗 API URL:', API_URL);
 
 const container = document.getElementById('container');
-const registerBtn = document.getElementById('register');
 const loginBtn = document.getElementById('login');
+const registerBtn = document.getElementById('register');
 
-registerBtn.addEventListener('click', () => {
-    container.classList.add("active");
-});
+if (registerBtn) {
+    registerBtn.addEventListener('click', () => {
+        container.classList.add("active");
+    });
+}
 
-loginBtn.addEventListener('click', () => {
-    container.classList.remove("active");
-});
+if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+        container.classList.remove("active");
+    });
+}
 
 // ============================================
 // FUNCIONALIDAD DE REGISTRO
 // ============================================
+
+const rolSelect = document.getElementById('rol-select');
+const semestreContainer = document.getElementById('semestre-container');
+const semestreSelect = document.getElementById('semestre-select');
+
+if (rolSelect && semestreContainer) {
+    rolSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'estudiante') {
+            semestreContainer.classList.remove('hidden');
+        } else {
+            semestreContainer.classList.add('hidden');
+            if(semestreSelect) semestreSelect.value = '';
+        }
+    });
+}
 
 const signUpForm = document.querySelector('.sign-up form');
 const signUpInputs = signUpForm.querySelectorAll('.input');
@@ -40,14 +59,29 @@ signUpForm.addEventListener('submit', async (e) => {
     const email = signUpInputs[1].value.trim();
     const password = signUpInputs[2].value.trim();
     
-    console.log('📝 Datos:', { nombre, email });
+    // Obtener rol y semestre
+    const rol = rolSelect ? rolSelect.value : '';
+    let semestre = '';
+    
+    console.log('📝 Datos:', { nombre, email, rol });
     
     // Validaciones
-    if (!nombre || !email || !password) {
-        alert('Por favor llena todos los campos');
+    if (!nombre || !email || !password || !rol) {
+        alert('Por favor llena todos los campos, incluyendo tu rol');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
+    }
+    
+    if (rol === 'estudiante') {
+        semestre = semestreSelect ? semestreSelect.value : '';
+        if (!semestre) {
+            alert('Por favor selecciona tu semestre');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            return;
+        }
+        console.log('🎓 Semestre:', semestre);
     }
     
     if (password.length < 6) {
@@ -65,7 +99,8 @@ signUpForm.addEventListener('submit', async (e) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ nombre, email, password })
+            // Se envían los nuevos datos aunque el backend actual sólo revise nombre, email, password
+            body: JSON.stringify({ nombre, email, password, rol, semestre })
         });
         
         console.log('📥 Status:', response.status);

@@ -1,103 +1,388 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="login.css">
-    <title>CBTis258 Financieros | Login</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <link rel="icon" href="imgs/yameharte.png" type="image">
+    <title>CBTis258 Financieros | Login</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#de1b1b",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#211111",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Public Sans', sans-serif; background: #f8f6f6; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Sliding Action Styles */
+        .container-box { position: relative; overflow: hidden; }
+        .form-container { position: absolute; top: 0; height: 100%; transition: all 0.6s ease-in-out; }
+        
+        .sign-in-container { left: 0; width: 50%; z-index: 2; }
+        .container-box.active .sign-in-container { transform: translateX(100%); opacity: 0; z-index: 1; }
+        
+        .sign-up-container { left: 0; width: 50%; opacity: 0; z-index: 1; transform: translateX(0); }
+        .container-box.active .sign-up-container { transform: translateX(100%); opacity: 1; z-index: 5; animation: show 0.6s; }
+        
+        @keyframes show {
+            0%, 49.99% { opacity: 0; z-index: 1; }
+            50%, 100% { opacity: 1; z-index: 5; }
+        }
+        
+        .overlay-container {
+            position: absolute; top: 0; left: 50%; width: 50%; height: 100%; overflow: hidden; transition: transform 0.6s ease-in-out; z-index: 100;
+        }
+        /* Bordes redondeados del slider overlay */
+        .overlay-container { border-radius: 100px 0 0 100px; }
+        .container-box.active .overlay-container { transform: translateX(-100%); border-radius: 0 100px 100px 0; }
+        
+        .overlay {
+            position: relative; left: -100%; height: 100%; width: 200%; transform: translateX(0); transition: transform 0.6s ease-in-out;
+        }
+        .container-box.active .overlay { transform: translateX(50%); }
+        
+        .overlay-panel {
+            position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; top: 0; height: 100%; width: 50%; transform: translateX(0); transition: transform 0.6s ease-in-out;
+        }
+        .overlay-left { transform: translateX(-20%); }
+        .container-box.active .overlay-left { transform: translateX(0); }
+        .overlay-right { right: 0; transform: translateX(0); }
+        .container-box.active .overlay-right { transform: translateX(20%); }
+
+        /* Mobile logic */
+        @media (max-width: 768px) {
+            .container-box { min-height: 100vh; display: flex; flex-direction: column; overflow: visible; }
+            .form-container { position: relative; width: 100%; height: auto; transition: none; opacity: 1; transform: none !important; }
+            .sign-in-container, .sign-up-container { width: 100%; }
+            .overlay-container { display: none; }
+            
+            .container-box.active .sign-in-container { display: none; }
+            .container-box:not(.active) .sign-up-container { display: none; }
+        }
+
+        /* Modal Styles */
+        .modal-overlay-forgot { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-overlay-forgot.active { display: flex; }
+        .form-container-forgot { max-width: 400px; width: 90%; background-color: #fff; padding: 32px 24px; font-size: 14px; color: #212121; display: flex; flex-direction: column; gap: 20px; border-radius: 10px; box-shadow: 0px 0px 3px rgba(0,0,0,0.084), 0px 2px 3px rgba(0,0,0,0.168); }
+        .logo-container-forgot { text-align: center; font-weight: 600; font-size: 18px; }
+        .form-forgot { display: flex; flex-direction: column; }
+        .form-group-forgot { display: flex; flex-direction: column; gap: 2px; }
+        .form-group-forgot label { margin-bottom: 5px; }
+        .form-group-forgot input { width: 100%; padding: 12px 16px; border-radius: 6px; border: 1px solid #ccc; outline: none; transition: 0.3s; }
+        .form-group-forgot input:focus { border-color: #94272C; box-shadow: 0 0 0 4px rgba(129,32,32,0.1); }
+        .form-submit-btn-forgot { background-color: #94272C; color: #fff; border: none; padding: 12px 16px; border-radius: 6px; cursor: pointer; margin-top: 12px; font-weight: bold; transition: 0.3s; }
+        .form-submit-btn-forgot:hover { background-color: #7a1f24; }
+        .signup-link-forgot { text-align: center; font-size: 14px; }
+        .signup-link-text { color: #94272C; text-decoration: none; font-weight: 600; }
+        .signup-link-text:hover { text-decoration: underline; }
+    </style>
 </head>
-
-<body>
-
-    <div class="container" id="container">
-        <div class="form-container sign-up">
-            <form>
-                <h1>Crear cuenta</h1>
-                <button type="button" class="button" id="google-signup-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" viewBox="0 0 256 262">
-                        <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
-                        <path fill="#34A853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"></path>
-                        <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"></path>
-                        <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
-                </svg>
-                Continuar con Google
-                </button>
-                <span>O usa tu email para registrarte</span>
-                <input class="input" type="text" placeholder="Nombre" required>
-                <input class="input" type="email" placeholder="Email" required>
-            <div class="password-container">
-                <input class="input" type="password" placeholder="Contraseña" required>
-                    <i class="fa-solid fa-eye toggle-password"></i>
-            </div>
-                <button type="submit">Ingresar</button>
-            </form>
-        </div>
-        <div class="form-container sign-in">
-            <form>
-                <h1>Iniciar sesión</h1>
-                <button type="button" class="button" id="google-signin-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" viewBox="0 0 256 262">
-                        <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
-                        <path fill="#34A853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"></path>
-                        <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"></path>
-                        <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
-                </svg>
-                Continuar con Google
-                </button>
-                <span>O usa tu contraseña de Email</span>
-                <input class="input" type="email" placeholder="Email" required>
-            <div class="password-container">
-                <input class="input" type="password" placeholder="Contraseña" required>
-                    <i class="fa-solid fa-eye toggle-password"></i>
-            </div>
-                <a href="#" id="forgot-password-link">¿Olvidaste tu contraseña?</a>
-                <button type="submit">Iniciar sesión</button>
-            </form>
-        </div>
-        <div class="toggle-container">
-            <div class="toggle">
-                <div class="toggle-panel toggle-left">
-                    <h1>Bienvenido</h1>
-                    <p>Ingresa tus datos para crear tu cuenta</p>
-                    <button class="hidden" id="login">Iniciar sesión</button>
-                </div>
-                <div class="toggle-panel toggle-right">
-                    <img src="imgs/yameharte.png" alt="logo" class="logo">
-                    <h1>CBTis 258</h1>
-                    <p class="lema">Un motivo de orgullo</p>
-                    <button class="hidden" id="register">Crear cuenta</button>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-0 md:p-4">
+    
+    <div id="container" class="container-box w-full max-w-[1200px] min-h-[700px] bg-white dark:bg-slate-900 shadow-2xl mx-auto rounded-none md:rounded-xl">
+        
+        <!-- SIGN UP SECTION (Hidden below overlay originally) -->
+        <div class="form-container sign-up sign-up-container bg-white dark:bg-slate-900 px-8 md:px-16 py-8 flex flex-col justify-center">
+            
+            <!-- Mobile Toggle presentation (Shows on top inside register form) -->
+            <div class="md:hidden flex flex-col items-center mb-8 relative">
+                <img src="imgs/yameharte.png" alt="logo" class="w-20 h-20 object-contain mb-4 z-10">
+                <h1 class="text-slate-900 text-3xl font-extrabold tracking-tight mb-2">CBTis 258</h1>
+                <h2 class="text-primary text-sm font-medium tracking-[0.2em] mb-4 uppercase">Un Motivo de Orgullo</h2>
+                <div class="w-full">
+                    <p class="text-slate-500 text-xs mb-2 text-center">¿Ya tienes una cuenta?</p>
+                    <button id="mobile-login" class="w-full px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors duration-300 mobile-trigger-login">
+                        Iniciar sesión
+                    </button>
                 </div>
             </div>
+
+            <div class="max-w-md mx-auto w-full">
+                <div class="mb-4 text-center md:text-left">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-3xl font-bold mb-2">Registro</h2>
+                    <p class="text-slate-500 dark:text-slate-400">Únete a nuestra comunidad educativa.</p>
+                </div>
+
+                <button type="button" id="google-signup-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-700 font-medium py-3 px-4 rounded-lg hover:bg-slate-50 transition-colors mt-4 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" viewBox="0 0 256 262" class="w-5 h-5">
+                         <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
+                         <path fill="#34A853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"></path>
+                         <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"></path>
+                         <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
+                    </svg>
+                    Continuar con Google
+                </button>
+                
+                <div class="relative flex py-4 items-center">
+                    <div class="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
+                    <span class="flex-shrink-0 mx-4 text-slate-400 text-sm">O usa tu email</span>
+                    <div class="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
+                </div>
+
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400 text-xl">person</span>
+                            </div>
+                            <input type="text" class="input block w-full pl-10 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="Nombre completo" required/>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400 text-xl">mail</span>
+                            </div>
+                            <input type="email" class="input block w-full pl-10 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="example@cbtis258.edu.mx" required/>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Contraseña</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400 text-xl">lock</span>
+                            </div>
+                            <input type="password" class="input block w-full pl-10 pr-10 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="••••••••" required/>
+                            <i class="fa-solid fa-eye toggle-password absolute right-4 top-[14px] text-slate-400 cursor-pointer hover:text-primary"></i>
+                        </div>
+                    </div>
+                    <!-- SELECT ROLES -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Rol</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400 text-xl">badge</span>
+                            </div>
+                            <select id="rol-select" onchange="toggleSemestre(this.value)" class="block w-full pl-10 pr-10 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all appearance-none cursor-pointer">
+                                <option disabled selected value="">Selecciona tu rol</option>
+                                <option value="estudiante">Estudiante</option>
+                                <option value="padre">Padre de familia</option>
+                                <option value="profesor">Profesor</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- SELECT SEMESTRE -->
+                    <div id="semestre-container" style="display: none;" class="transition-all duration-300">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Semestre</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400 text-xl">school</span>
+                            </div>
+                            <select id="semestre-select" class="block w-full pl-10 pr-10 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all appearance-none cursor-pointer">
+                                <option disabled selected value="">Selecciona tu semestre</option>
+                                <option value="1">1er Semestre</option>
+                                <option value="2">2do Semestre</option>
+                                <option value="3">3er Semestre</option>
+                                <option value="4">4to Semestre</option>
+                                <option value="5">5to Semestre</option>
+                                <option value="6">6to Semestre</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="material-symbols-outlined text-slate-400">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SCRIPT INLINE TO FIX SEMESTER BUG RELIABLY -->
+                    <script>
+                        function toggleSemestre(val) {
+                            var container = document.getElementById("semestre-container");
+                            var selectBox = document.getElementById("semestre-select");
+                            if (val === 'estudiante') {
+                                container.style.display = 'block';
+                            } else {
+                                container.style.display = 'none';
+                                if(selectBox) selectBox.value = '';
+                            }
+                        }
+                    </script>
+
+                    <button type="submit" class="w-full bg-primary text-white py-4 px-4 rounded-lg font-bold hover:bg-red-700 shadow-lg shadow-primary/20 transition-all mt-2">
+                        Crear cuenta
+                    </button>
+                </form>
+            </div>
         </div>
+
+        <!-- SIGN IN SECTION (Left side default) -->
+        <div class="form-container sign-in sign-in-container bg-white dark:bg-slate-900 px-8 md:px-16 py-8 flex flex-col justify-center">
+
+            <!-- Mobile Toggle presentation -->
+            <div class="md:hidden flex flex-col items-center mb-8 relative">
+                <img src="imgs/yameharte.png" alt="logo" class="w-20 h-20 object-contain mb-4 z-10">
+                <h1 class="text-slate-900 text-3xl font-extrabold tracking-tight mb-2">CBTis 258</h1>
+                <h2 class="text-primary text-sm font-medium tracking-[0.2em] mb-4 uppercase">Un Motivo de Orgullo</h2>
+                <div class="w-full">
+                    <p class="text-slate-500 text-xs mb-2 text-center">¿No tienes una cuenta?</p>
+                    <button id="mobile-register-btn" class="w-full px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors duration-300 mobile-trigger-register">
+                        Crear cuenta
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-8 hidden md:flex items-center gap-2">
+                <img src="imgs/yameharte.png" alt="logo" class="w-10 h-10 object-contain">
+                <span class="text-slate-900 dark:text-slate-100 font-bold text-xl tracking-tight">CBTis 258</span>
+            </div>
+            
+            <div class="max-w-md w-full mx-auto">
+                <h1 class="text-slate-900 dark:text-slate-100 text-4xl font-bold mb-2 text-center md:text-left">Iniciar sesión</h1>
+                <p class="text-slate-500 dark:text-slate-400 mb-8 text-center md:text-left">Accede a tu cuenta institucional</p>
+                
+                <button type="button" id="google-signin-btn" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-700 font-medium py-3 px-4 rounded-lg hover:bg-slate-50 transition-colors mb-6 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" viewBox="0 0 256 262" class="w-5 h-5">
+                         <path fill="#4285F4" d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"></path>
+                         <path fill="#34A853" d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"></path>
+                         <path fill="#FBBC05" d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"></path>
+                         <path fill="#EB4335" d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"></path>
+                    </svg>
+                    Continuar con Google
+                </button>
+                
+                <div class="relative flex py-4 items-center mb-6">
+                    <div class="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
+                    <span class="flex-shrink-0 mx-4 text-slate-400 text-sm">O usa tu contraseña de Email</span>
+                    <div class="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
+                </div>
+
+                <form class="space-y-6">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold">Email</label>
+                        <div class="relative flex items-center">
+                            <span class="material-symbols-outlined absolute left-4 text-slate-400">mail</span>
+                            <input type="email" class="input w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="Email" required/>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-slate-700 dark:text-slate-300 text-sm font-semibold">Contraseña</label>
+                        </div>
+                        <div class="relative flex items-center">
+                            <span class="material-symbols-outlined absolute left-4 text-slate-400">lock</span>
+                            <input type="password" class="input w-full pl-12 pr-12 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" placeholder="Contraseña" required/>
+                            <i class="fa-solid fa-eye toggle-password absolute right-4 text-slate-400 cursor-pointer hover:text-primary"></i>
+                        </div>
+                        <div class="text-right mt-1">
+                            <a id="forgot-password-link" class="text-primary text-sm font-medium hover:underline" href="#">¿Olvidaste tu contraseña?</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-red-700 text-white font-bold py-3 pt-4 pb-4 rounded-lg transition-colors shadow-lg shadow-primary/20">
+                        Iniciar sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- DESKTOP OVERLAY SLIDER (Brand Presentation) -->
+        <div class="overlay-container hidden md:block pointer-events-none">
+            <div class="overlay bg-primary">
+                <!-- Decorative Pattern bg -->
+                <div class="absolute inset-0 opacity-10">
+                    <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+                        <defs><pattern height="40" id="grid1" patternunits="userSpaceOnUse" width="40"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"></path></pattern></defs>
+                        <rect fill="url(#grid1)" height="100%" width="100%"></rect>
+                    </svg>
+                </div>
+                
+                <!-- Overlay Left (Visible when Create Account is active -> Left side) -->
+                <div class="overlay-panel overlay-left pointer-events-auto">
+                    <img src="imgs/yameharte.png" alt="logo" class="w-32 h-32 object-contain mb-8 z-10">
+                    <h2 class="text-white text-5xl font-extrabold mb-4 tracking-tight">CBTis 258</h2>
+                    <p class="text-white/90 text-xl font-medium mb-12 tracking-widest uppercase">Un motivo de orgullo</p>
+                    <div class="w-full max-w-xs space-y-4">
+                        <p class="text-white/80 text-sm">¿Ya tienes una cuenta?</p>
+                        <button id="login" class="w-full border-2 border-white text-white font-bold py-4 rounded-lg hover:bg-white hover:text-primary transition-all duration-300">
+                            Iniciar sesión
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overlay Right (Visible when Login is active -> Right side originally) -->
+                <div class="overlay-panel overlay-right pointer-events-auto">
+                    <img src="imgs/yameharte.png" alt="logo" class="w-32 h-32 object-contain mb-8 z-10">
+                    <h2 class="text-white text-5xl font-extrabold mb-4 tracking-tight">CBTis 258</h2>
+                    <p class="text-white/90 text-xl font-medium mb-12 tracking-widest uppercase">Un motivo de orgullo</p>
+                    <div class="w-full max-w-xs space-y-4">
+                        <p class="text-white/80 text-sm">¿No tienes una cuenta?</p>
+                        <button id="register" class="w-full border-2 border-white text-white font-bold py-4 rounded-lg hover:bg-white hover:text-primary transition-all duration-300">
+                            Crear cuenta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Absolute positioned decorative blobs -->
+                <div class="absolute bottom-10 left-10 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                <div class="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- Modal Forgot Password -->
     <div class="modal-overlay-forgot" id="modal-forgot">
-    <div class="form-container-forgot">
-        <div class="logo-container-forgot">
-            ¿Olvidaste tu contraseña?
-        </div>
-
-        <div class="form-forgot">
-            <div class="form-group-forgot">
-                <label for="email-forgot">Email</label>
-                <input type="email" id="email-forgot" name="email" placeholder="Ingresa tu email" required>
+        ...
+        <div class="form-container-forgot">
+            <div class="logo-container-forgot">
+                ¿Olvidaste tu contraseña?
             </div>
-
-            <button class="form-submit-btn-forgot" id="send-forgot-btn" type="button">Enviar Email</button>
+            <div class="form-forgot">
+                <div class="form-group-forgot">
+                    <label for="email-forgot">Email</label>
+                    <input type="email" id="email-forgot" name="email" placeholder="Ingresa tu email" required>
+                </div>
+                <button class="form-submit-btn-forgot" id="send-forgot-btn" type="button">Enviar Email</button>
+            </div>
+            <p class="signup-link-forgot">
+                ¿No tienes una cuenta?
+                <a href="#" class="signup-link-text" onclick="document.getElementById('register').click(); return false;">Regístrate ahora</a>
+            </p>
         </div>
-
-        <p class="signup-link-forgot">
-            ¿No tienes una cuenta?
-            <a href="#" class="signup-link-text" id="go-to-signup">Regístrate ahora</a>
-        </p>
     </div>
-</div>
 
+    <!-- Script Inline to handle Mobile buttons to toggle CSS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const containerBox = document.getElementById('container');
+            const btnLogin = document.getElementById('login');
+            const btnRegister = document.getElementById('register');
+            const mobileBtnLogin = document.querySelector('.mobile-trigger-login');
+            const mobileBtnRegister = document.querySelector('.mobile-trigger-register');
+
+            btnRegister?.addEventListener('click', () => {
+                containerBox.classList.add('active');
+            });
+            btnLogin?.addEventListener('click', () => {
+                containerBox.classList.remove('active');
+            });
+
+            // Mobile triggers
+            mobileBtnRegister?.addEventListener('click', () => containerBox.classList.add('active'));
+            mobileBtnLogin?.addEventListener('click', () => containerBox.classList.remove('active'));
+        });
+    </script>
     <script src="login.js"></script>
 </body>
-
 </html>
