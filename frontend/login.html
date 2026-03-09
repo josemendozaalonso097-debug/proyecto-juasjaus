@@ -67,15 +67,103 @@
         .overlay-right { right: 0; transform: translateX(0); }
         .container-box.active .overlay-right { transform: translateX(20%); }
 
-        /* Mobile logic */
+        /* Mobile logic - High Fidelity Premium Design */
         @media (max-width: 768px) {
-            .container-box { min-height: 100vh; display: flex; flex-direction: column; overflow: visible; }
-            .form-container { position: relative; width: 100%; height: auto; transition: none; opacity: 1; transform: none !important; }
-            .sign-in-container, .sign-up-container { width: 100%; }
-            .overlay-container { display: none; }
+            body {
+                background: #f8f6f6;
+                padding: 0;
+                align-items: flex-start;
+            }
+            .container-box {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                box-shadow: none;
+                border-radius: 0;
+                background: transparent;
+                overflow-y: auto;
+            }
+            .form-container {
+                position: relative;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                transition: none;
+                opacity: 1;
+                transform: none !important;
+                background: #f8f6f6;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 40px 24px;
+            }
+            .sign-in-container, .sign-up-container {
+                width: 100%;
+            }
+            .overlay-container {
+                display: none;
+            }
             
-            .container-box.active .sign-in-container { display: none; }
-            .container-box:not(.active) .sign-up-container { display: none; }
+            .container-box.active .sign-in-container {
+                display: none;
+            }
+            .container-box:not(.active) .sign-up-container {
+                display: none;
+            }
+
+            /* Premium Mobile Branding */
+            .mobile-header {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+            .mobile-header img {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 1rem;
+                filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            }
+            .mobile-header h1 {
+                font-size: 1.875rem;
+                font-weight: 800;
+                color: #1e293b;
+                letter-spacing: -0.025em;
+            }
+            .mobile-header h2 {
+                color: #de1b1b;
+                font-size: 0.75rem;
+                font-weight: 600;
+                letter-spacing: 0.2em;
+                text-transform: uppercase;
+                margin-top: 0.25rem;
+            }
+
+            /* Custom inputs/buttons for Mobile */
+            .mobile-toggle-footer {
+                margin-top: 2rem;
+                text-align: center;
+                border-top: 1px solid #e2e8f0;
+                padding-top: 1.5rem;
+            }
+            .mobile-toggle-footer p {
+                color: #64748b;
+                font-size: 0.875rem;
+                margin-bottom: 0.75rem;
+            }
+            .mobile-switch-btn {
+                color: #de1b1b;
+                font-weight: 700;
+                font-size: 0.875rem;
+                text-decoration: none;
+                padding: 0.5rem 1rem;
+                border: 1px solid #de1b1b;
+                border-radius: 0.5rem;
+                display: inline-block;
+                transition: all 0.2s;
+            }
+            .mobile-switch-btn:active {
+                background: #de1b1b;
+                color: white;
+            }
         }
 
         /* Modal Styles */
@@ -100,19 +188,13 @@
     <div id="container" class="container-box w-full max-w-[1200px] min-h-[700px] bg-white dark:bg-slate-900 shadow-2xl mx-auto rounded-none md:rounded-xl">
         
         <!-- SIGN UP SECTION (Hidden below overlay originally) -->
-        <div class="form-container sign-up sign-up-container bg-white dark:bg-slate-900 px-8 md:px-16 py-8 flex flex-col justify-center">
+        <div class="form-container sign-up sign-up-container px-8 md:px-16 py-8">
             
-            <!-- Mobile Toggle presentation (Shows on top inside register form) -->
-            <div class="md:hidden flex flex-col items-center mb-8 relative">
-                <img src="imgs/yameharte.png" alt="logo" class="w-20 h-20 object-contain mb-4 z-10">
-                <h1 class="text-slate-900 text-3xl font-extrabold tracking-tight mb-2">CBTis 258</h1>
-                <h2 class="text-primary text-sm font-medium tracking-[0.2em] mb-4 uppercase">Un Motivo de Orgullo</h2>
-                <div class="w-full">
-                    <p class="text-slate-500 text-xs mb-2 text-center">¿Ya tienes una cuenta?</p>
-                    <button id="mobile-login" class="w-full px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors duration-300 mobile-trigger-login">
-                        Iniciar sesión
-                    </button>
-                </div>
+            <!-- Mobile Branding Header -->
+            <div class="md:hidden mobile-header">
+                <img src="imgs/yameharte.png" alt="logo">
+                <h1>CBTis 258</h1>
+                <h2>Un Motivo de Orgullo</h2>
             </div>
 
             <div class="max-w-md mx-auto w-full">
@@ -224,23 +306,23 @@
                         Crear cuenta
                     </button>
                 </form>
+
+                <!-- Mobile Switch Footer -->
+                <div class="md:hidden mobile-toggle-footer">
+                    <p>¿Ya tienes una cuenta?</p>
+                    <a href="#" class="mobile-switch-btn mobile-trigger-login">Iniciar sesión</a>
+                </div>
             </div>
         </div>
 
         <!-- SIGN IN SECTION (Left side default) -->
-        <div class="form-container sign-in sign-in-container bg-white dark:bg-slate-900 px-8 md:px-16 py-8 flex flex-col justify-center">
+        <div class="form-container sign-in sign-in-container px-8 md:px-16 py-8">
 
-            <!-- Mobile Toggle presentation -->
-            <div class="md:hidden flex flex-col items-center mb-8 relative">
-                <img src="imgs/yameharte.png" alt="logo" class="w-20 h-20 object-contain mb-4 z-10">
-                <h1 class="text-slate-900 text-3xl font-extrabold tracking-tight mb-2">CBTis 258</h1>
-                <h2 class="text-primary text-sm font-medium tracking-[0.2em] mb-4 uppercase">Un Motivo de Orgullo</h2>
-                <div class="w-full">
-                    <p class="text-slate-500 text-xs mb-2 text-center">¿No tienes una cuenta?</p>
-                    <button id="mobile-register-btn" class="w-full px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors duration-300 mobile-trigger-register">
-                        Crear cuenta
-                    </button>
-                </div>
+            <!-- Mobile Branding Header -->
+            <div class="md:hidden mobile-header">
+                <img src="imgs/yameharte.png" alt="logo">
+                <h1>CBTis 258</h1>
+                <h2>Un Motivo de Orgullo</h2>
             </div>
 
             <div class="mb-8 hidden md:flex items-center gap-2">
@@ -293,6 +375,12 @@
                         Iniciar sesión
                     </button>
                 </form>
+
+                <!-- Mobile Switch Footer -->
+                <div class="md:hidden mobile-toggle-footer">
+                    <p>¿No tienes una cuenta?</p>
+                    <a href="#" class="mobile-switch-btn mobile-trigger-register">Crear cuenta</a>
+                </div>
             </div>
         </div>
         
