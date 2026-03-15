@@ -1083,11 +1083,7 @@ function mostrarConfirmacionDeposito() {
 }
 
 // Después de subir comprobante y dar clic en enviar
-agregarHistorial({
-    productos: [...carrito],
-    metodoPago: 'Depósito',
-    fecha: new Date().toLocaleString()
-});
+
 
 
 function limpiarFormularioDeposito() {
@@ -1423,11 +1419,7 @@ function mostrarConfirmacionTransferencia() {
     document.body.style.overflow = 'hidden';
 }
 
-agregarHistorial({
-    productos: [...carrito],
-    metodoPago: 'Transferencia',
-    fecha: new Date().toLocaleString()
-});
+
 
 
 // Limpiar formulario
@@ -1486,13 +1478,7 @@ function agregarAlHistorialUnificado(metodoPago) {
     };
     
     // Obtener historial existente
-    let historial = JSON.parse(localStorage.getItem('historial')) || [];
-    
-    // Agregar nueva compra
-    historial.push(compra);
-    
-    // Guardar en localStorage
-    localStorage.setItem('historial', JSON.stringify(historial));
+    guardarEnHistorial(compra);
     
     console.log('✅ Compra agregada al historial:', compra);
 }

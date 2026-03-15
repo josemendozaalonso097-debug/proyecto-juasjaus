@@ -6,67 +6,159 @@
     <title>CBTis258 Financieros | Principal</title>
     <link rel="stylesheet" href="principal.css?v=123">
     <link rel="icon" href="../imgs/yameharte.png" type="image">
+
+<style>
+/* Reset for modals */
+.modal-historial, .modal-informacion, .modal-detalle, .modal-papeleria {
+    z-index: 1000 !important;
+}
+/* Allow main content not to break scrolling if modals open */
+</style>
+
 </head>
-<body>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
 
-    <!--Header xd-->
-    <header class="cab-header">
-        <div class="header-content">
-            <div class="logo-section">
-                <img src="../imgs/yameharte.png" alt="cblogoxdd" class="logo">
-            <div>
-                <h1>CBTis 258</h1>
-                <h2>Un motivo de orgullo</h2>
-            </div>
-            </div>
-        </div>
-    </header>
-        <!--Main-->
-    <main class="main-content">
-        <section class="bienvenida">
-            <h2 class="titulodeBienvenida">Bienvenid@, <span id="user-name">Usuario</span>!</h2>
-        </section>
-
-    <div class="dashboard"> 
-        <div class="card-main">
-            <h3 class="card-title">Estados de pago</h3>
-
-            <div class="alert-box"> 
-                <p class="alert-text">Tienes <strong id="pendientes">1</strong> pagos pendientes.</p>           
-            </div> 
-
-            <div class="botones">
-                <button class="btn btn-secondary">Historial de pagos</button>
-                <button class="btn btn-tercero" id="info-btn">Informacion</button>
-                <button class="btn btn-tercero" id="pape-btn">Papeleria</button>
-            </div>
-        </div>
-
-        <div class="columna-derecha">
-            <div class="info-card">
-                <div class="status" id="status-badge">Cuenta activa</div>
-                <h3 class="info-title-s">Proximo vencimiento:</h3>
-                <p class="info-text">Colegiatura:<strong id="next-date">1 de Enero del 2026</strong></p>
-            </div>
-            
-            <div class="info-card">
-                <h3 class="info-title">Financieros</h3>
-                <p class="info-text">Comprar productos o subir papeleria</p>
-                <button class="btn btn-store" id="store-btn">Entrar</button>
-            </div>
-    </div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="#">Ayuda</a>
-            <a href="#">Terminos y condiciones</a>
-            <a href="#">Politica de privacidad</a>
-        </div>
-        <button class="btn btn-logout" id="logout-btn">Cerrar sesion</button>
-    </footer>
-
-    <div class="modal-historial" id="modalHistorial">
+<header class="bg-gradient-to-r from-primary to-red-800/90 backdrop-blur-md bg-opacity-90 text-white flex items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
+<div class="flex items-center gap-4">
+<div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+<span class="material-symbols-outlined text-3xl">school</span>
+</div>
+<div>
+<h1 class="text-2xl font-black leading-tight tracking-[-0.015em]">CBTis 258</h1>
+<p class="text-xs font-semibold text-white/90 uppercase tracking-widest">Un motivo de orgullo</p>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-9 hidden md:flex">
+<a class="text-white text-sm font-semibold leading-normal hover:text-white/80 transition-colors" href="#">Dashboard</a>
+<a class="text-white/70 text-sm font-semibold leading-normal hover:text-white transition-colors" href="#">Pagos</a>
+<a class="text-white/70 text-sm font-semibold leading-normal hover:text-white transition-colors" href="#">Trámites</a>
+</nav>
+<div class="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors">
+<span class="text-sm font-bold hidden sm:block" id="user-name-nav">Manuel G.</span>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50" data-alt="User profile picture of Manuel" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ");'></div>
+</div>
+</div>
+</header>
+<main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
+<div class="mb-12">
+<h2 class="text-5xl font-black leading-tight tracking-[-0.033em] mb-3 bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent inline-block transform transition-transform hover:scale-[1.02] cursor-default">
+                Bienvenid@, <span id="user-name">Usuario</span>
+            </h2>
+<p class="text-slate-500 dark:text-slate-400 text-lg font-medium leading-normal ml-1">
+                Revisa tu estado de cuenta y realiza pagos escolares.
+            </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div class="lg:col-span-2 flex flex-col gap-8">
+<section class="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 flex flex-col h-full relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+<h3 class="text-2xl font-bold leading-tight tracking-[-0.015em] mb-8 flex items-center gap-3 relative z-10">
+<div class="p-2 bg-primary/10 rounded-xl">
+<span class="material-symbols-outlined text-primary text-2xl">account_balance_wallet</span>
+</div>
+                        Estados de pago
+                    </h3>
+<div class="flex-grow flex flex-col items-center justify-center p-10 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 mb-8 text-center relative z-10">
+<div class="relative inline-flex items-center justify-center w-36 h-36 rounded-full mb-6">
+<svg class="w-full h-full text-slate-200 dark:text-slate-700" viewbox="0 0 36 36">
+<path class="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-linecap="round" stroke-width="2.5"></path>
+</svg>
+<svg class="w-full h-full text-green-500 absolute top-0 left-0" viewbox="0 0 36 36">
+<path class="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="100, 100" stroke-linecap="round" stroke-width="2.5"></path>
+</svg>
+<div class="absolute bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-green-500">check</span>
+</div>
+</div>
+<h4 class="text-2xl font-bold leading-tight tracking-[-0.015em] mb-3 text-slate-800 dark:text-slate-100">Tienes <strong id="pendientes" class="text-primary">1</strong> pagos pendientes</h4>
+<p class="text-slate-500 dark:text-slate-400 text-base max-w-md">Tu cuenta está al corriente. ¡Gracias por tu puntualidad y compromiso con tu educación!</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-5 mt-auto relative z-10">
+<button id="info-btn" class="flex-1 flex cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-gradient-to-r from-primary to-red-600 text-white text-base font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all focus:ring-4 focus:ring-primary/20"><span class="material-symbols-outlined mr-3 text-[22px]">info</span>Información</button>
+<button id="historial-btn" onclick="document.getElementById('modalHistorial').style.display='flex'" class="flex-1 flex cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-base font-bold shadow-sm border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 hover:-translate-y-0.5 transition-all">
+<span class="material-symbols-outlined mr-3 text-[22px]">history</span>
+                            Historial de Pagos
+                        </button>
+</div>
+</section>
+</div>
+<div class="flex flex-col gap-8">
+<section class="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
+<h3 class="text-xl font-bold leading-tight tracking-[-0.015em] mb-6 flex items-center gap-3">
+<div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+<span class="material-symbols-outlined text-blue-500 text-xl">credit_card</span>
+</div>
+                        Cuenta Activa
+                    </h3>
+<div class="space-y-5">
+<div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700/50">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Semestre Actual</span>
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200" id="status-badge">Cuenta activa</span>
+</div>
+<div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700/50">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Colegiatura Mensual</span>
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">$1,250.00 MXN</span>
+</div>
+<div class="flex justify-between items-center p-4 bg-primary/5 rounded-xl border border-primary/10">
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">Próximo Vencimiento</span>
+<span class="text-sm font-black text-primary" id="next-date">1 de Enero del 2026</span>
+</div>
+</div>
+</section>
+<section class="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
+<h3 class="text-xl font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-3">
+<div class="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+<span class="material-symbols-outlined text-purple-500 text-xl">storefront</span>
+</div>
+                        Financieros
+                    </h3>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">Adquiere productos escolares o paga trámites especiales.</p>
+<ul class="space-y-4 mb-6">
+<li>
+<a id="pape-btn" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-orange-200 dark:hover:border-orange-500/30 hover:shadow-md transition-all group cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="p-2.5 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-xl">draw</span>
+</div>
+<span class="text-base font-bold text-slate-700 dark:text-slate-200" id="pape-btn-span">Papelería</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-orange-500 transition-colors">arrow_forward</span>
+</a>
+</li>
+<li>
+<a class="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/30 hover:shadow-md transition-all group" href="#">
+<div class="flex items-center gap-4">
+<div class="p-2.5 bg-teal-100 dark:bg-teal-900/30 rounded-lg text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-xl">psychology</span>
+</div>
+<span class="text-base font-bold text-slate-700 dark:text-slate-200">Orientación</span>
+</div>
+<span class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-teal-500 transition-colors">arrow_forward</span>
+</a>
+</li>
+</ul>
+<button id="store-btn" class="w-full flex items-center justify-center h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
+                        Ingresar a Tienda
+                    </button>
+</section>
+</div>
+</div>
+</main>
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 mt-auto py-10">
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[1280px] flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-wrap items-center justify-center md:justify-start gap-6 md:gap-10 text-sm font-medium text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Ayuda</a>
+<a class="hover:text-primary transition-colors" href="#">Términos y condiciones</a>
+<a class="hover:text-primary transition-colors" href="#">Política de privacidad</a>
+</div>
+<button id="logout-btn" class="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/10">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                Cerrar sesión
+            </button>
+</div>
+</footer>
+<div class="modal-historial" id="modalHistorial">
         <div class="modal-historial-content">
             <span class="close-modal-historial" onclick="cerrarHistorial()">&times;</span>
             
