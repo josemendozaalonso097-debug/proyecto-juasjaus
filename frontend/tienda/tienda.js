@@ -3,6 +3,47 @@ const API_URL = 'http://localhost:8000/api';
 
 let archivoComprobanteTransferencia = null;
 
+// ========== MODAL DE PAPELERÍA (declarado al inicio para disponibilidad inmediata) ==========
+let archivosSubidos = [];
+
+function abrirModalPapeleria() {
+    const modalPapeleria = document.getElementById('modalPapeleria');
+    if (modalPapeleria) {
+        modalPapeleria.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Pre-llenar nombre y matrícula si están disponibles
+        const userName = document.getElementById('user-name-nav')?.textContent;
+        const userMatricula = document.getElementById('user-matricula')?.textContent;
+
+        if (userName && userName !== 'Usuario') {
+            const campo = document.getElementById('nombreAlumno');
+            if (campo) campo.value = userName;
+        }
+        if (userMatricula) {
+            const campo = document.getElementById('matriculaAlumno');
+            if (campo) campo.value = userMatricula;
+        }
+    }
+}
+
+function cerrarModalPapeleria() {
+    const modalPapeleria = document.getElementById('modalPapeleria');
+    if (modalPapeleria) {
+        modalPapeleria.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    const formPapeleria = document.getElementById('formPapeleria');
+    if (formPapeleria) formPapeleria.reset();
+    archivosSubidos = [];
+    if (typeof actualizarListaArchivos === 'function') actualizarListaArchivos();
+}
+
+// Expose to window for onclick attributes
+window.abrirModalPapeleria = abrirModalPapeleria;
+window.cerrarModalPapeleria = cerrarModalPapeleria;
+
+
 // ========================================
 // SISTEMA DE HISTORIAL POR USUARIO
 // ========================================
@@ -147,8 +188,24 @@ function abrirModal(categoria) {
         informacion: 'Información',
         subir: 'Subir Papelería'
     };
-    
-    modalTitle.textContent = titulos[categoria] || 'Productos';
+
+    const iconos = {
+        uniformes: 'apparel',
+        Libros: 'menu_book',
+        libros: 'menu_book',
+        tramites: 'description',
+        material: 'backpack',
+        informacion: 'info',
+        subir: 'upload_file'
+    };
+
+    modalTitle.textContent = titulos[categoria] || titulos[categoria.toLowerCase()] || 'Productos';
+
+    const modalIcon = document.getElementById('modalIcon');
+    if (modalIcon) {
+        modalIcon.textContent = iconos[categoria] || 'shopping_bag';
+    }
+
     productosGrid.innerHTML = '';
     
     const productos = productosData[categoria] || [];
@@ -402,7 +459,7 @@ function abrirModalPago() {
     
     const modalMetodo = document.getElementById('modalMetodoPago');
     if (modalMetodo) {
-        modalMetodo.style.display = 'block';
+        modalMetodo.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 }
@@ -1484,3 +1541,271 @@ function agregarAlHistorialUnificado(metodoPago) {
 }
 
 document.addEventListener('DOMContentLoaded', renderizarHistorial);
+
+
+
+
+// Mostrar campo "Otro" cuando se selecciona
+window.mostrarCampoOtro = function() {
+    const tipoDocumento = document.getElementById('tipoDocumento').value;
+    const campoOtro = document.getElementById('campoOtro');
+    const inputOtro = document.getElementById('otroDocumento');
+    
+    if (tipoDocumento === 'Otro') {
+        campoOtro.style.display = 'block';
+        if (inputOtro) inputOtro.required = true;
+    } else {
+        campoOtro.style.display = 'none';
+        if (inputOtro) inputOtro.required = false;
+    }
+}
+
+// Configurar zona de subida de archivos
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadZone = document.getElementById('uploadZone');
+    const archivosInput = document.getElementById('archivosInput');
+    
+    if (uploadZone && archivosInput) {
+        // Click para abrir selector
+        uploadZone.addEventListener('click', function() {
+            archivosInput.click();
+        });
+        
+        // Drag & Drop
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            agregarArchivos(files);
+        });
+        
+        // Cambio de archivo
+        archivosInput.addEventListener('change', function(e) {
+            agregarArchivos(e.target.files);
+        });
+    }
+});
+
+// Agregar archivos a la lista
+window.agregarArchivos = function(files) {
+    if (archivosSubidos.length >= 10) {
+        alert('Ya has alcanzado el máximo de 10 archivos.');
+        return;
+    }
+    
+    Array.from(files).forEach(file => {
+        if (archivosSubidos.length >= 10) {
+            alert('Solo puedes subir un máximo de 10 archivos.');
+            return;
+        }
+        
+        // Validar tamaño (5MB máx)
+        if (file.size > 5 * 1024 * 1024) {
+            alert(`El archivo "${file.name}" es demasiado grande. Máximo 5MB.`);
+            return;
+        }
+        
+        // Validar tipo
+        const tiposPermitidos = [
+            'image/png', 'image/jpeg', 'image/jpg', 
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        if (!tiposPermitidos.includes(file.type)) {
+            alert(`El archivo "${file.name}" no tiene un formato permitido.`);
+            return;
+        }
+        
+        // Agregar archivo
+        archivosSubidos.push(file);
+    });
+    
+    actualizarListaArchivos();
+}
+
+// Actualizar la lista visual de archivos
+window.actualizarListaArchivos = function() {
+    const archivosLista = document.getElementById('archivosLista');
+    const contador = document.getElementById('contadorArchivos');
+    
+    if (!archivosLista || !contador) return;
+    
+    // Actualizar contador
+    contador.textContent = `${archivosSubidos.length} / 10 archivos`;
+    
+    // Limpiar lista
+    archivosLista.innerHTML = '';
+    
+    // Agregar cada archivo
+    archivosSubidos.forEach((file, index) => {
+        const archivoItem = document.createElement('div');
+        archivoItem.className = 'archivo-item';
+        
+        const icono = obtenerIconoArchivo(file.type);
+        const tamano = formatearTamano(file.size);
+        
+        archivoItem.innerHTML = `
+            <div class="archivo-info">
+                <div class="archivo-icon">${icono}</div>
+                <div class="archivo-detalles">
+                    <div class="archivo-nombre">${file.name}</div>
+                    <div class="archivo-tamano">${tamano}</div>
+                </div>
+            </div>
+            <button type="button" class="btn-eliminar-archivo" onclick="eliminarArchivo(${index})">✕ Eliminar</button>
+        `;
+        
+        archivosLista.appendChild(archivoItem);
+    });
+}
+
+// Obtener icono según tipo de archivo
+window.obtenerIconoArchivo = function(tipo) {
+    if (tipo.includes('image')) return '🖼️';
+    if (tipo.includes('pdf')) return '📄';
+    if (tipo.includes('word') || tipo.includes('document')) return '📝';
+    return '📎';
+}
+
+// Formatear tamaño de archivo
+window.formatearTamano = function(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+// Eliminar archivo de la lista
+window.eliminarArchivo = function(index) {
+    archivosSubidos.splice(index, 1);
+    actualizarListaArchivos();
+}
+
+// Enviar formulario de papelería
+document.addEventListener('DOMContentLoaded', function() {
+    const formPapeleria = document.getElementById('formPapeleria');
+    
+    if (formPapeleria) {
+        formPapeleria.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar que haya al menos un archivo
+            if (archivosSubidos.length === 0) {
+                alert('Debes subir al menos un archivo.');
+                return;
+            }
+            
+            // Recopilar datos
+            const datos = {
+                alumno: {
+                    nombre: document.getElementById('nombreAlumno').value,
+                    matricula: document.getElementById('matriculaAlumno').value,
+                    gradoGrupo: document.getElementById('gradoGrupo').value,
+                    telefono: document.getElementById('telefonoAlumno').value
+                },
+                padre: {
+                    nombre: document.getElementById('nombrePadre').value,
+                    telefono: document.getElementById('telefonoPadre').value,
+                    email: document.getElementById('emailPadre').value,
+                    parentesco: document.getElementById('parentesco').value
+                },
+                tipoDocumento: document.getElementById('tipoDocumento').value,
+                otroDocumento: document.getElementById('otroDocumento').value,
+                observaciones: document.getElementById('observaciones').value,
+                archivos: archivosSubidos.map(f => f.name),
+                fecha: new Date().toLocaleString()
+            };
+            
+            console.log('Datos a enviar:', datos);
+            
+            // Aquí harías el fetch al backend
+            // Por ahora solo mostramos confirmación
+            mostrarConfirmacionPapeleria(datos);
+        });
+    }
+});
+
+// Mostrar confirmación de envío
+window.mostrarConfirmacionPapeleria = function(datos) {
+    const confirmacion = document.createElement('div');
+    confirmacion.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        text-align: center;
+        max-width: 450px;
+        border: 3px solid #f20d0d;
+    `;
+    
+    confirmacion.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
+        <h2 style="color: #f20d0d; margin-bottom: 15px; font-size: 1.5em;">¡Documentos enviados!</h2>
+        <p style="color: #666; margin-bottom: 15px; line-height: 1.6;">
+            Tu papelería ha sido recibida exitosamente.<br>
+            <strong>Tipo:</strong> ${datos.tipoDocumento}<br>
+            <strong>Archivos:</strong> ${datos.archivos.length}<br><br>
+            <strong>Estado: Pendiente de revisión</strong>
+        </p>
+        <p style="color: #999; font-size: 0.9em; margin-bottom: 20px;">
+            Recibirás una notificación cuando sea validada.
+        </p>
+        <button onclick="cerrarConfirmacion(this)" style="
+            background: #f20d0d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        ">Entendido</button>
+    `;
+    
+    document.body.appendChild(confirmacion);
+    cerrarModalPapeleria();
+}
+
+window.cerrarConfirmacion = function(button) {
+    button.parentElement.remove();
+    document.body.style.overflow = 'auto';
+}
+
+// Cerrar modal al hacer clic fuera
+window.addEventListener('click', function(event) {
+    const modalPapeleria = document.getElementById('modalPapeleria');
+    if (event.target === modalPapeleria) {
+        cerrarModalPapeleria();
+    }
+});
+
+// Cerrar con tecla ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modalPapeleria = document.getElementById('modalPapeleria');
+        if (modalPapeleria && modalPapeleria.style.display === 'block') {
+            cerrarModalPapeleria();
+        }
+    }
+});
