@@ -69,9 +69,10 @@
 
         /* Mobile logic */
         @media (max-width: 768px) {
-            .container-box { min-height: 100vh; display: flex; flex-direction: column; overflow: visible; }
-            .form-container { position: relative; width: 100%; height: auto; transition: none; opacity: 1; transform: none !important; }
-            .sign-in-container, .sign-up-container { width: 100%; }
+            body { overflow-x: hidden; }
+            .container-box { min-height: 100vh; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; }
+            .form-container { position: relative; width: 100%; min-height: 100vh; height: auto; transition: none; opacity: 1; transform: none !important; }
+            .sign-in-container, .sign-up-container { width: 100%; flex-grow: 1; }
             .overlay-container { display: none; }
             
             .container-box.active .sign-in-container { display: none; }
@@ -95,28 +96,39 @@
         .signup-link-text:hover { text-decoration: underline; }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-0 md:p-4">
+<body class="bg-background-light dark:bg-background-dark min-h-screen md:flex md:items-center md:justify-center p-0 md:p-4">
     
-    <div id="container" class="container-box w-full max-w-[1200px] min-h-[700px] bg-white dark:bg-slate-900 shadow-2xl mx-auto rounded-none md:rounded-xl">
+    <div id="container" class="container-box w-full md:max-w-[1200px] md:min-h-[700px] bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 md:shadow-2xl mx-auto rounded-none md:rounded-xl">
         
         <!-- SIGN UP SECTION (Hidden below overlay originally) -->
-        <div class="form-container sign-up sign-up-container bg-white dark:bg-slate-900 px-8 md:px-16 py-8 flex flex-col justify-center">
+        <div class="form-container sign-up sign-up-container bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 px-0 py-0 md:px-16 md:py-8 flex flex-col justify-start md:justify-center">
             
-            <!-- Mobile Toggle presentation (Shows on top inside register form) -->
-            <div class="md:hidden flex flex-col items-center mb-8 relative">
-                <img src="imgs/yameharte.png" alt="logo" class="w-20 h-20 object-contain mb-4 z-10">
-                <h1 class="text-slate-900 text-3xl font-extrabold tracking-tight mb-2">CBTis 258</h1>
-                <h2 class="text-primary text-sm font-medium tracking-[0.2em] mb-4 uppercase">Un Motivo de Orgullo</h2>
-                <div class="w-full">
-                    <p class="text-slate-500 text-xs mb-2 text-center">¿Ya tienes una cuenta?</p>
-                    <button id="mobile-login" class="w-full px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors duration-300 mobile-trigger-login">
-                        Iniciar sesión
-                    </button>
-                </div>
-            </div>
+            <!-- Mobile Top Navigation Bar -->
+            <header class="md:hidden flex items-center justify-between px-4 py-4 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+                <button aria-label="Volver" class="text-primary mobile-trigger-login cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+                <h1 class="text-xl font-extrabold tracking-tight text-[#0f172a] dark:text-white">CBTis 258</h1>
+                <div class="w-6"></div> <!-- Spacer for centering -->
+            </header>
 
-            <div class="max-w-md mx-auto w-full">
-                <div class="mb-4 text-center md:text-left">
+            <!-- Mobile Hero Image Section -->
+            <section class="md:hidden relative w-full h-64 overflow-hidden mb-8">
+                <img alt="Edificio CBTis 258" class="w-full h-full object-cover brightness-75" src="./imgs/banner_mobile_new.jpg"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+                <div class="absolute bottom-6 left-0 right-0 px-6">
+                    <h2 class="text-white text-3xl font-black uppercase tracking-wide leading-tight">
+                        UN MOTIVO DE ORGULLO
+                    </h2>
+                </div>
+            </section>
+
+            <!-- Mobile padding wrapper -->
+            <div class="px-6 md:px-0 pb-10 md:pb-0">
+                <div class="max-w-md mx-auto w-full">
+                    <div class="mb-4 text-center md:text-left">
                     <h2 class="text-slate-900 dark:text-slate-100 text-3xl font-bold mb-2">Registro</h2>
                     <p class="text-slate-500 dark:text-slate-400">Únete a nuestra comunidad educativa.</p>
                 </div>
@@ -224,31 +236,48 @@
                         Crear cuenta
                     </button>
                 </form>
+
+                <!-- Mobile Switch to Login -->
+                <div class="md:hidden flex justify-center mt-6 w-full">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal">
+                        ¿Ya tienes una cuenta? 
+                        <a class="text-primary font-bold hover:underline ml-1 cursor-pointer mobile-trigger-login" id="mobile-login-link">Inicia sesión</a>
+                    </p>
+                </div>
+            </div>
             </div>
         </div>
 
         <!-- SIGN IN SECTION (Left side default) -->
-        <div class="form-container sign-in sign-in-container bg-white dark:bg-slate-900 px-8 md:px-16 py-8 flex flex-col justify-center">
+        <div class="form-container sign-in sign-in-container bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 px-0 py-0 md:px-16 md:py-8 flex flex-col justify-start md:justify-center">
 
-            <!-- Mobile Toggle presentation -->
-            <div class="md:hidden flex flex-col items-center mb-8 relative">
-                <img src="imgs/yameharte.png" alt="logo" class="w-20 h-20 object-contain mb-4 z-10">
-                <h1 class="text-slate-900 text-3xl font-extrabold tracking-tight mb-2">CBTis 258</h1>
-                <h2 class="text-primary text-sm font-medium tracking-[0.2em] mb-4 uppercase">Un Motivo de Orgullo</h2>
-                <div class="w-full">
-                    <p class="text-slate-500 text-xs mb-2 text-center">¿No tienes una cuenta?</p>
-                    <button id="mobile-register-btn" class="w-full px-6 py-2 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-white transition-colors duration-300 mobile-trigger-register">
-                        Crear cuenta
-                    </button>
+            <!-- Mobile Top Navigation Bar -->
+            <header class="md:hidden flex items-center justify-between px-4 py-4 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+                <div class="w-6"></div>
+                <h1 class="text-xl font-extrabold tracking-tight text-[#0f172a] dark:text-white uppercase">CBTis 258</h1>
+                <div class="w-6"></div>
+            </header>
+
+            <!-- Mobile Hero Image Section -->
+            <section class="md:hidden relative w-full h-64 overflow-hidden mb-8">
+                <!-- Puedes cambiar la imagen de fondo para "Iniciar sesión" aquí -->
+                <img alt="Edificio CBTis 258" class="w-full h-full object-cover brightness-75" src="./imgs/mkc.jpg"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+                <div class="absolute bottom-6 left-0 right-0 px-6">
+                    <h2 class="text-white text-3xl font-black uppercase tracking-wide leading-tight">
+                        UN MOTIVO DE ORGULLO
+                    </h2>
                 </div>
-            </div>
+            </section>
 
-            <div class="mb-8 hidden md:flex items-center gap-2">
-                <img src="imgs/yameharte.png" alt="logo" class="w-10 h-10 object-contain">
-                <span class="text-slate-900 dark:text-slate-100 font-bold text-xl tracking-tight">CBTis 258</span>
-            </div>
-            
-            <div class="max-w-md w-full mx-auto">
+            <!-- Mobile padding wrapper -->
+            <div class="px-6 md:px-0 pb-10 md:pb-0">
+                <div class="mb-8 hidden md:flex items-center gap-2">
+                    <img src="imgs/yameharte.png" alt="logo" class="w-10 h-10 object-contain">
+                    <span class="text-slate-900 dark:text-slate-100 font-bold text-xl tracking-tight">CBTis 258</span>
+                </div>
+                
+                <div class="max-w-md w-full mx-auto">
                 <h1 class="text-slate-900 dark:text-slate-100 text-4xl font-bold mb-2 text-center md:text-left">Iniciar sesión</h1>
                 <p class="text-slate-500 dark:text-slate-400 mb-8 text-center md:text-left">Accede a tu cuenta institucional</p>
                 
@@ -293,6 +322,15 @@
                         Iniciar sesión
                     </button>
                 </form>
+
+                <!-- Mobile Switch to Register -->
+                <div class="md:hidden flex justify-center mt-6 w-full">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal">
+                        ¿No tienes una cuenta? 
+                        <a class="text-primary font-bold hover:underline ml-1 cursor-pointer mobile-trigger-register" id="mobile-register-link">Regístrate</a>
+                    </p>
+                </div>
+            </div>
             </div>
         </div>
         
@@ -368,8 +406,6 @@
             const containerBox = document.getElementById('container');
             const btnLogin = document.getElementById('login');
             const btnRegister = document.getElementById('register');
-            const mobileBtnLogin = document.querySelector('.mobile-trigger-login');
-            const mobileBtnRegister = document.querySelector('.mobile-trigger-register');
 
             btnRegister?.addEventListener('click', () => {
                 containerBox.classList.add('active');
@@ -379,8 +415,12 @@
             });
 
             // Mobile triggers
-            mobileBtnRegister?.addEventListener('click', () => containerBox.classList.add('active'));
-            mobileBtnLogin?.addEventListener('click', () => containerBox.classList.remove('active'));
+            document.querySelectorAll('.mobile-trigger-register').forEach(btn => {
+                btn.addEventListener('click', () => containerBox.classList.add('active'));
+            });
+            document.querySelectorAll('.mobile-trigger-login').forEach(btn => {
+                btn.addEventListener('click', () => containerBox.classList.remove('active'));
+            });
         });
     </script>
     <script src="login.js"></script>
