@@ -214,36 +214,72 @@ signInForm.addEventListener('submit', async (e) => {
 });
 
 // ============================================
-// LOGIN CON GOOGLE
+// LOGIN CON GOOGLE — usando OAuth popup (sin FedCM)
 // ============================================
 
-let googleInitialized = false;
+const GOOGLE_CLIENT_ID = '518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com';
 
-async function handleCredentialResponse(response) {
-    const id_token = response.credential;
-    
-    console.log('🔐 Token de Google recibido');
-    
+function googleOAuthPopup() {
+    const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+    const scope = encodeURIComponent('openid email profile');
+    const nonce = Math.random().toString(36).substring(2);
+
+    const url = `https://accounts.google.com/o/oauth2/v2/auth` +
+        `?client_id=${GOOGLE_CLIENT_ID}` +
+        `&redirect_uri=${redirectUri}` +
+        `&response_type=id_token` +
+        `&scope=${scope}` +
+        `&nonce=${nonce}` +
+        `&prompt=select_account`;
+
+    // Abrir popup centrado
+    const width = 500, height = 600;
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+    const popup = window.open(url, 'google-login', 
+        `width=${width},height=${height},top=${top},left=${left}`);
+
+    // Escuchar cuando el popup regresa con el token
+    const interval = setInterval(() => {
+        try {
+            if (!popup || popup.closed) {
+                clearInterval(interval);
+                return;
+            }
+            const popupUrl = popup.location.href;
+            if (popupUrl.includes('#')) {
+                const hash = new URLSearchParams(popup.location.hash.substring(1));
+                const id_token = hash.get('id_token');
+                if (id_token) {
+                    popup.close();
+                    clearInterval(interval);
+                    sendGoogleToken(id_token);
+                }
+            }
+        } catch (e) {
+            // Cross-origin — aún cargando Google, ignorar
+        }
+    }, 200);
+}
+
+async function sendGoogleToken(id_token) {
+    console.log('🔐 Token de Google recibido, enviando al backend...');
     try {
         const res = await fetch(`${API_URL}/login/google`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token: id_token })
         });
-        
+
         const data = await res.json();
-        
+
         if (res.ok) {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            
-            alert(`¡Bienvenido ${data.user.nombre}!`);
+            alert(`¡Bienvenido ${data.user.nombre}! 🎉`);
             window.location.href = 'principal/index.html';
         } else {
-            console.error('❌ Error:', data);
-            alert('Error de autenticación con Google: ' + data.detail);
+            alert('Error con Google: ' + (data.detail || 'Intenta de nuevo'));
         }
     } catch (error) {
         console.error('❌ Error:', error);
@@ -251,48 +287,16 @@ async function handleCredentialResponse(response) {
     }
 }
 
-function initializeGoogleSignIn() {
-    if (typeof google === 'undefined' || !google.accounts) {
-        console.log('⏳ Google SDK no cargado, reintentando...');
-        setTimeout(initializeGoogleSignIn, 500);
-        return;
-    }
-    
-    if (googleInitialized) return;
-    
-    try {
-        google.accounts.id.initialize({
-            client_id: '518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com',
-            callback: handleCredentialResponse,
-            ux_mode: 'popup',
-            auto_select: false
-        });
-        
-        googleInitialized = true;
-        console.log('✅ Google Sign-In inicializado');
-        
-        const signupBtn = document.getElementById('google-signup-btn');
-        if (signupBtn) {
-            signupBtn.onclick = function(e) {
-                e.preventDefault();
-                google.accounts.id.prompt();
-                return false;
-            };
-        }
-        
-        const signinBtn = document.getElementById('google-signin-btn');
-        if (signinBtn) {
-            signinBtn.onclick = function(e) {
-                e.preventDefault();
-                google.accounts.id.prompt();
-                return false;
-            };
-        }
-        
-    } catch (error) {
-        console.error('❌ Error inicializando Google:', error);
-    }
-}
+// Asignar a los botones directamente (ya no necesitas google.accounts.id)
+document.getElementById('google-signup-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    googleOAuthPopup();
+});
+
+document.getElementById('google-signin-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    googleOAuthPopup();
+});
 
 // ============================================
 // INICIALIZACIÓN
@@ -305,7 +309,6 @@ window.onload = async function () {
     if (localStorage.getItem('just_registered')) {
         console.log('🆕 Usuario recién registrado, saltando check-session');
         localStorage.removeItem('just_registered');
-        initializeGoogleSignIn();
         return;
     }
 
@@ -338,7 +341,7 @@ window.onload = async function () {
     }
     
     // Inicializar Google
-    initializeGoogleSignIn();
+    
     
     // Verificar backend
     console.log('🔍 Verificando backend...');
