@@ -6,7 +6,27 @@
     <title>CBTis258 Financieros | Principal</title>
     <link rel="stylesheet" href="principal.css?v=123">
     <link rel="icon" href="../imgs/yameharte.png" type="image">
-
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f20d0d",
+                        "background-light": "#f8f5f5",
+                        "background-dark": "#221010",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
 <style>
 /* Reset for modals */
 .modal-historial, .modal-informacion, .modal-detalle, .modal-papeleria {
@@ -21,7 +41,7 @@
 <header class="bg-gradient-to-r from-primary to-red-800/90 backdrop-blur-md bg-opacity-90 text-white flex items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
 <div class="flex items-center gap-4">
 <div class="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-<span class="material-symbols-outlined text-3xl">school</span>
+<img src="../imgs/yameharte.png" alt="Logo" class="h-8 w-auto object-contain">
 </div>
 <div>
 <h1 class="text-2xl font-black leading-tight tracking-[-0.015em]">CBTis 258</h1>
@@ -29,12 +49,7 @@
 </div>
 </div>
 <div class="flex flex-1 justify-end gap-8 items-center">
-<nav class="flex items-center gap-9 hidden md:flex">
-<a class="text-white text-sm font-semibold leading-normal hover:text-white/80 transition-colors" href="#">Dashboard</a>
-<a class="text-white/70 text-sm font-semibold leading-normal hover:text-white transition-colors" href="#">Pagos</a>
-<a class="text-white/70 text-sm font-semibold leading-normal hover:text-white transition-colors" href="#">Trámites</a>
-</nav>
-<div class="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors">
+<div onclick="document.getElementById('modalPerfil').classList.remove('hidden')" class="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors">
 <span class="text-sm font-bold hidden sm:block" id="user-name-nav">Manuel G.</span>
 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50" data-alt="User profile picture of Manuel" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ");'></div>
 </div>
@@ -61,10 +76,10 @@
                     </h3>
 <div class="flex-grow flex flex-col items-center justify-center p-10 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 mb-8 text-center relative z-10">
 <div class="relative inline-flex items-center justify-center w-36 h-36 rounded-full mb-6">
-<svg class="w-full h-full text-slate-200 dark:text-slate-700" viewbox="0 0 36 36">
+<svg class="w-full h-full text-slate-200 dark:text-slate-700" viewBox="0 0 36 36">
 <path class="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-linecap="round" stroke-width="2.5"></path>
 </svg>
-<svg class="w-full h-full text-green-500 absolute top-0 left-0" viewbox="0 0 36 36">
+<svg class="w-full h-full text-green-500 absolute top-0 left-0" viewBox="0 0 36 36">
 <path class="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="100, 100" stroke-linecap="round" stroke-width="2.5"></path>
 </svg>
 <div class="absolute bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center">
@@ -158,6 +173,7 @@
             </button>
 </div>
 </footer>
+
 <div class="modal-historial" id="modalHistorial">
         <div class="modal-historial-content">
             <span class="close-modal-historial" onclick="cerrarHistorial()">&times;</span>
@@ -485,6 +501,95 @@
         </div>
     </div>
 </div>
+
+<!-- Profile Modal Overlay -->
+<div id="modalPerfil" class="fixed inset-0 z-[1001] flex items-center justify-center hidden bg-black/60 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
+<!-- Profile Modal Container -->
+<div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden border border-primary/10 mx-4">
+<!-- Header / Top Bar -->
+<header class="flex items-center justify-between px-6 py-4 border-b border-primary/10 bg-white dark:bg-slate-900 sticky top-0 z-10">
+<div class="flex items-center gap-3">
+<div class="text-primary">
+<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold tracking-tight">CBTis 258</h2>
+</div>
+<button onclick="document.getElementById('modalPerfil').classList.add('hidden')" class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
+</button>
+</header>
+<!-- Profile Section -->
+<div class="p-8 flex flex-col items-center">
+<div class="relative">
+<div class="size-40 rounded-full border-4 border-primary/20 p-1 bg-white dark:bg-slate-800 shadow-xl overflow-hidden">
+<div class="w-full h-full rounded-full bg-center bg-no-repeat bg-cover" data-alt="Professional portrait of a young male student" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3bzl8IMOU8SfdkGUfw4qPHpb84QgBjmtRQ4CzCNFzCv8LdOICP6wp6R4I1N8KvJjmjBlKX7w6c1BgkKmbMpru1ovW_dPiVIlM37HGbXdt8AYtQ-CPgDe7szuDFqHdzzK_KPxhX_xQz-XryDZZ2DDP75xB04wSMQpA05XOeTx4EI1N2nyKpekFgfrEqBV3lkSJPmcVKDGEYcTEufk6H0ak_3MShU2qGuWEZJhQvZ9OHq5jYOt0hMfN5ozt245TGwX5_VQwn2VEHXE');">
+</div>
+</div>
+<!-- Change Photo Badge Overlay -->
+<button class="absolute bottom-2 right-2 bg-primary text-white size-10 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center border-4 border-white dark:border-slate-900 group">
+<span class="material-symbols-outlined text-xl">photo_camera</span>
+</button>
+</div>
+<div class="mt-6 text-center">
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white" id="modal-perfil-nombre">Manuel G.</h1>
+<p class="text-primary font-semibold mt-1">Estudiante</p>
+</div>
+</div>
+<!-- Details Section -->
+<div class="px-6 pb-8 space-y-3">
+<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 pb-1">Detalles de la Cuenta</h3>
+<!-- Detail Row: Name -->
+<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
+<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">person</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Nombre Completo</span>
+<span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-nombre-completo">Manuel G.</span>
+</div>
+</div>
+<!-- Detail Row: Email -->
+<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
+<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">mail</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Correo</span>
+<span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-email">manuel.g@cbtis258.edu.mx</span>
+</div>
+</div>
+<!-- Detail Row: Role -->
+<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
+<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">badge</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Rol</span>
+<span class="text-sm font-medium text-slate-900 dark:text-slate-100">Estudiante</span>
+</div>
+</div>
+<!-- Detail Row: Semester -->
+<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
+<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">calendar_today</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Semestre</span>
+<span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-semestre">2</span>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-6 flex flex-col gap-3">
+<button class="w-full py-3 bg-primary text-white font-bold rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
+                Actualizar Información
+            </button>
+</div>
+</div>
+</div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="principal.js"></script>
 </body> 
