@@ -45,7 +45,7 @@
 <div class="flex flex-1 justify-end gap-8 items-center">
 <div onclick="document.getElementById('modalPerfil').classList.remove('hidden')" class="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors">
 <span class="text-sm font-bold hidden sm:block" id="user-name-nav">Manuel G.</span>
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50" data-alt="User profile picture of Manuel" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ");'></div>
+<div id="header-user-photo" class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50" data-alt="User profile picture of Manuel" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ");'></div>
 </div>
 </div>
 </header>
@@ -606,94 +606,127 @@ Los comprobantes de pago digitales deben presentarse en ventanilla para la entre
 
 
 <!-- Profile Modal Overlay -->
-<div id="modalPerfil" class="fixed inset-0 z-[1001] flex items-center justify-center hidden bg-black/60 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.4)]">
+<div id="modalPerfil" class="fixed inset-0 z-[1001] flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
 <!-- Profile Modal Container -->
-<div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden border border-primary/10 mx-4">
-<!-- Header / Top Bar -->
-<header class="flex items-center justify-between px-6 py-4 border-b border-primary/10 bg-white dark:bg-slate-900 sticky top-0 z-10">
-<div class="flex items-center gap-3">
-<div class="text-primary">
-<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-<path d="M8.57829 8.57829C5.52816 11.6284 3.451 15.5145 2.60947 19.7452C1.76794 23.9758 2.19984 28.361 3.85056 32.3462C5.50128 36.3314 8.29667 39.7376 11.8832 42.134C15.4698 44.5305 19.6865 45.8096 24 45.8096C28.3135 45.8096 32.5302 44.5305 36.1168 42.134C39.7033 39.7375 42.4987 36.3314 44.1494 32.3462C45.8002 28.361 46.2321 23.9758 45.3905 19.7452C44.549 15.5145 42.4718 11.6284 39.4217 8.57829L24 24L8.57829 8.57829Z"></path>
-</svg>
+<div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-primary/10 mx-4 max-h-[90vh] flex flex-col">
+
+    <!-- Header con degradado rojo + Logo CBTis -->
+    <header class="bg-gradient-to-r from-primary to-red-800 px-6 py-4 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <img src="../imgs/yameharte.png" alt="CBTis 258" class="h-9 w-auto object-contain">
+            <div>
+                <h2 class="text-white text-lg font-black leading-tight">CBTis 258</h2>
+                <p class="text-white/80 text-[11px] font-semibold uppercase tracking-widest">Mi Perfil</p>
+            </div>
+        </div>
+        <button onclick="document.getElementById('modalPerfil').classList.add('hidden')" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+            <span class="material-symbols-outlined text-white">close</span>
+        </button>
+    </header>
+
+    <!-- Scrollable body -->
+    <div class="overflow-y-auto flex-1">
+        <!-- Profile Photo Section -->
+        <div class="p-8 pb-4 flex flex-col items-center">
+            <div class="relative">
+                <div class="size-32 rounded-full border-4 border-primary/20 p-1 bg-white dark:bg-slate-800 shadow-xl overflow-hidden cursor-pointer" onclick="document.getElementById('profilePhotoInput').click()" title="Cambiar foto">
+                    <div id="profilePhotoPreview" class="w-full h-full rounded-full bg-center bg-no-repeat bg-cover bg-slate-200" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3bzl8IMOU8SfdkGUfw4qPHpb84QgBjmtRQ4CzCNFzCv8LdOICP6wp6R4I1N8KvJjmjBlKX7w6c1BgkKmbMpru1ovW_dPiVIlM37HGbXdt8AYtQ-CPgDe7szuDFqHdzzK_KPxhX_xQz-XryDZZ2DDP75xB04wSMQpA05XOeTx4EI1N2nyKpekFgfrEqBV3lkSJPmcVKDGEYcTEufk6H0ak_3MShU2qGuWEZJhQvZ9OHq5jYOt0hMfN5ozt245TGwX5_VQwn2VEHXE');"></div>
+                </div>
+                <!-- Input oculto para subir foto -->
+                <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="cambiarFotoPerfil(event)">
+                <!-- Badge botón cambiar foto -->
+                <button onclick="document.getElementById('profilePhotoInput').click()" class="absolute bottom-1 right-1 bg-primary text-white size-9 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center border-3 border-white dark:border-slate-900" title="Cambiar foto">
+                    <span class="material-symbols-outlined text-lg">photo_camera</span>
+                </button>
+            </div>
+            <div class="mt-4 text-center">
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white" id="modal-perfil-nombre">—</h1>
+                <p class="text-primary font-semibold text-sm mt-0.5" id="modal-perfil-rol">—</p>
+            </div>
+        </div>
+
+        <!-- Details Section (read-only display) -->
+        <div class="px-6 pb-2 space-y-2">
+            <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 pb-1">Información de la Cuenta</h3>
+            <!-- Nombre -->
+            <div class="flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-transparent">
+                <div class="size-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Nombre</span>
+                    <span class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate" id="modal-perfil-nombre-completo">—</span>
+                </div>
+            </div>
+            <!-- Email -->
+            <div class="flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-transparent">
+                <div class="size-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">mail</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Correo</span>
+                    <span class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate" id="modal-perfil-email">—</span>
+                </div>
+            </div>
+            <!-- Rol -->
+            <div class="flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-transparent">
+                <div class="size-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">badge</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Rol</span>
+                    <span class="text-sm font-medium capitalize text-slate-900 dark:text-slate-100" id="modal-perfil-rol-detalle">—</span>
+                </div>
+            </div>
+            <!-- Semestre (solo si es estudiante) -->
+            <div class="flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-transparent" id="fila-semestre">
+                <div class="size-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Semestre</span>
+                    <span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-semestre">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Section -->
+        <div class="px-6 pb-6 pt-3 space-y-3">
+            <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 pb-1">Actualizar Datos</h3>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Nombre completo</label>
+                <input id="input-perfil-nombre" type="text" placeholder="Tu nombre completo" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
+            </div>
+            <div class="flex flex-col gap-1.5" id="editar-semestre-container">
+                <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Semestre</label>
+                <select id="input-perfil-semestre" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
+                    <option value="">Seleccionar...</option>
+                    <option value="1">1er Semestre</option>
+                    <option value="2">2do Semestre</option>
+                    <option value="3">3er Semestre</option>
+                    <option value="4">4to Semestre</option>
+                    <option value="5">5to Semestre</option>
+                    <option value="6">6to Semestre</option>
+                </select>
+            </div>
+            <!-- Save Feedback -->
+            <p id="perfil-guardado-msg" class="text-green-600 text-xs font-semibold text-center hidden">✅ Perfil actualizado correctamente.</p>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="bg-slate-50 dark:bg-slate-800/50 px-6 py-4 flex flex-col gap-2 shrink-0 border-t border-slate-100 dark:border-slate-800">
+        <button onclick="actualizarPerfil()" class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-red-700 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-lg">save</span>
+            Actualizar Información
+        </button>
+    </div>
+
 </div>
-<h2 class="text-lg font-bold tracking-tight">CBTis 258</h2>
 </div>
-<button onclick="document.getElementById('modalPerfil').classList.add('hidden')" class="p-2 hover:bg-primary/10 rounded-full transition-colors">
-<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">close</span>
-</button>
-</header>
-<!-- Profile Section -->
-<div class="p-8 flex flex-col items-center">
-<div class="relative">
-<div class="size-40 rounded-full border-4 border-primary/20 p-1 bg-white dark:bg-slate-800 shadow-xl overflow-hidden">
-<div class="w-full h-full rounded-full bg-center bg-no-repeat bg-cover" data-alt="Professional portrait of a young male student" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3bzl8IMOU8SfdkGUfw4qPHpb84QgBjmtRQ4CzCNFzCv8LdOICP6wp6R4I1N8KvJjmjBlKX7w6c1BgkKmbMpru1ovW_dPiVIlM37HGbXdt8AYtQ-CPgDe7szuDFqHdzzK_KPxhX_xQz-XryDZZ2DDP75xB04wSMQpA05XOeTx4EI1N2nyKpekFgfrEqBV3lkSJPmcVKDGEYcTEufk6H0ak_3MShU2qGuWEZJhQvZ9OHq5jYOt0hMfN5ozt245TGwX5_VQwn2VEHXE');">
-</div>
-</div>
-<!-- Change Photo Badge Overlay -->
-<button class="absolute bottom-2 right-2 bg-primary text-white size-10 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center border-4 border-white dark:border-slate-900 group">
-<span class="material-symbols-outlined text-xl">photo_camera</span>
-</button>
-</div>
-<div class="mt-6 text-center">
-<h1 class="text-2xl font-bold text-slate-900 dark:text-white" id="modal-perfil-nombre">Manuel G.</h1>
-<p class="text-primary font-semibold mt-1">Estudiante</p>
-</div>
-</div>
-<!-- Details Section -->
-<div class="px-6 pb-8 space-y-3">
-<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 pb-1">Detalles de la Cuenta</h3>
-<!-- Detail Row: Name -->
-<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
-<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-xl">person</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Nombre Completo</span>
-<span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-nombre-completo">Manuel G.</span>
-</div>
-</div>
-<!-- Detail Row: Email -->
-<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
-<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-xl">mail</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Correo</span>
-<span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-email">manuel.g@cbtis258.edu.mx</span>
-</div>
-</div>
-<!-- Detail Row: Role -->
-<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
-<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-xl">badge</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Rol</span>
-<span class="text-sm font-medium text-slate-900 dark:text-slate-100">Estudiante</span>
-</div>
-</div>
-<!-- Detail Row: Semester -->
-<div class="flex items-center gap-4 p-3 bg-primary/5 dark:bg-primary/10 rounded-xl border border-transparent hover:border-primary/20 transition-all">
-<div class="size-10 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-xl">calendar_today</span>
-</div>
-<div class="flex flex-col">
-<span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Semestre</span>
-<span class="text-sm font-medium text-slate-900 dark:text-slate-100" id="modal-perfil-semestre">2</span>
-</div>
-</div>
-</div>
-<!-- Footer Actions -->
-<div class="bg-slate-50 dark:bg-slate-800/50 p-6 flex flex-col gap-3">
-<button class="w-full py-3 bg-primary text-white font-bold rounded-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
-                Actualizar Información
-            </button>
-</div>
-</div>
-</div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="./tienda.js?v=6"></script>
+    <script src="./tienda.js?v=8"></script>
 
 </body>
 </html>

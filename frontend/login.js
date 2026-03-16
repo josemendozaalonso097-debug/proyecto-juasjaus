@@ -111,14 +111,19 @@ signUpForm.addEventListener('submit', async (e) => {
         if (response.ok) {
             console.log('✅ ¡REGISTRO EXITOSO!');
             
-            // Guardar token
+            // Guardar token y datos del perfil completo
             localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('user', JSON.stringify({
-    id: data.user.id,
-    email: data.user.email
-}));
-            
-            console.log('💾 Token guardado');
+            const userProfile = {
+                id: data.user.id,
+                email: data.user.email,
+                nombre: nombre,
+                rol: rol,
+                semestre: rol === 'estudiante' ? semestre : null
+            };
+            localStorage.setItem('user', JSON.stringify(userProfile));
+            // Guardar también perfil extendido con llave por usuario
+            localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(userProfile));
+
             
             alert('¡Cuenta creada exitosamente! 🎉');
             
@@ -193,6 +198,15 @@ signInForm.addEventListener('submit', async (e) => {
             
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
+            // Sincronizar perfil extendido para este usuario
+            if (data.user.id) {
+                const perfilGuardado = localStorage.getItem(`perfil_${data.user.id}`);
+                if (!perfilGuardado) {
+                    // Guardar si no hay perfil previo
+                    localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(data.user));
+                }
+            }
+
             
             alert(`¡Bienvenid@ ${data.user.nombre}! 🎉`);
             

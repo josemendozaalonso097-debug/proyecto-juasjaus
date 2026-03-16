@@ -60,6 +60,140 @@
 })();
 
 // ========================================
+// PERFIL DE USUARIO
+// ========================================
+
+function cargarDatosPerfil() {
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) return;
+
+    const user = JSON.parse(userRaw);
+    const userId = user.id;
+
+    // Preferir perfil extendido por usuario
+    const perfilRaw = userId ? localStorage.getItem(`perfil_${userId}`) : null;
+    const perfil = perfilRaw ? JSON.parse(perfilRaw) : user;
+
+    const nombre   = perfil.nombre   || user.nombre   || 'Usuario';
+    const email    = perfil.email    || user.email    || '—';
+    const rol      = perfil.rol      || user.rol      || 'estudiante';
+    const semestre = perfil.semestre || user.semestre || '';
+
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+    setEl('modal-perfil-nombre', nombre);
+    setEl('modal-perfil-rol', rol.charAt(0).toUpperCase() + rol.slice(1));
+    setEl('modal-perfil-nombre-completo', nombre);
+    setEl('modal-perfil-email', email);
+    setEl('modal-perfil-rol-detalle', rol.charAt(0).toUpperCase() + rol.slice(1));
+    setEl('modal-perfil-semestre', semestre ? `${semestre}° Semestre` : '—');
+
+    // Mostrar/ocultar semestre según rol
+    const filaSemestre = document.getElementById('fila-semestre');
+    const editarSemestre = document.getElementById('editar-semestre-container');
+    const esEstudiante = rol === 'estudiante';
+    if (filaSemestre) filaSemestre.style.display = esEstudiante ? '' : 'none';
+    if (editarSemestre) editarSemestre.style.display = esEstudiante ? '' : 'none';
+
+    // Pre-rellenar campos de edición
+    const inputNombre = document.getElementById('input-perfil-nombre');
+    const inputSemestre = document.getElementById('input-perfil-semestre');
+    if (inputNombre) inputNombre.value = nombre;
+    if (inputSemestre && semestre) inputSemestre.value = semestre;
+
+    // Actualizar nombre en el header
+    const navName = document.getElementById('user-name-nav');
+    if (navName) navName.textContent = nombre;
+
+    // Actualizar también el saludo "Bienvenid@, ..."
+    const userNameEl = document.getElementById('user-name');
+    if (userNameEl) userNameEl.textContent = nombre;
+
+    // Cargar foto guardada
+    if (userId) {
+        const foto = localStorage.getItem(`foto_perfil_${userId}`);
+        const DEFAULT_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ";
+        const fotoUrl = foto || DEFAULT_PHOTO;
+
+        const preview = document.getElementById('profilePhotoPreview');
+        if (preview) preview.style.backgroundImage = `url('${fotoUrl}')`;
+
+        // También actualizar el mini-avatar en el header
+        const headerPhoto = document.getElementById('header-user-photo');
+        if (headerPhoto) headerPhoto.style.backgroundImage = `url('${fotoUrl}')`;
+    }
+}
+
+window.actualizarPerfil = function() {
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) return;
+    const user = JSON.parse(userRaw);
+    const userId = user.id;
+
+    const inputNombre   = document.getElementById('input-perfil-nombre');
+    const inputSemestre = document.getElementById('input-perfil-semestre');
+    const msg = document.getElementById('perfil-guardado-msg');
+
+    const nuevoNombre   = inputNombre   ? inputNombre.value.trim() : '';
+    const nuevoSemestre = inputSemestre ? inputSemestre.value      : '';
+
+    if (!nuevoNombre) { alert('El nombre no puede estar vacío.'); return; }
+
+    const perfilKey = `perfil_${userId}`;
+    const perfilRaw = localStorage.getItem(perfilKey);
+    const perfil = perfilRaw ? JSON.parse(perfilRaw) : { ...user };
+
+    perfil.nombre = nuevoNombre;
+    if (nuevoSemestre) perfil.semestre = nuevoSemestre;
+
+    localStorage.setItem(perfilKey, JSON.stringify(perfil));
+
+    user.nombre = nuevoNombre;
+    if (nuevoSemestre) user.semestre = nuevoSemestre;
+    localStorage.setItem('user', JSON.stringify(user));
+
+    cargarDatosPerfil();
+
+    if (msg) {
+        msg.classList.remove('hidden');
+        setTimeout(() => msg.classList.add('hidden'), 3000);
+    }
+};
+
+window.cambiarFotoPerfil = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 3 * 1024 * 1024) {
+        alert('La imagen es demasiado grande. Máximo 3MB.');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64 = e.target.result;
+
+        const preview = document.getElementById('profilePhotoPreview');
+        if (preview) preview.style.backgroundImage = `url('${base64}')`;
+
+        const headerPhoto = document.getElementById('header-user-photo');
+        if (headerPhoto) headerPhoto.style.backgroundImage = `url('${base64}')`;
+
+        const userRaw = localStorage.getItem('user');
+        if (userRaw) {
+            const user = JSON.parse(userRaw);
+            if (user.id) localStorage.setItem(`foto_perfil_${user.id}`, base64);
+        }
+    };
+    reader.readAsDataURL(file);
+};
+
+// Inicializar perfil al cargar la página
+document.addEventListener('DOMContentLoaded', cargarDatosPerfil);
+
+
+
+// ========================================
 // FIN SISTEMA HISTORIAL
 // ========================================
 
@@ -94,17 +228,26 @@ window.onload = async function() {
         }
         
         const userData = await response.json();
+        console.log('✅ Usuario autenticado:', userData.nombre);
         
-        // Actualizar UI con datos del usuario
-        const userName = document.getElementById('user-name');
-        if (userName) {
-            userName.textContent = userData.nombre;
-        }
+        // Sincronizar datos del usuario en localStorage (MERGE para no perder campos locales)
+        const userPrevRaw = localStorage.getItem('user');
+        const userPrev = userPrevRaw ? JSON.parse(userPrevRaw) : {};
+        
+        // El servidor manda id, email, nombre. Mezclamos con lo que ya tenemos (rol, semestre, etc)
+        const userActualizado = { ...userPrev, ...userData };
+        localStorage.setItem('user', JSON.stringify(userActualizado));
 
-        const userMatricula = document.getElementById('user-matricula');
-        if (userMatricula) {
-            userMatricula.textContent = 'A' + String(userData.id).padStart(7, '0');
-        }
+        // Sincronizar también el perfil extendido si no tiene nombre/email
+        const perfilKey = `perfil_${userData.id}`;
+        const perfilPrevRaw = localStorage.getItem(perfilKey);
+        const perfilPrev = perfilPrevRaw ? JSON.parse(perfilPrevRaw) : {};
+        const perfilActualizado = { ...perfilPrev, ...userData };
+        localStorage.setItem(perfilKey, JSON.stringify(perfilActualizado));
+        
+        // Cargar/actualizar datos del perfil en el modal y header
+        cargarDatosPerfil();
+
         
     } catch (error) {
         console.error('Error:', error);
