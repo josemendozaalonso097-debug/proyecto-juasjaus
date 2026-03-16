@@ -1210,3 +1210,91 @@ const historial = obtenerHistorial();
     
     doc.save('historial_facturas.pdf');
 }
+// ========================================
+// SISTEMA DE ORIENTACIÓN
+// ========================================
+
+window.abrirModalOrientacion = function() {
+    const modal = document.getElementById('modalOrientacion');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        // Reset to first tab
+        cambiarTabOrientacion('reporte');
+    }
+};
+
+window.cerrarModalOrientacion = function() {
+    const modal = document.getElementById('modalOrientacion');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+};
+
+window.cambiarTabOrientacion = function(tab) {
+    // Ocultar todas las secciones
+    document.querySelectorAll('.seccion-orientacion').forEach(s => s.classList.add('hidden'));
+    // Mostrar la seleccionada
+    const seccion = document.getElementById('seccion-' + tab);
+    if (seccion) seccion.classList.remove('hidden');
+
+    // Actualizar estilos de los botones de tab
+    document.querySelectorAll('.tab-orientacion').forEach(t => {
+        t.classList.remove('border-teal-600', 'text-teal-600');
+        t.classList.add('border-transparent', 'text-slate-500');
+    });
+
+    const activeTab = document.getElementById('tab-' + tab);
+    if (activeTab) {
+        activeTab.classList.remove('border-transparent', 'text-slate-500');
+        activeTab.classList.add('border-teal-600', 'text-teal-600');
+    }
+};
+
+window.enviarOrientacion = function(tipo) {
+    let mensajeSuccess = "";
+
+    if (tipo === 'reporte') {
+        const texto = document.getElementById('reporte-texto').value.trim();
+        if (!texto) { alert("Por favor describe el incidente."); return; }
+        mensajeSuccess = "🚨 Reporte enviado con éxito. Orientación revisará el caso a la brevedad.";
+        document.getElementById('reporte-texto').value = "";
+    } else if (tipo === 'queja') {
+        const tipoQueja = document.getElementById('queja-tipo').value;
+        const texto = document.getElementById('queja-texto').value.trim();
+        if (!tipoQueja) { alert("Por favor selecciona un tipo de queja."); return; }
+        mensajeSuccess = "📢 Tu queja sobre \"" + tipoQueja + "\" ha sido recibida. Le daremos seguimiento inmediato.";
+        document.getElementById('queja-tipo').value = "";
+        document.getElementById('queja-texto').value = "";
+    } else if (tipo === 'cita') {
+        const motivo = document.getElementById('cita-motivo').value.trim();
+        const horario = document.getElementById('cita-horario').value;
+        mensajeSuccess = "📅 Solicitud de cita enviada (" + horario + "). El psicólogo se pondrá en contacto contigo pronto.";
+        document.getElementById('cita-motivo').value = "";
+    } else if (tipo === 'buzon') {
+        const texto = document.getElementById('buzon-texto').value.trim();
+        if (!texto) { alert("Por favor escribe tu sugerencia."); return; }
+        mensajeSuccess = "📥 ¡Gracias por tu sugerencia! Tu opinión nos ayuda a mejorar el plantel.";
+        document.getElementById('buzon-texto').value = "";
+    }
+
+    if (mensajeSuccess) {
+        alert(mensajeSuccess);
+        cerrarModalOrientacion();
+    }
+};
+
+// Listeners para cerrar con click fuera o Escape
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('modalOrientacion');
+    if (event.target === modal) {
+        cerrarModalOrientacion();
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        cerrarModalOrientacion();
+    }
+});
