@@ -345,15 +345,117 @@ function abrirModal(categoria) {
     }
 
     productosGrid.innerHTML = '';
-    
+
+    // Limpiar tabs si existían de una apertura anterior
+    const tabsNav = document.getElementById('modalTabsNav');
+    if (tabsNav) tabsNav.innerHTML = '';
+
     const productos = productosData[categoria] || [];
-    
+
     if (productos.length === 0) {
         productosGrid.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">No hay productos disponibles</p>';
         modal.style.display = 'block';
         return;
     }
-    
+
+    // ── MODAL DE LIBROS: tabs por semestre ──
+    if (categoria === 'Libros') {
+        // Qué libros aparecen en cada semestre
+        const librosPorSemestre = {
+            1: [6, 7, 8, 9, 10, 11, 13],          // todos los base + La materia
+            2: [6, 7, 8, 9, 10, 11, 12],           // todos los base + Conservacion
+            3: [6, 7, 8, 9, 10, 11, 14],           // todos los base + Ecosistemas
+            4: [6, 7, 8, 9, 10, 11, 15, 17],       // todos los base + Conciencia hist + Temas selectos mat
+            5: [6, 7, 8, 9, 10, 11, 15, 16, 17, 18], // todos los base + Conciencia hist + Reacciones + Temas selectos + Energia vida
+            6: [6, 7, 8, 9, 10, 11, 19],           // todos los base + Temas de filosofia
+        };
+
+        const semestresLabels = ['1er', '2do', '3er', '4to', '5to', '6to'];
+
+        // Tabs van en su propio contenedor fuera del grid
+        const tabsNav = document.getElementById('modalTabsNav');
+        tabsNav.innerHTML = `
+            <div id="libros-tabs-nav" style="
+                display: flex;
+                border-bottom: 2px solid #e2e8f0;
+                background: #fff;
+                padding: 0 20px;
+            ">
+                ${semestresLabels.map((label, i) => `
+                    <button
+                        class="libro-tab-btn"
+                        data-sem="${i + 1}"
+                        onclick="cambiarTabLibros(${i + 1})"
+                        style="
+                            flex: 1;
+                            padding: 13px 6px;
+                            border: none;
+                            border-bottom: 3px solid ${i === 0 ? '#f20d0d' : 'transparent'};
+                            background: transparent;
+                            color: ${i === 0 ? '#f20d0d' : '#64748b'};
+                            font-weight: ${i === 0 ? '700' : '500'};
+                            font-size: 0.88em;
+                            cursor: pointer;
+                            transition: all 0.2s;
+                            font-family: inherit;
+                            white-space: nowrap;
+                            margin-bottom: -2px;
+                            text-align: center;
+                        "
+                    >${label} Sem</button>
+                `).join('')}
+            </div>
+        `;
+
+        productosGrid.innerHTML = '';
+
+        // Función global para cambiar tab
+        window.cambiarTabLibros = function(sem) {
+            // Resaltar tab activo
+            document.querySelectorAll('.libro-tab-btn').forEach(btn => {
+                const active = parseInt(btn.dataset.sem) === sem;
+                btn.style.borderBottom = active ? '3px solid #f20d0d' : '3px solid transparent';
+                btn.style.color = active ? '#f20d0d' : '#64748b';
+                btn.style.fontWeight = active ? '700' : '500';
+            });
+
+            const ids = librosPorSemestre[sem] || [];
+            const librosDelSem = productos.filter(p => ids.includes(p.id));
+            const contenedor = document.getElementById('productosGrid');
+            contenedor.innerHTML = '';
+
+            librosDelSem.forEach(producto => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-image-container">
+                        <div class="product-image-placeholder">
+                            ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : '📚'}
+                        </div>
+                        <div class="price-badge">$${producto.precio}</div>
+                    </div>
+                    <div class="product-info">
+                        <p class="product-brand">${producto.marca}</p>
+                        <h2 class="product-title">${producto.nombre}</h2>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" onclick="agregarAlCarrito(${producto.id}, 'Libros')">
+                                Agregar al carrito
+                            </button>
+                            <button class="btn-icon">🛒</button>
+                        </div>
+                    </div>
+                `;
+                contenedor.appendChild(productCard);
+            });
+        };
+
+        // Mostrar semestre 1 por defecto
+        window.cambiarTabLibros(1);
+        modal.style.display = 'block';
+        return;
+    }
+    // ── FIN MODAL LIBROS ──
+
     productos.forEach(producto => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
