@@ -176,11 +176,18 @@
 
 <div class="modal-historial" id="modalHistorial">
         <div class="modal-historial-content">
-            <span class="close-modal-historial" onclick="cerrarHistorial()">&times;</span>
-            
-            <div class="historial-header">
-                <h2>HISTORIAL DE COMPRAS</h2>
-            </div>
+            <header class="bg-gradient-to-r from-primary to-red-800 px-6 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <img src="../imgs/yameharte.png" alt="CBTis 258" class="h-9 w-auto object-contain">
+                    <div>
+                        <h2 class="text-white text-lg font-black leading-tight">CBTis 258</h2>
+                        <p class="text-white/80 text-[11px] font-semibold uppercase tracking-widest">Historial de Compras</p>
+                    </div>
+                </div>
+                <button onclick="cerrarHistorial()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </header>
 
             <div class="historial-layout">
                 <!-- Columna Izquierda: Historial -->
@@ -272,11 +279,18 @@
     <!-- MODAL DE INFORMACIÓN -->
 <div class="modal-informacion" id="modalInformacion">
     <div class="modal-informacion-content">
-        <span class="close-modal-info" onclick="cerrarInformacion()">&times;</span>
-        
-        <div class="historial-header">
-            <h2>INFORMACIÓN CBTis 258</h2>
-        </div>
+        <header class="bg-gradient-to-r from-primary to-red-800 px-6 py-4 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <img src="../imgs/yameharte.png" alt="CBTis 258" class="h-9 w-auto object-contain">
+                <div>
+                    <h2 class="text-white text-lg font-black leading-tight">CBTis 258</h2>
+                    <p class="text-white/80 text-[11px] font-semibold uppercase tracking-widest">Información General</p>
+                </div>
+            </div>
+            <button onclick="cerrarInformacion()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                <span class="material-symbols-outlined text-white">close</span>
+            </button>
+        </header>
 
         <div class="info-grid">
             <div class="info-card-section" onclick="abrirSeccion('nuevoIngreso')">
@@ -308,11 +322,18 @@
 
 <div class="modal-detalle" id="modalDetalle">
     <div class="modal-detalle-content">
-        <span class="close-modal-detalle" onclick="cerrarDetalle()">&times;</span>
-        
-        <div class="historial-header">
-            <h2 id="detalleTitle">Información</h2>
-        </div>
+        <header class="bg-gradient-to-r from-primary to-red-800 px-6 py-4 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <img src="../imgs/yameharte.png" alt="CBTis 258" class="h-9 w-auto object-contain">
+                <div>
+                    <h2 class="text-white text-lg font-black leading-tight">CBTis 258</h2>
+                    <p id="detalleTitle" class="text-white/80 text-[11px] font-semibold uppercase tracking-widest">Información</p>
+                </div>
+            </div>
+            <button onclick="cerrarDetalle()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                <span class="material-symbols-outlined text-white">close</span>
+            </button>
+        </header>
 
         <div class="detalle-contenido" id="detalleContenido">
         </div>
