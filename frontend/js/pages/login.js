@@ -1,11 +1,7 @@
-// ============================================
-// CONFIGURACIÓN
-// ============================================
-
-const API_BASE = 'http://127.0.0.1:8000';
-const API_URL = `${API_BASE}/api/auth`;
-
-console.log('🔗 API URL:', API_URL);
+import { 
+    registerUser, loginUser, loginWithGoogleToken, 
+    checkSessionToken, checkBackendHealth, sendForgotPasswordLink
+} from '../api/auth.js';
 
 const container = document.getElementById('container');
 const loginBtn = document.getElementById('login');
@@ -59,13 +55,11 @@ signUpForm.addEventListener('submit', async (e) => {
     const email = signUpInputs[1].value.trim();
     const password = signUpInputs[2].value.trim();
     
-    // Obtener rol y semestre
     const rol = rolSelect ? rolSelect.value : '';
     let semestre = '';
     
     console.log('📝 Datos:', { nombre, email, rol });
     
-    // Validaciones
     if (!nombre || !email || !password || !rol) {
         alert('Por favor llena todos los campos, incluyendo tu rol');
         submitBtn.disabled = false;
@@ -92,26 +86,17 @@ signUpForm.addEventListener('submit', async (e) => {
     }
     
     try {
-        console.log('📡 Enviando a:', `${API_URL}/register`);
-        
-        const response = await fetch(`${API_URL}/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            // Se envían los nuevos datos aunque el backend actual sólo revise nombre, email, password
-            body: JSON.stringify({ nombre, email, password, rol, semestre })
-        });
+        console.log('📡 Enviando registro');
+        const userData = { nombre, email, password, rol, semestre };
+        const response = await registerUser(userData);
         
         console.log('📥 Status:', response.status);
-        
         const data = await response.json();
         console.log('📦 Respuesta:', data);
         
         if (response.ok) {
             console.log('✅ ¡REGISTRO EXITOSO!');
             
-            // Guardar token y datos del perfil completo
             localStorage.setItem('access_token', data.access_token);
             const userProfile = {
                 id: data.user.id,
@@ -121,28 +106,22 @@ signUpForm.addEventListener('submit', async (e) => {
                 semestre: rol === 'estudiante' ? semestre : null
             };
             localStorage.setItem('user', JSON.stringify(userProfile));
-            // Guardar también perfil extendido con llave por usuario
             localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(userProfile));
 
-            
             alert('¡Cuenta creada exitosamente! 🎉');
-            
             console.log('🔄 Redirigiendo...');
             
             localStorage.setItem('just_registered', 'true');
-            // Redirigir
             window.location.href = 'principal/index.html';
-            
         } else {
             console.log('❌ Error:', data.detail);
             alert(data.detail || 'Error al crear cuenta');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
-        
     } catch (error) {
         console.error('❌ Error:', error);
-        alert('Error de conexión. Verifica que el backend esté corriendo en http://127.0.0.1:8000');
+        alert('Error de conexión. Verifica que el backend esté corriendo');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
@@ -179,17 +158,9 @@ signInForm.addEventListener('submit', async (e) => {
     
     try {
         console.log('📡 Enviando login...');
-        
-        const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password })
-        });
+        const response = await loginUser(email, password);
         
         console.log('📥 Status:', response.status);
-        
         const data = await response.json();
         console.log('📦 Respuesta:', data);
         
@@ -198,27 +169,21 @@ signInForm.addEventListener('submit', async (e) => {
             
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            // Sincronizar perfil extendido para este usuario
             if (data.user.id) {
                 const perfilGuardado = localStorage.getItem(`perfil_${data.user.id}`);
                 if (!perfilGuardado) {
-                    // Guardar si no hay perfil previo
                     localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(data.user));
                 }
             }
-
             
             alert(`¡Bienvenid@ ${data.user.nombre}! 🎉`);
-            
             window.location.href = 'principal/index.html';
-            
         } else {
             console.log('❌ Error:', data.detail);
             alert(data.detail || 'Email o contraseña incorrectos');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
-        
     } catch (error) {
         console.error('❌ Error:', error);
         alert('Error de conexión con el servidor');
@@ -228,7 +193,7 @@ signInForm.addEventListener('submit', async (e) => {
 });
 
 // ============================================
-// LOGIN CON GOOGLE — usando OAuth popup (sin FedCM)
+// LOGIN CON GOOGLE
 // ============================================
 
 const GOOGLE_CLIENT_ID = '518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com';
@@ -246,14 +211,12 @@ function googleOAuthPopup() {
         `&nonce=${nonce}` +
         `&prompt=select_account`;
 
-    // Abrir popup centrado
     const width = 500, height = 600;
     const left = (screen.width - width) / 2;
     const top = (screen.height - height) / 2;
     const popup = window.open(url, 'google-login', 
         `width=${width},height=${height},top=${top},left=${left}`);
 
-    // Escuchar cuando el popup regresa con el token
     const interval = setInterval(() => {
         try {
             if (!popup || popup.closed) {
@@ -271,7 +234,7 @@ function googleOAuthPopup() {
                 }
             }
         } catch (e) {
-            // Cross-origin — aún cargando Google, ignorar
+            // Cross-origin
         }
     }, 200);
 }
@@ -279,12 +242,7 @@ function googleOAuthPopup() {
 async function sendGoogleToken(id_token) {
     console.log('🔐 Token de Google recibido, enviando al backend...');
     try {
-        const res = await fetch(`${API_URL}/login/google`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: id_token })
-        });
-
+        const res = await loginWithGoogleToken(id_token);
         const data = await res.json();
 
         if (res.ok) {
@@ -301,7 +259,6 @@ async function sendGoogleToken(id_token) {
     }
 }
 
-// Asignar a los botones directamente (ya no necesitas google.accounts.id)
 document.getElementById('google-signup-btn').addEventListener('click', (e) => {
     e.preventDefault();
     googleOAuthPopup();
@@ -319,25 +276,17 @@ document.getElementById('google-signin-btn').addEventListener('click', (e) => {
 window.onload = async function () {
     console.log('🚀 Página cargada');
     
-        // 🚩 EVITAR CHECK-SESSION JUSTO DESPUÉS DE REGISTRO
     if (localStorage.getItem('just_registered')) {
         console.log('🆕 Usuario recién registrado, saltando check-session');
         localStorage.removeItem('just_registered');
         return;
     }
 
-
-    // Verificar sesión activa
     const token = localStorage.getItem('access_token');
     if (token) {
         console.log('🔑 Token encontrado, verificando...');
         try {
-            const response = await fetch(`${API_URL}/check-session`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
+            const response = await checkSessionToken(token);
             if (response.ok) {
                 console.log('✅ Sesión válida, redirigiendo...');
                 window.location.href = 'principal/index.html';
@@ -354,13 +303,9 @@ window.onload = async function () {
         }
     }
     
-    // Inicializar Google
-    
-    
-    // Verificar backend
     console.log('🔍 Verificando backend...');
     try {
-        const response = await fetch(`${API_BASE}/health`);
+        const response = await checkBackendHealth();
         if (response.ok) {
             const data = await response.json();
             console.log('✅ Backend conectado:', data);
@@ -418,14 +363,7 @@ if (sendForgotBtn) {
         sendForgotBtn.textContent = 'Enviando...';
         
         try {
-            const response = await fetch(`${API_URL}/forgot-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email })
-            });
-            
+            const response = await sendForgotPasswordLink(email);
             const data = await response.json();
             
             alert('✅ Si el correo existe, recibirás un email con instrucciones');
