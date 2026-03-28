@@ -1,0 +1,13 @@
+# Archivo de variables de entorno (EL MÁS IMPORTANTE)
+.env,
+.flaskenv
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Entornos virtuales (si usas venv)
+venv/
+env/
