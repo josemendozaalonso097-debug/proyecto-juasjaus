@@ -1,0 +1,95 @@
+<div class="modal-historial" id="modalHistorial">
+        <div class="modal-historial-content">
+            <header class="bg-gradient-to-r from-primary to-red-800 px-6 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <img src="../imgs/yameharte.png" alt="CBTis 258" class="h-9 w-auto object-contain">
+                    <div>
+                        <h2 class="text-white text-lg font-black leading-tight">CBTis 258</h2>
+                        <p class="text-white/80 text-[11px] font-semibold uppercase tracking-widest">Historial de Compras</p>
+                    </div>
+                </div>
+                <button onclick="cerrarHistorial()" class="p-2 hover:bg-white/20 rounded-full transition-colors">
+                    <span class="material-symbols-outlined text-white">close</span>
+                </button>
+            </header>
+
+            <div class="historial-layout">
+                <!-- Columna Izquierda: Historial -->
+                <div class="historial-compras">
+                    <!-- Compra 1 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">25/OCT/2023</div>
+                        <div class="compra-info">
+                            <h3>Paquete de Uniformes Deportivos</h3>
+                            <div class="compra-badges">
+                                <span class="badge-entregado">Entregado</span>
+                                <span class="badge-entregado">Entregado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$1,250.00 MXN</div>
+                    </div>
+
+                    <!-- Compra 2 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">10/AGO/2023</div>
+                        <div class="compra-info">
+                            <h3>Libros y Gelas de 3er Semestre</h3>
+                            <div class="compra-badges">
+                                <span class="badge-entregado">Entregado</span>
+                                <span class="badge-entregado">Entregado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$1,980.00 MXN</div>
+                    </div>
+
+                    <!-- Compra 3 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">15/JUL/2023</div>
+                        <div class="compra-info">
+                            <h3>Ficha Examen Extordinario (Física)</h3>
+                            <div class="compra-badges">
+                                <span class="badge-completado">Completado</span>
+                                <span class="badge-completado">Completado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$1,250.00 MXN</div>
+                    </div>
+
+                    <!-- Compra 4 -->
+                    <div class="compra-card">
+                        <div class="compra-fecha">02/JUN/2023</div>
+                        <div class="compra-info">
+                            <h3>Material de Laboratorio</h3>
+                            <div class="compra-badges">
+                                <span class="badge-entregado">Entregado</span>
+                            </div>
+                        </div>
+                        <div class="compra-precio">$850.00 MXN</div>
+                    </div>
+                </div>
+
+                <div class="resumen-cuenta">
+                    <h3>RESUMEN DE CUENTA</h3>
+                    
+                    <div class="resumen-info">
+                        <p class="resumen-item">
+                            <span>Compras Realizadas</span>
+                            <strong>4</strong>
+                        </p>
+                        <p class="resumen-item">
+                            <span>Total Gastado</span>
+                            <strong class="total-amount">$5,330.00 MXN</strong>
+                        </p>
+                    </div>
+
+                    <button class="btn-facturas">VER FACTURAS</button>
+
+                    <div class="info-adicional">
+    <p><strong>Nota:</strong> Puedes visualizar o descargar tus facturas en formato PDF.
+    </p>
+</div>
+
+                </div>
+            </div>
+        </div>
+    </div>
