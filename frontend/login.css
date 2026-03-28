@@ -47,7 +47,7 @@ body{
 }
 
 .container button{
-    background-color: #94272C;
+    background-color: var(--color-primary-dark);
     color: #fff;
     font-size: 12px;
     padding: 10px 45px;
@@ -90,7 +90,7 @@ body{
 
 .input:hover, 
 .input:focus {
-  border: 2px solid #94272C;
+  border: 2px solid var(--color-primary-dark);
   box-shadow: 0px 0px 0px 7px rgba(129, 32, 32, 0.2);
   background-color: white;
 }
@@ -183,9 +183,9 @@ body{
 }
 
 .toggle{
-    background-color: #94272C;
+    background-color: var(--color-primary-dark);
     height: 100%;
-    background: linear-gradient(to right, #94272C, #8b292e);
+    background: linear-gradient(to right, var(--color-primary-dark), #8b292e);
     color: #fff;
     position: relative;
     left: -100%;
@@ -318,8 +318,8 @@ body{
 .form-group-forgot input:hover,
 .form-group-forgot input:focus {
     outline: none;
-    border-color: #94272C;
-    border: 2px solid #94272C;
+    border-color: var(--color-primary-dark);
+    border: 2px solid var(--color-primary-dark);
     box-shadow: 0px 0px 0px 7px rgba(129, 32, 32, 0.2);
     background-color: white;
 }
@@ -331,7 +331,7 @@ body{
     font-family: inherit;
     font-style: rgb(0, 0, 0);
     color: #ffffff;
-    background-color: #94272C;
+    background-color: var(--color-primary-dark);
     border: none;
     width: 100%;
     padding: 12px 16px;
@@ -345,7 +345,7 @@ body{
 
 .form-submit-btn-forgot:hover {
     background-color: #ffffff;
-    color: #94272C;
+    color: var(--color-primary-dark);
 }
 
 .signup-link-forgot {
@@ -355,7 +355,7 @@ body{
 }
 
 .signup-link-text {
-    color: #94272C;
+    color: var(--color-primary-dark);
     text-decoration: none;
     font-weight: 400;
 }
@@ -385,6 +385,6 @@ body{
 }
 
 .toggle-password:hover {
-    color: #94272C;
+    color: var(--color-primary-dark);
 }
 

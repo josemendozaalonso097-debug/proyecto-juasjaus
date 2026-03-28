@@ -16,7 +16,7 @@ body{
 }
 
 .cab-header{
-    background-color: #94272C;
+    background-color: var(--color-primary-dark);
     color: #fff;
     padding: 10px 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -70,7 +70,7 @@ body{
   align-items: center;
   padding: 15px 40px;
   gap: 20px;
-  background-color: #94272C;
+  background-color: var(--color-primary-dark);
   outline: 3px #fff solid;
   outline-offset: -3px;
   border-radius: 5px;
@@ -117,7 +117,7 @@ body{
 
 .section-title {
     font-size: 28px;
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-weight: 700;
     margin-bottom: 25px;
 }
@@ -131,7 +131,7 @@ body{
 .card {
     width: 100%;
     height: 300px;
-    border: 2px solid #94272C;
+    border: 2px solid var(--color-primary-dark);
     background-image: linear-gradient(163deg, #641c20 0%, #ff0000 100%);
     border-radius: 20px;
     transition: all 0.3s;
@@ -153,14 +153,14 @@ body{
 }
 
 .card2 h3 {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 8px;
 }
 
 .card2 p {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-size: 14px;
 }
 
@@ -190,7 +190,7 @@ body{
     background: rgb(255, 255, 255);
     border-radius: 15px;
     padding: 20px;
-    border: 2px solid #94272C;
+    border: 2px solid var(--color-primary-dark);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     position: relative;
     min-height: 200px;
@@ -232,7 +232,7 @@ body{
 }
 
 .pay-btn:hover {
-  background-color: #6e0404;
+  background-color: var(--color-primary-darker);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -305,12 +305,12 @@ body{
 }
 
 .footer-links a{
-    color: #94272C;
+    color: var(--color-primary-dark);
     transition: color 0.3s ease;
 }
 
 .btn-logout{
-    background: linear-gradient(135deg, #8a3535 0%, #750616 100%);
+    background: linear-gradient(135deg, #8a3535 0%, var(--color-primary-gradient) 100%);
     color: white;
     padding: 12px 40px;
     display: block;
@@ -379,12 +379,12 @@ body{
 }
 
 .close-modal:hover {
-    color: #94272C;
+    color: var(--color-primary-dark);
 }
 
 .modal-title {
     font-size: 2.2em;
-    color: #94272C;
+    color: var(--color-primary-dark);
     margin-bottom: 30px;
     font-weight: 700;
     clear: both;
@@ -593,7 +593,7 @@ body{
 }
 
 .historial-header {
-    background: linear-gradient(135deg, #94272C 0%, #750616 100%);
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-gradient) 100%);
     padding: 30px 40px;
     color: white;
     position: relative;
@@ -618,7 +618,7 @@ body{
 .form .label:has(input:focus) .title {
   top: 0;
   left: 0;
-  color: #94272c;
+  color: var(--color-primary-dark);
 }
 .form .label .title {
   padding: 0 10px;
@@ -655,7 +655,7 @@ body{
 
 .form .input-field:focus {
   border-color: #97242c;
-  border: 2px solid #94272c;
+  border: 2px solid var(--color-primary-dark);
   box-shadow: 0px 0px 0px 5px rgba(129, 32, 32, 0.2);
   background-color: #eee;
 }
@@ -759,7 +759,7 @@ body{
 
 /* Borde verde cuando es válido */
 .form .input-field:valid {
-    border-color: #94272C;
+    border-color: var(--color-primary-dark);
 }
 
 /* Animación cuando el campo tiene error */
@@ -836,7 +836,7 @@ body{
 }
 
 .metodo-card:hover {
-    border-color: #94272C;
+    border-color: var(--color-primary-dark);
     transform: translateY(-8px);
     box-shadow: 0 10px 30px rgba(148, 39, 44, 0.25);
 }
@@ -848,7 +848,7 @@ body{
 
 .metodo-card h3 {
     font-size: 1.3em;
-    color: #94272C;
+    color: var(--color-primary-dark);
     margin-bottom: 12px;
     font-weight: 700;
 }
@@ -959,11 +959,11 @@ header.cab-header { z-index: 1; }
     padding: 25px;
     border-radius: 15px;
     margin-bottom: 30px;
-    border: 2px solid #94272C;
+    border: 2px solid var(--color-primary-dark);
 }
 
 .info-bancaria h3 {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-size: 1.3em;
     margin-bottom: 20px;
     font-weight: 700;
@@ -983,7 +983,7 @@ header.cab-header { z-index: 1; }
 .dato-bancario.total-pagar {
     margin-top: 15px;
     padding-top: 15px;
-    border-top: 2px solid #94272C;
+    border-top: 2px solid var(--color-primary-dark);
     font-size: 1.2em;
     font-weight: 700;
 }
@@ -994,7 +994,7 @@ header.cab-header { z-index: 1; }
 }
 
 .valor-dato {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-weight: 700;
 }
 
@@ -1002,18 +1002,18 @@ header.cab-header { z-index: 1; }
     background: white;
     padding: 25px;
     border-radius: 15px;
-    border: 2px solid #94272C;
+    border: 2px solid var(--color-primary-dark);
 }
 
 .form-comprobante h3 {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-size: 1.3em;
     margin-bottom: 20px;
     font-weight: 700;
 }
 
 .upload-area {
-    border: 3px dashed #94272C;
+    border: 3px dashed var(--color-primary-dark);
     border-radius: 15px;
     padding: 40px;
     text-align: center;
@@ -1024,7 +1024,7 @@ header.cab-header { z-index: 1; }
 
 .upload-area:hover {
     background: #fff;
-    border-color: #6e0404;
+    border-color: var(--color-primary-darker);
 }
 
 .upload-icon {
@@ -1033,7 +1033,7 @@ header.cab-header { z-index: 1; }
 }
 
 .upload-text {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-size: 1.1em;
     font-weight: 600;
     margin-bottom: 5px;
@@ -1076,7 +1076,7 @@ header.cab-header { z-index: 1; }
 
 .form-group label {
     display: block;
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-weight: 600;
     margin-bottom: 8px;
 }
@@ -1084,7 +1084,7 @@ header.cab-header { z-index: 1; }
 .form-group input {
     width: 100%;
     padding: 12px;
-    border: 2px solid #94272C;
+    border: 2px solid var(--color-primary-dark);
     border-radius: 10px;
     font-size: 1em;
     transition: all 0.3s ease;
@@ -1092,13 +1092,13 @@ header.cab-header { z-index: 1; }
 
 .form-group input:focus {
     outline: none;
-    border-color: #6e0404;
+    border-color: var(--color-primary-darker);
     box-shadow: 0 0 0 3px rgba(148, 39, 44, 0.1);
 }
 
 .btn-enviar-comprobante {
     width: 100%;
-    background: linear-gradient(135deg, #94272C 0%, #6e0404 100%);
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-darker) 100%);
     color: white;
     border: none;
     padding: 15px;
@@ -1179,7 +1179,7 @@ header.cab-header { z-index: 1; }
 
 /* Botón copiar */
 .btn-copiar {
-    background: #94272C;
+    background: var(--color-primary-dark);
     color: white;
     border: none;
     padding: 8px 15px;
@@ -1192,7 +1192,7 @@ header.cab-header { z-index: 1; }
 }
 
 .btn-copiar:hover {
-    background: #6e0404;
+    background: var(--color-primary-darker);
     transform: scale(1.05);
 }
 
@@ -1207,11 +1207,11 @@ header.cab-header { z-index: 1; }
     padding: 25px;
     border-radius: 15px;
     margin-top: 30px;
-    border: 2px solid #94272C;
+    border: 2px solid var(--color-primary-dark);
 }
 
 .instrucciones-transferencia h3 {
-    color: #94272C;
+    color: var(--color-primary-dark);
     font-size: 1.3em;
     margin-bottom: 20px;
     font-weight: 700;
@@ -1234,7 +1234,7 @@ header.cab-header { z-index: 1; }
     padding: 15px;
     border-radius: 10px;
     margin-top: 20px;
-    border-left: 4px solid #94272C;
+    border-left: 4px solid var(--color-primary-dark);
 }
 
 .contacto-info p {
@@ -1246,7 +1246,7 @@ header.cab-header { z-index: 1; }
 /* Botón entendido */
 .btn-entendido {
     width: 100%;
-    background: linear-gradient(135deg, #94272C 0%, #6e0404 100%);
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-darker) 100%);
     color: white;
     border: none;
     padding: 15px;
