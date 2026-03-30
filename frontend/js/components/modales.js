@@ -263,10 +263,12 @@ export function inicializarModalesGlobales() {
         const mInfo = document.getElementById('modalInformacion');
         const mDetalle = document.getElementById('modalDetalle');
         const mOrienta = document.getElementById('modalOrientacion');
+        const mHistorial = document.getElementById('modalHistorial');
         
         if (event.target === mInfo) cerrarInformacion();
         if (event.target === mDetalle) cerrarDetalle();
         if (event.target === mOrienta) cerrarModalOrientacion();
+        if (event.target === mHistorial && window.cerrarHistorial) window.cerrarHistorial();
     });
 
     document.addEventListener('keydown', function(event) {
@@ -274,9 +276,25 @@ export function inicializarModalesGlobales() {
             const mOrienta = document.getElementById('modalOrientacion');
             if (mOrienta && !mOrienta.classList.contains('hidden')) cerrarModalOrientacion();
             
+            const mDeuda = document.getElementById('modalDeuda');
+            if (mDeuda && !mDeuda.classList.contains('hidden')) mDeuda.classList.add('hidden');
             // Note: History, Pago, and Papeleria also have escape listeners in their modules/setup
         }
     });
+
+}
+
+export function mostrarModalDeuda(pagosPendientes) {
+    const modalDeuda = document.getElementById('modalDeuda');
+    if (modalDeuda) {
+        // Asumiendo $3,000 por pago
+        const adeudo = pagosPendientes * 3000;
+        
+        document.getElementById('modal-deuda-cantidad').textContent = pagosPendientes;
+        document.getElementById('modal-deuda-monto').textContent = `$${adeudo.toLocaleString('en-US')}.00 MXN`;
+        
+        modalDeuda.classList.remove('hidden');
+    }
 }
 
 // Global exposes for inline clicks
@@ -286,3 +304,4 @@ window.abrirModalOrientacion = abrirModalOrientacion;
 window.cerrarModalOrientacion = cerrarModalOrientacion;
 window.cambiarTabOrientacion = cambiarTabOrientacion;
 window.enviarOrientacion = enviarOrientacion;
+window.mostrarModalDeuda = mostrarModalDeuda;

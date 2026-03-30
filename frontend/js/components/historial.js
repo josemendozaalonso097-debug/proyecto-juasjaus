@@ -70,6 +70,19 @@ export function abrirHistorial() {
     if (modal) {
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
+
+        // Evento para cerrar al hacer clic en el fondo gris
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                cerrarHistorial();
+            }
+        };
+
+        // Evento para el botón X de la cabecera
+        const closeBtn = modal.querySelector('header button');
+        if (closeBtn) {
+            closeBtn.onclick = cerrarHistorial;
+        }
     }
 }
 
@@ -82,6 +95,12 @@ export function cerrarHistorial() {
 }
 
 export function inicializarHistorial() {
+    // Botón del dashboard principal
+    const historialBtn = document.getElementById('historial-btn');
+    if (historialBtn) {
+        historialBtn.addEventListener('click', abrirHistorial);
+    }
+
     const secondaryBtn = document.querySelector('.btn-secondary');
     if (secondaryBtn) {
         secondaryBtn.addEventListener('click', abrirHistorial);
@@ -92,3 +111,6 @@ export function inicializarHistorial() {
         btnFacturas.addEventListener('click', generarPDFHistorial);
     }
 }
+
+window.cerrarHistorial = cerrarHistorial;
+window.abrirHistorial = abrirHistorial;

@@ -1,6 +1,7 @@
 import { productosData } from '../api/tienda.js';
 import { carrito, actualizarCarrito } from './carrito.js';
 import { mostrarNotificacion } from '../utils/notificaciones.js';
+import { verificarLimiteColegiatura } from './pago.js';
 
 export function abrirModal(categoria) { 
     const modal = document.getElementById('productModal');
@@ -156,6 +157,16 @@ function agregarAlCarritoWrapper(productoId, categoria, cardElement) {
     }
     if (!producto) return;
     
+    if (producto.nombre && producto.nombre.toLowerCase().includes('colegiatura')) {
+        verificarLimiteColegiatura(() => {
+            procesarAgregadoCarrito(producto, productoId, cardElement);
+        });
+    } else {
+        procesarAgregadoCarrito(producto, productoId, cardElement);
+    }
+}
+
+function procesarAgregadoCarrito(producto, productoId, cardElement) {
     if (producto.tallas || producto.semestre) {
         const sizeBtn = cardElement.querySelector('.size-btn.active');
         producto.tallaSeleccionada = sizeBtn ? sizeBtn.getAttribute('data-size') : 'S';

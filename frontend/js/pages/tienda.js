@@ -41,8 +41,20 @@ document.addEventListener('DOMContentLoaded', async function() {
         const userData = await response.json();
         console.log('✅ Usuario autenticado en la tienda:', userData.nombre);
         
-        // 3. Inicializar Datos
-        cargarDatosPerfil(userData);
+        // 3. Merge user data with local profile (preserves semestre, etc.)
+        const userPrevRaw = localStorage.getItem('user');
+        const userPrev = userPrevRaw ? JSON.parse(userPrevRaw) : {};
+        const userActualizado = { ...userPrev, ...userData };
+        localStorage.setItem('user', JSON.stringify(userActualizado));
+
+        const perfilKey = `perfil_${userData.id}`;
+        const perfilPrevRaw = localStorage.getItem(perfilKey);
+        const perfilPrev = perfilPrevRaw ? JSON.parse(perfilPrevRaw) : {};
+        const perfilActualizado = { ...perfilPrev, ...userData };
+        localStorage.setItem(perfilKey, JSON.stringify(perfilActualizado));
+
+        // 4. Inicializar Datos
+        cargarDatosPerfil(userActualizado);
         inicializarCarrito();
         inicializarPapeleria();
         inicializarPago('tienda');

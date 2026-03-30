@@ -1,6 +1,6 @@
 import { generarPDFComprobante } from '../utils/pdf.js';
 import { carrito, calcularTotal, vaciarCarrito } from './carrito.js';
-import { guardarEnHistorial } from '../utils/storage.js';
+import { guardarEnHistorial, obtenerHistorial } from '../utils/storage.js';
 
 export function inicializarPago(modo = 'principal') {
     const cardNumberInput = document.getElementById('serialCardNumber');
@@ -82,7 +82,12 @@ export function inicializarPago(modo = 'principal') {
 
     if (modo === 'principal') {
         const payBtn = document.getElementById('pay-btn');
-        if (payBtn) payBtn.addEventListener('click', abrirModalPago);
+        if (payBtn) {
+            payBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                verificarLimiteColegiatura(abrirModalPago);
+            });
+        }
     }
 
     const checkoutBtn2 = document.querySelector('.checkout-btn');
@@ -104,6 +109,10 @@ export function inicializarPago(modo = 'principal') {
                 guardarEnHistorial(compra);
                 cerrarModalPago();
                 alert('Pago procesado correctamente y agregado al historial.');
+                
+                if (window.actualizarProximoVencimiento) {
+                    window.actualizarProximoVencimiento();
+                }
             }
         });
     }
@@ -395,4 +404,94 @@ export function mostrarConfirmacionExt(metodo) {
     `;
     document.body.appendChild(confirmacion);
     document.body.style.overflow = 'hidden';
+}
+
+export function verificarLimiteColegiatura(callback) {
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) {
+        callback();
+        return;
+    }
+    const user = JSON.parse(userRaw);
+    const userId = user.id;
+
+    // Leer perfil extendido que contiene el semestre actualizado
+    const perfilRaw = userId ? localStorage.getItem(`perfil_${userId}`) : null;
+    const perfil = perfilRaw ? JSON.parse(perfilRaw) : {};
+    
+    const rol = (perfil.rol || user.rol || 'estudiante').toLowerCase();
+    const semestreStr = perfil.semestre || user.semestre || '1';
+
+    console.log('🔒 Verificando límite — Rol:', rol, '| Semestre:', semestreStr);
+
+    // Solo aplica límite si el rol es Estudiante
+    if (rol === 'estudiante') {
+        const semestreDelUsuario = parseInt(semestreStr, 10) || 1;
+        const maxPagosPermitidos = Math.max(0, (6 - semestreDelUsuario) + 1);
+        
+        const historial = obtenerHistorial() || [];
+        let count = 0;
+        historial.forEach(compra => {
+            if (compra.productos && compra.productos.some(p => p.nombre.toLowerCase().includes('colegiatura'))) {
+                count++;
+            }
+        });
+
+        console.log('🔒 Pagos realizados:', count, '| Máx permitidos:', maxPagosPermitidos);
+
+        if (count >= maxPagosPermitidos) {
+            mostrarModalLimite(callback, maxPagosPermitidos);
+            return;
+        }
+    }
+    
+    callback();
+}
+
+function mostrarModalLimite(callback, maxPagos) {
+    const confirmacion = document.createElement('div');
+    confirmacion.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 10005;
+        display: flex; justify-content: center; align-items: center;
+    `;
+    
+    const panel = document.createElement('div');
+    panel.style.cssText = `
+        background: white; padding: 40px; border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); text-align: center; max-width: 400px;
+    `;
+    
+    const textoPagos = maxPagos === 1 ? '1 pago' : `${maxPagos} pagos`;
+    
+    panel.innerHTML = `
+        <div style="font-size: 4em; margin-bottom: 20px;">⚠️</div>
+        <h2 style="color: #e67e22; margin-bottom: 15px; font-size: 1.5em; font-weight: bold;">Límite de colegiaturas alcanzado</h2>
+        <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">
+            De acuerdo a tu grado actual, has alcanzado tu límite de <strong>${textoPagos}</strong> de colegiatura correspondientes a lo que restaba de tu plan de estudios.<br><br>
+            ¿Estás seguro de que quieres realizar otro pago adicional?
+        </p>
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button id="btn-cancel-limit" style="
+                background: #f1f5f9; color: #64748b; border: none; padding: 12px 25px;
+                border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            ">Cancelar</button>
+            <button id="btn-continue-limit" style="
+                background: #e67e22; color: white; border: none; padding: 12px 25px;
+                border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s;
+            ">Sí, continuar</button>
+        </div>
+    `;
+    
+    confirmacion.appendChild(panel);
+    document.body.appendChild(confirmacion);
+    
+    document.getElementById('btn-cancel-limit').addEventListener('click', () => {
+        confirmacion.remove();
+    });
+    
+    document.getElementById('btn-continue-limit').addEventListener('click', () => {
+        confirmacion.remove();
+        callback();
+    });
 }

@@ -1,0 +1,49 @@
+<!-- Detalle Deuda Modal Overlay -->
+<div id="modalDeuda" class="fixed inset-0 z-[1005] flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
+<!-- Container -->
+<div class="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-red-500/30 mx-4 max-h-[90vh] flex flex-col">
+    
+    <!-- Background accents -->
+    <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl -ml-10 -mb-10 pointer-events-none"></div>
+
+    <!-- Header Alert Box -->
+    <div class="bg-red-50 dark:bg-red-900/20 px-6 py-6 border-b border-red-100 dark:border-red-900/50 flex flex-col items-center text-center relative z-10">
+        <div class="w-16 h-16 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-4 shadow-inner ring-4 ring-white dark:ring-slate-900">
+            <span class="material-symbols-outlined text-3xl">warning</span>
+        </div>
+        <h2 class="text-xl font-black text-slate-800 dark:text-white leading-tight mb-1">Aviso Importante</h2>
+        <p class="text-sm text-red-600 dark:text-red-400 font-bold">Tienes colegiaturas atrasadas</p>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 relative z-10 bg-white dark:bg-slate-900">
+        <div class="text-center mb-6">
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                Hemos detectado que tienes <strong id="modal-deuda-cantidad" class="text-slate-800 dark:text-slate-200">X</strong> pago(s) pendiente(s) de colegiatura.
+            </p>
+        </div>
+        
+        <!-- Monto Box -->
+        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center mb-6">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Total a liquidar</span>
+            <span class="text-2xl font-black text-red-600 dark:text-red-500" id="modal-deuda-monto">$0.00 MXN</span>
+        </div>
+
+        <p class="text-[11px] text-center text-slate-500 dark:text-slate-400 mb-6 px-2">
+            Por favor, ponte al corriente lo antes posible para evitar recargos o bloqueos en tus servicios escolares. Puedes realizar tu pago en la Tienda.
+        </p>
+
+        <!-- Actions -->
+        <div class="flex flex-col gap-3">
+            <button onclick="document.querySelector('.sidebar-derecha')?.scrollIntoView({ behavior: 'smooth' }); document.getElementById('modalDeuda').classList.add('hidden')" class="w-full py-3 bg-gradient-to-r from-red-600 to-primary text-white font-bold rounded-xl shadow-lg shadow-red-500/20 hover:shadow-red-500/40 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg">payment</span>
+                Ir a pagar ahora
+            </button>
+            <button onclick="document.getElementById('modalDeuda').classList.add('hidden')" class="w-full py-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all active:scale-95">
+                Cerrar aviso
+            </button>
+        </div>
+    </div>
+</div>
+</div>
