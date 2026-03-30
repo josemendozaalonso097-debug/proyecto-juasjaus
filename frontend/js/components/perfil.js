@@ -39,6 +39,16 @@ export function cargarDatosPerfil(user) {
     const userNameEl = document.getElementById('user-name');
     if (userNameEl) userNameEl.textContent = nombre;
 
+    // Actualizar badge de semestre en el dashboard (Cuenta Activa)
+    const statusBadge = document.getElementById('status-badge');
+    if (statusBadge) {
+        if (rol === 'estudiante') {
+            statusBadge.textContent = semestre ? `${semestre}° Semestre` : 'Sin semestre';
+        } else {
+            statusBadge.textContent = 'No aplica';
+        }
+    }
+
     if (userId) {
         const foto = localStorage.getItem(`foto_perfil_${userId}`);
         const DEFAULT_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ";
