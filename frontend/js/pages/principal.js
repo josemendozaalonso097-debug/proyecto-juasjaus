@@ -6,6 +6,7 @@ import { inicializarModalesGlobales } from '../components/modales.js';
 import { inicializarPapeleria } from '../components/papeleria.js';
 import { loadComponent } from '../utils/components.js';
 import { obtenerHistorial } from '../utils/storage.js';
+import { inicializarSidebar } from '../components/sidebar.js';
 // Nota: splash es manejado por inline script en <head> de index.html
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -82,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         inicializarPago();
         inicializarModalesGlobales();
         inicializarPapeleria();
+        inicializarSidebar();
         
         actualizarProximoVencimiento();
         

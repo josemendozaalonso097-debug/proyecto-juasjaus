@@ -285,6 +285,24 @@ window.onload = async function () {
     const token = localStorage.getItem('access_token');
     if (token) {
         console.log('🔑 Token encontrado, verificando...');
+
+        // VERIFICAR PREFERENCIA DE LOGIN MANUAL
+        const userRaw = localStorage.getItem('user');
+        if (userRaw) {
+            try {
+                const user = JSON.parse(userRaw);
+                if (user && user.id) {
+                    const prefs = JSON.parse(localStorage.getItem(`prefs_${user.id}`)) || {};
+                    if (prefs.manualLogin) {
+                        console.log('🛑 Login Manual activo por preferencia del usuario. Deteniendo redirección.');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error('Error al procesar preferencias de login manual:', e);
+            }
+        }
+
         try {
             const response = await checkSessionToken(token);
             if (response.ok) {

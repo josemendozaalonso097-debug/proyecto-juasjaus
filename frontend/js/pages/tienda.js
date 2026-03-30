@@ -7,6 +7,7 @@ import { mostrarNotificacion } from '../utils/notificaciones.js';
 import { abrirModal, cerrarModal } from '../components/productos.js';
 
 import { loadComponent } from '../utils/components.js';
+import { inicializarSidebar } from '../components/sidebar.js';
 
 // ========== SESIÓN Y PERFIL ==========
 document.addEventListener('DOMContentLoaded', async function() {
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         inicializarCarrito();
         inicializarPapeleria();
         inicializarPago('tienda');
+        inicializarSidebar();
 
         // Escuchadores que dependen del DOM inyectado
         const logoutBtn = document.getElementById('logout-btn');
