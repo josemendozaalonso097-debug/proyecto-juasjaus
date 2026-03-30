@@ -177,7 +177,7 @@ signInForm.addEventListener('submit', async (e) => {
             }
             
             alert(`¡Bienvenid@ ${data.user.nombre}! 🎉`);
-            window.location.href = 'principal/index.html';
+            window.location.href = 'principal/index.html?splash=1';
         } else {
             console.log('❌ Error:', data.detail);
             alert(data.detail || 'Email o contraseña incorrectos');
@@ -249,7 +249,7 @@ async function sendGoogleToken(id_token) {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             alert(`¡Bienvenido ${data.user.nombre}! 🎉`);
-            window.location.href = 'principal/index.html';
+            window.location.href = 'principal/index.html?splash=1';
         } else {
             alert('Error con Google: ' + (data.detail || 'Intenta de nuevo'));
         }
@@ -289,7 +289,7 @@ window.onload = async function () {
             const response = await checkSessionToken(token);
             if (response.ok) {
                 console.log('✅ Sesión válida, redirigiendo...');
-                window.location.href = 'principal/index.html';
+                window.location.href = 'principal/index.html?splash=1';
                 return;
             } else {
                 console.log('⚠️ Token inválido');

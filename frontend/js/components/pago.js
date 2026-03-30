@@ -108,7 +108,7 @@ export function inicializarPago(modo = 'principal') {
                 };
                 guardarEnHistorial(compra);
                 cerrarModalPago();
-                alert('Pago procesado correctamente y agregado al historial.');
+                mostrarConfirmacionExt('Tarjeta Bancaria');
                 
                 if (window.actualizarProximoVencimiento) {
                     window.actualizarProximoVencimiento();
@@ -378,10 +378,16 @@ export function procesarCompraExitosa(metodoPago) {
     generarPDFComprobante(metodoPago, fechaFormato, total, carrito);
     
     vaciarCarrito();
-    if (metodoPago !== 'Tarjeta') mostrarConfirmacionExt(metodoPago);
+    mostrarConfirmacionExt(metodoPago);
 }
 
 export function mostrarConfirmacionExt(metodo) {
+    const esTarjeta = metodo === 'Tarjeta' || metodo === 'Tarjeta Bancaria';
+    const titulo = esTarjeta ? "¡Pago Exitoso!" : "¡Comprobante recibido!";
+    const mensaje = esTarjeta 
+        ? `Tu pago con ${metodo} se procesó correctamente.<br><strong>Estado: Completado</strong>`
+        : `Tu comprobante de ${metodo} fue recibido exitosamente.<br><strong>Estado: Pendiente de verificación</strong><br><br>Te notificaremos una vez que sea validado.`;
+
     const confirmacion = document.createElement('div');
     confirmacion.style.cssText = `
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -391,11 +397,9 @@ export function mostrarConfirmacionExt(metodo) {
     `;
     confirmacion.innerHTML = `
         <div style="font-size: 4em; margin-bottom: 20px;">✅</div>
-        <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">¡Comprobante recibido!</h2>
+        <h2 style="color: #27ae60; margin-bottom: 15px; font-size: 1.5em;">${titulo}</h2>
         <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
-            Tu comprobante de ${metodo} fue recibido exitosamente.<br>
-            <strong>Estado: Pendiente de verificación</strong><br><br>
-            Te notificaremos una vez que sea validado.
+            ${mensaje}
         </p>
         <button onclick="this.parentElement.remove(); document.body.style.overflow = 'auto';" style="
             background: #27ae60; color: white; border: none; padding: 12px 30px;
@@ -404,6 +408,41 @@ export function mostrarConfirmacionExt(metodo) {
     `;
     document.body.appendChild(confirmacion);
     document.body.style.overflow = 'hidden';
+
+    if (typeof confetti !== 'undefined') {
+        lanzarConfeti();
+    } else {
+        const script = document.createElement('script');
+        script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+        script.onload = () => lanzarConfeti();
+        document.body.appendChild(script);
+    }
+}
+
+function lanzarConfeti() {
+    var duration = 3 * 1000;
+    var end = Date.now() + duration;
+
+    (function frame() {
+        confetti({
+            particleCount: 5,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            zIndex: 10004
+        });
+        confetti({
+            particleCount: 5,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            zIndex: 10004
+        });
+
+        if (Date.now() < end) {
+            requestAnimationFrame(frame);
+        }
+    }());
 }
 
 export function verificarLimiteColegiatura(callback) {

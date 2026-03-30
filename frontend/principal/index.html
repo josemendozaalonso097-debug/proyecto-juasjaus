@@ -1,6 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- SPLASH LOGIC -->
+    <script>
+        if (new URLSearchParams(location.search).get('splash') !== '1') {
+            document.documentElement.classList.add('hide-splash');
+        } else {
+            history.replaceState(null, '', location.pathname);
+        }
+    </script>
+    <style>
+        .hide-splash #_splash { display: none !important; }
+        @keyframes _sPopIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+        @keyframes _sFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes _sSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @keyframes _sBounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-8px);opacity:1;background:white}}
+        #_splash{position:fixed;inset:0;z-index:999999;background:#94272C;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity .5s ease; pointer-events:none;}
+        #_splash-inner{display:flex;flex-direction:column;align-items:center;gap:18px;position:relative;z-index:2;animation:_sPopIn .65s cubic-bezier(.34,1.56,.64,1) forwards}
+        #_splash-ring{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
+        #_splash-ring-border{position:absolute;inset:0;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;animation:_sSpin 1.4s linear infinite}
+        #_splash-logo-bg{width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
+        #_splash-logo-bg img{width:64px;height:64px;object-fit:contain}
+        #_splash-title{color:white;font-size:1.9rem;font-weight:900;letter-spacing:-.5px;font-family:Lexend,Montserrat,sans-serif;margin:0;animation:_sFadeUp .5s ease .35s both}
+        #_splash-sub{color:rgba(255,255,255,.65);font-size:.72rem;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;font-family:Lexend,Montserrat,sans-serif;margin:-10px 0 0;animation:_sFadeUp .5s ease .55s both}
+        #_splash-dots{display:flex;gap:8px;margin-top:6px;animation:_sFadeUp .5s ease .7s both}
+        .splash-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4)}
+        .splash-dot:nth-child(1){animation:_sBounce 1.1s ease infinite 0s}
+        .splash-dot:nth-child(2){animation:_sBounce 1.1s ease infinite .18s}
+        .splash-dot:nth-child(3){animation:_sBounce 1.1s ease infinite .36s}
+        ._sc{position:absolute;border-radius:50%;background:rgba(255,100,100,.18)}
+        ._sc-tr{width:360px;height:360px;top:-130px;right:-130px}
+        ._sc-bl{width:300px;height:300px;bottom:-110px;left:-110px}
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBTis258 Financieros | Principal</title>
@@ -38,6 +69,40 @@
     <link rel="stylesheet" href="../css/base.css">
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+
+<!-- SPLASH HTML -->
+<div id="_splash">
+    <div class="_sc _sc-tr"></div>
+    <div class="_sc _sc-bl"></div>
+    <div id="_splash-inner">
+      <div id="_splash-ring">
+        <div id="_splash-ring-border"></div>
+        <div id="_splash-logo-bg">
+          <img src="/imgs/yameharte.png" alt="CBTis 258">
+        </div>
+      </div>
+      <p id="_splash-title">CBTis 258</p>
+      <p id="_splash-sub">Un motivo de orgullo</p>
+      <div id="_splash-dots">
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+      </div>
+    </div>
+</div>
+<script>
+    // Destruir el splash después de la animación si no está oculto
+    if (!document.documentElement.classList.contains('hide-splash')) {
+        setTimeout(function() {
+            var spl = document.getElementById('_splash');
+            if(spl) {
+                spl.style.opacity = '0';
+                setTimeout(function(){ spl.remove(); }, 500);
+            }
+        }, 2500);
+    }
+</script>
+<!-- FIN SPLASH -->
 
 <div id="header-container" style="display: contents;"></div>
 <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
@@ -159,6 +224,6 @@
 <div id="modal-deuda-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script type="module" src="../js/pages/principal.js?v=5"></script>
+    <script type="module" src="../js/pages/principal.js?v=6"></script>
 </body> 
 </html>
