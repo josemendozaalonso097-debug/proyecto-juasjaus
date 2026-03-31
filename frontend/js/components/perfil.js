@@ -51,14 +51,14 @@ export function cargarDatosPerfil(user) {
 
     if (userId) {
         const foto = localStorage.getItem(`foto_perfil_${userId}`);
-        const DEFAULT_PHOTO = "https://lh3.googleusercontent.com/aida-public/AB6AXuDEQm0NeyozARQi9aBza43r16ZH_WPKEO3mRI2BvTcbKusRr55Irby19Z-_NuAIQCDgfpfzI00rr22gshKFT5RtRDRSNijam8EniCt4_gghz-Sj8qjN3HsbZmzLUslSveULtwhuHnnskV3qMU-rW5RftSQ18Gif6gQqRI23w4qqvvas_1GbHuR-SdXxNixDtg5E4yiG2YDIV0dEUIy90mzYUjwk5MtSqGqYKmL74aTzPniYHyDxtC09Uo9FvVrzlnVtrlv-ZWmR4QQ";
+        const DEFAULT_PHOTO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
         const fotoUrl = foto || DEFAULT_PHOTO;
 
         const preview = document.getElementById('profilePhotoPreview');
-        if (preview) preview.style.backgroundImage = `url('${fotoUrl}')`;
+        if (preview) preview.style.backgroundImage = `url("${fotoUrl}")`;
 
         const headerPhoto = document.getElementById('header-user-photo');
-        if (headerPhoto) headerPhoto.style.backgroundImage = `url('${fotoUrl}')`;
+        if (headerPhoto) headerPhoto.style.backgroundImage = `url("${fotoUrl}")`;
     }
 }
 
