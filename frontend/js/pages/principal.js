@@ -1,28 +1,29 @@
-import { checkSessionToken } from '../api/auth.js';
-import { cargarDatosPerfil } from '../components/perfil.js';
-import { inicializarHistorial, renderizarHistorial } from '../components/historial.js?v=3';
-import { inicializarPago } from '../components/pago.js?v=3';
-import { inicializarModalesGlobales } from '../components/modales.js';
-import { inicializarPapeleria } from '../components/papeleria.js';
-import { loadComponent } from '../utils/components.js';
-import { obtenerHistorial } from '../utils/storage.js';
-import { inicializarSidebar } from '../components/sidebar.js';
+import { checkSessionToken } from '../api/auth.js?v=1';
+import { cargarDatosPerfil, verificarCambioAutomatico } from '../components/perfil.js?v=1';
+import { inicializarHistorial, renderizarHistorial } from '../components/historial.js?v=4';
+import { inicializarPago } from '../components/pago.js?v=4';
+import { inicializarModalesGlobales } from '../components/modales.js?v=1';
+import { inicializarPapeleria } from '../components/papeleria.js?v=1';
+import { loadComponent } from '../utils/components.js?v=1';
+import { obtenerHistorial } from '../utils/storage.js?v=1';
+import { inicializarSidebar } from '../components/sidebar.js?v=1';
 // Nota: splash es manejado por inline script en <head> de index.html
 
 document.addEventListener('DOMContentLoaded', async function() {
     // 1. Cargar Componentes HTML
-    await loadComponent('header-container', '../components/header.html');
-    await loadComponent('footer-container', '../components/footer.html');
+    await loadComponent('header-container', '../../components/header.html?v=1');
+    await loadComponent('footer-container', '../../components/footer.html?v=1');
 
     // Modales
-    await loadComponent('modal-historial-container', '../components/modal-historial.html');
-    await loadComponent('modal-informacion-container', '../components/modal-informacion.html');
-    await loadComponent('modal-detalle-container', '../components/modal-detalle.html');
-    await loadComponent('modal-pago-container', '../components/modal-pago.html');
-    await loadComponent('modal-papeleria-container', '../components/modal-papeleria.html');
-    await loadComponent('modal-perfil-container', '../components/modal-perfil.html');
-    await loadComponent('modal-deuda-container', '../components/modal-deuda.html');
-    await loadComponent('modal-orientacion-container', '../components/modal-orientacion.html');
+    await loadComponent('modal-historial-container', '../../components/modal-historial.html?v=1');
+    await loadComponent('modal-informacion-container', '../../components/modal-informacion.html?v=1');
+    await loadComponent('modal-detalle-container', '../../components/modal-detalle.html?v=1');
+    await loadComponent('modal-pago-container', '../../components/modal-pago.html?v=1');
+    await loadComponent('modal-papeleria-container', '../../components/modal-papeleria.html?v=1');
+    await loadComponent('modal-perfil-container', '../../components/modal-perfil.html?v=1');
+    await loadComponent('modal-deuda-container', '../../components/modal-deuda.html?v=1');
+    await loadComponent('modal-orientacion-container', '../../components/modal-orientacion.html?v=1');
+    await loadComponent('modal-confirmacion-container', '../../components/modal-confirmacion.html?v=1');
 
     // Mover event listeners que dependen del HTML cargado
     const logoutBtn = document.getElementById('logout-btn');
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // 3. Inicializar Lógica Visual y Datos
         cargarDatosPerfil(userActualizado);
+        verificarCambioAutomatico();
         inicializarHistorial();
         renderizarHistorial();
         inicializarPago();

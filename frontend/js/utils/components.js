@@ -3,7 +3,8 @@ export async function loadComponent(id, path) {
     const container = document.getElementById(id);
     if (!container) return;
     try {
-        const response = await fetch(path);
+        const bustPath = path.includes('?') ? `${path}&cb=${Date.now()}` : `${path}?cb=${Date.now()}`;
+        const response = await fetch(bustPath);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const html = await response.text();
         container.innerHTML = html;

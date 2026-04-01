@@ -90,8 +90,23 @@
                 <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Nombre completo</label>
                 <input id="input-perfil-nombre" type="text" placeholder="Tu nombre completo" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
             </div>
+            <div class="flex flex-col gap-1.5" id="editar-rol-container">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Rol</label>
+                    <span id="badge-cambios-rol" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">3 cambios restantes</span>
+                </div>
+                <select id="input-perfil-rol" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
+                    <option value="estudiante">Estudiante</option>
+                    <option value="administrador">Administrador</option>
+                    <option value="prefecto">Prefecto</option>
+                    <option value="orientador">Orientador</option>
+                </select>
+            </div>
             <div class="flex flex-col gap-1.5" id="editar-semestre-container">
-                <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Semestre</label>
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-semibold text-slate-600 dark:text-slate-400">Semestre</label>
+                    <span id="badge-cambios-semestre" class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">10 cambios restantes</span>
+                </div>
                 <select id="input-perfil-semestre" class="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all">
                     <option value="">Seleccionar...</option>
                     <option value="1">1er Semestre</option>

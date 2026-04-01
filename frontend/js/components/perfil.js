@@ -1,4 +1,8 @@
+const LIMIT_ROL = 3;
+const LIMIT_SEMESTRE = 10;
+
 export function cargarDatosPerfil(user) {
+    console.log('DEBUG: cargarDatosPerfil() con user.id =', user?.id);
     const userId = user.id;
 
     // Preferir perfil extendido por usuario
@@ -29,8 +33,37 @@ export function cargarDatosPerfil(user) {
     // Pre-rellenar campos de edición
     const inputNombre = document.getElementById('input-perfil-nombre');
     const inputSemestre = document.getElementById('input-perfil-semestre');
+    const inputRol = document.getElementById('input-perfil-rol');
+
     if (inputNombre) inputNombre.value = nombre;
     if (inputSemestre && semestre) inputSemestre.value = semestre;
+    if (inputRol) inputRol.value = rol;
+
+    // Cargar estadísticas de cambios
+    if (userId) {
+        const cambiosRol = parseInt(localStorage.getItem(`cambios_rol_${userId}`) || '0', 10);
+        const cambiosSemestre = parseInt(localStorage.getItem(`cambios_semestre_${userId}`) || '0', 10);
+
+        const badgeRol = document.getElementById('badge-cambios-rol');
+        const badgeSemestre = document.getElementById('badge-cambios-semestre');
+
+        if (badgeRol) {
+            const restRol = Math.max(0, LIMIT_ROL - cambiosRol);
+            badgeRol.textContent = `${restRol} cambios restantes`;
+            if (restRol === 0) {
+                badgeRol.className = "text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600";
+                if (inputRol) inputRol.disabled = true;
+            }
+        }
+        if (badgeSemestre) {
+            const restSem = Math.max(0, LIMIT_SEMESTRE - cambiosSemestre);
+            badgeSemestre.textContent = `${restSem} cambios restantes`;
+            if (restSem === 0) {
+                badgeSemestre.className = "text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600";
+                if (inputSemestre) inputSemestre.disabled = true;
+            }
+        }
+    }
 
     // Actualizar nombre en el header
     const navName = document.getElementById('user-name-nav');
@@ -63,6 +96,7 @@ export function cargarDatosPerfil(user) {
 }
 
 export function actualizarPerfil() {
+    console.log('DEBUG: inicializando actualizarPerfil()');
     const userRaw = localStorage.getItem('user');
     if (!userRaw) return;
     const user = JSON.parse(userRaw);
@@ -70,10 +104,12 @@ export function actualizarPerfil() {
 
     const inputNombre   = document.getElementById('input-perfil-nombre');
     const inputSemestre = document.getElementById('input-perfil-semestre');
+    const inputRol      = document.getElementById('input-perfil-rol');
     const msg = document.getElementById('perfil-guardado-msg');
 
     const nuevoNombre   = inputNombre   ? inputNombre.value.trim() : '';
     const nuevoSemestre = inputSemestre ? inputSemestre.value      : '';
+    const nuevoRol      = inputRol      ? inputRol.value           : '';
 
     if (!nuevoNombre) { alert('El nombre no puede estar vacío.'); return; }
 
@@ -81,20 +117,131 @@ export function actualizarPerfil() {
     const perfilRaw = localStorage.getItem(perfilKey);
     const perfil = perfilRaw ? JSON.parse(perfilRaw) : { ...user };
 
+    const cambiosRol = parseInt(localStorage.getItem(`cambios_rol_${userId}`) || '0', 10);
+    const cambiosSemestre = parseInt(localStorage.getItem(`cambios_semestre_${userId}`) || '0', 10);
+
+    const rolCambiado = nuevoRol !== (perfil.rol || user.rol);
+    const semestreCambiado = nuevoSemestre !== (perfil.semestre || user.semestre);
+
+    // Lógica de validación de límites
+    if (rolCambiado && cambiosRol >= LIMIT_ROL) {
+        alert('Has alcanzado el límite de cambios de rol.');
+        return;
+    }
+    if (semestreCambiado && cambiosSemestre >= LIMIT_SEMESTRE) {
+        alert('Has alcanzado el límite de cambios de semestre.');
+        return;
+    }
+
+    // Si es el primer cambio de algo, pedir confirmación
+    if ((rolCambiado && cambiosRol === 0) || (semestreCambiado && cambiosSemestre === 0)) {
+        const tipo = rolCambiado ? 'Rol' : 'Semestre';
+        const limite = rolCambiado ? LIMIT_ROL : LIMIT_SEMESTRE;
+        
+        mostrarModalConfirmacion(
+            '¡Atención!',
+            `Si cambias tu ${tipo}, solo tendrás ${limite} probabilidades de cambiarlo. ¿Deseas continuar?`,
+            () => ejecutarActualizacion(user, perfil, nuevoNombre, nuevoRol, nuevoSemestre, rolCambiado, semestreCambiado)
+        );
+        return;
+    }
+
+    ejecutarActualizacion(user, perfil, nuevoNombre, nuevoRol, nuevoSemestre, rolCambiado, semestreCambiado);
+}
+
+function ejecutarActualizacion(user, perfil, nuevoNombre, nuevoRol, nuevoSemestre, rolCambiado, semestreCambiado) {
+    const userId = user.id;
+    const perfilKey = `perfil_${userId}`;
+
     perfil.nombre = nuevoNombre;
+    perfil.rol = nuevoRol;
     if (nuevoSemestre) perfil.semestre = nuevoSemestre;
+
+    if (rolCambiado) {
+        const c = parseInt(localStorage.getItem(`cambios_rol_${userId}`) || '0', 10);
+        localStorage.setItem(`cambios_rol_${userId}`, c + 1);
+    }
+    if (semestreCambiado) {
+        const c = parseInt(localStorage.getItem(`cambios_semestre_${userId}`) || '0', 10);
+        localStorage.setItem(`cambios_semestre_${userId}`, c + 1);
+    }
 
     localStorage.setItem(perfilKey, JSON.stringify(perfil));
 
     user.nombre = nuevoNombre;
+    user.rol = nuevoRol;
     if (nuevoSemestre) user.semestre = nuevoSemestre;
     localStorage.setItem('user', JSON.stringify(user));
 
     cargarDatosPerfil(user);
 
+    const msg = document.getElementById('perfil-guardado-msg');
     if (msg) {
         msg.classList.remove('hidden');
         setTimeout(() => msg.classList.add('hidden'), 3000);
+    }
+    
+    const modalConfirm = document.getElementById('modalConfirmacion');
+    if (modalConfirm) modalConfirm.classList.add('hidden');
+}
+
+export function mostrarModalConfirmacion(titulo, mensaje, onConfirm) {
+    const modal = document.getElementById('modalConfirmacion');
+    const titleEl = document.getElementById('confirm-title');
+    const msgEl = document.getElementById('confirm-msg');
+    const btn = document.getElementById('confirm-accept-btn');
+
+    if (modal && titleEl && msgEl && btn) {
+        titleEl.textContent = titulo;
+        msgEl.textContent = mensaje;
+        
+        // Clonar botón para limpiar listeners viejos
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.onclick = onConfirm;
+        modal.classList.remove('hidden');
+    }
+}
+
+export function verificarCambioAutomatico() {
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) return;
+    const user = JSON.parse(userRaw);
+    if (!user.id || user.rol !== 'estudiante') return;
+
+    const hoy = new Date();
+    const mes = hoy.getMonth(); // 0-11 (Jan=0, Jul=6)
+    const anio = hoy.getFullYear();
+    
+    // Periodos: "Enero" (mes 0) y "Julio" (mes 6)
+    if (mes !== 0 && mes !== 6) return;
+
+    const periodoKey = `${anio}-${mes}`;
+    const ultimoUpdate = localStorage.getItem(`ultimo_auto_update_${user.id}`);
+
+    if (ultimoUpdate === periodoKey) return; // Ya se hizo este periodo
+
+    // Incrementar semestre
+    const perfilKey = `perfil_${user.id}`;
+    const perfilRaw = localStorage.getItem(perfilKey);
+    const perfil = perfilRaw ? JSON.parse(perfilRaw) : user;
+
+    let semestreActual = parseInt(perfil.semestre || '1', 10);
+    if (semestreActual < 6) {
+        semestreActual++;
+        perfil.semestre = semestreActual.toString();
+        user.semestre = perfil.semestre;
+
+        localStorage.setItem(perfilKey, JSON.stringify(perfil));
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(`ultimo_auto_update_${user.id}`, periodoKey);
+
+        console.log(`🚀 Semestre actualizado automáticamente a ${semestreActual}°`);
+        cargarDatosPerfil(user);
+        
+        // Opcional: Notificación visual
+        alert(`¡Felicidades! Has pasado al ${semestreActual}° semestre.`);
     }
 }
 
@@ -129,3 +276,4 @@ export function cambiarFotoPerfil(event) {
 // Ensure the profile functions are available globally if buttons call them via inline onclick
 window.actualizarPerfil = actualizarPerfil;
 window.cambiarFotoPerfil = cambiarFotoPerfil;
+window.verificarCambioAutomatico = verificarCambioAutomatico;
