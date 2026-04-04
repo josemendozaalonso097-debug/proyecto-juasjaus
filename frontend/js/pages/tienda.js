@@ -1,4 +1,5 @@
 import { checkSessionToken } from '../api/auth.js';
+import { navigateTo, initPageReveal } from '../utils/pageTransition.js';
 import { cargarDatosPerfil, actualizarPerfil, cambiarFotoPerfil } from '../components/perfil.js';
 import { inicializarPapeleria } from '../components/papeleria.js';
 import { inicializarCarrito } from '../components/carrito.js';
@@ -11,6 +12,7 @@ import { inicializarSidebar } from '../components/sidebar.js';
 
 // ========== SESIÓN Y PERFIL ==========
 document.addEventListener('DOMContentLoaded', async function() {
+    const reveal = initPageReveal();
     // 1. Cargar Componentes HTML
     await loadComponent('header-container', '../components/header.html');
     await loadComponent('footer-container', '../components/footer.html');
@@ -80,6 +82,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 document.querySelector('.sidebar-derecha')?.scrollIntoView({ behavior: 'smooth' });
             });
         }
+
+        if (reveal) reveal();
         
     } catch (error) {
         console.error('Error:', error);

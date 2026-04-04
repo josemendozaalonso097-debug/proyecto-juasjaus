@@ -70,6 +70,42 @@
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
 
+<script>
+    (function () {
+        if (!sessionStorage.getItem('pt_pending')) return;
+        var d = document.createElement('div');
+        d.id = 'pt-simple-ov';
+        d.style.cssText = [
+            'position:fixed',
+            'inset:0',
+            'z-index:99998',
+            'background:#f20d0d',
+            'display:flex',
+            'align-items:center',
+            'justify-content:center'
+        ].join(';');
+        var s = document.createElement('style');
+        s.textContent = '@keyframes ptSpin2{to{transform:rotate(360deg)}}';
+        document.head.appendChild(s);
+        d.innerHTML = [
+            '<div style="text-align:center;color:white">',
+            '<div style="width:66px;height:66px;border-radius:50%;',
+            'border:2.5px solid rgba(255,255,255,.3);border-top-color:white;',
+            'margin:0 auto 12px;position:relative;',
+            'animation:ptSpin2 1s linear infinite;">',
+            '<div style="position:absolute;top:50%;left:50%;',
+            'transform:translate(-50%,-50%);width:46px;height:46px;',
+            'border-radius:50%;background:rgba(255,255,255,.15);"></div>',
+            '</div>',
+            '<div style="font-size:18px;font-weight:700;">CBTis 258</div>',
+            '<div style="font-size:10px;opacity:.65;letter-spacing:3px;',
+            'text-transform:uppercase;margin-top:5px;">Cargando...</div>',
+            '</div>'
+        ].join('');
+        document.body.appendChild(d);
+    })();
+</script>
+
 <!-- SPLASH HTML -->
 <div id="_splash">
     <div class="_sc _sc-tr"></div>

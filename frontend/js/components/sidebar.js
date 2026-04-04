@@ -1,3 +1,5 @@
+import { navigateTo } from '../utils/pageTransition.js?v=1';
+
 let sidebarInicializado = false;
 
 export function inicializarSidebar() {
@@ -118,12 +120,15 @@ function inyectarSidebarHTML(prefs) {
             <div class="flex-grow py-6 overflow-y-auto">
                 <div class="px-4 mb-4">
                     <p class="text-[10px] font-black uppercase tracking-[2px] text-slate-400 px-4 mb-2">Accesos Rápidos</p>
-                    <a href="${navUrl}" class="flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
+                    <button
+                        id="sidebar-nav-btn"
+                        class="flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group w-full text-left"
+                    >
                         <div class="p-2.5 bg-primary/5 rounded-xl group-hover:bg-primary/10 transition-colors">
                             <span class="material-symbols-outlined text-primary text-[22px] group-hover:scale-110 transition-transform">${navIcon}</span>
                         </div>
                         <span class="font-bold text-slate-700 dark:text-slate-200">${navText}</span>
-                    </a>
+                    </button>
                     
                     <button id="open-prefs" class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group text-left">
                         <div class="p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
@@ -201,6 +206,7 @@ function inyectarSidebarHTML(prefs) {
     // Event Listeners UI
     document.getElementById('sidebar-overlay').onclick = () => toggleSidebar(false);
     document.getElementById('close-sidebar').onclick = () => toggleSidebar(false);
+    document.getElementById('sidebar-nav-btn').addEventListener('click', () => {navigateTo(navUrl, navDirection);});
     document.getElementById('open-prefs').onclick = () => togglePrefs(true);
     document.getElementById('back-to-main').onclick = () => togglePrefs(false);
     

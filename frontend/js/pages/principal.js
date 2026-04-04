@@ -1,4 +1,5 @@
 import { checkSessionToken } from '../api/auth.js?v=1';
+import { navigateTo, initPageReveal } from '../utils/pageTransition.js?v=1';
 import { cargarDatosPerfil, verificarCambioAutomatico } from '../components/perfil.js?v=1';
 import { inicializarHistorial, renderizarHistorial } from '../components/historial.js?v=4';
 import { inicializarPago } from '../components/pago.js?v=4';
@@ -10,6 +11,7 @@ import { inicializarSidebar } from '../components/sidebar.js?v=1';
 // Nota: splash es manejado por inline script en <head> de index.html
 
 document.addEventListener('DOMContentLoaded', async function() {
+    const reveal = initPageReveal();
     // 1. Cargar Componentes HTML
     await loadComponent('header-container', '../../components/header.html?v=1');
     await loadComponent('footer-container', '../../components/footer.html?v=1');
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const storeBtn = document.getElementById('store-btn');
     if (storeBtn) {
         storeBtn.addEventListener('click', function() {
-            window.location.href = '../tienda/tienda.html';
+            navigateTo('../tienda/tienda.html', 'right');
         });
     }
 
@@ -88,6 +90,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         inicializarSidebar();
         
         actualizarProximoVencimiento();
+
+        if (reveal) reveal();
         
     } catch (error) {
 
