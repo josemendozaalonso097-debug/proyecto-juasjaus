@@ -88,6 +88,7 @@ function inyectarSidebarHTML(prefs) {
     const navUrl = isTienda ? '../principal/index.html' : '../tienda/tienda.html';
     const navText = isTienda ? 'Ir al Tablero' : 'Ir a la Tienda';
     const navIcon = isTienda ? 'dashboard' : 'storefront';
+    const navDirection = isTienda ? 'left' : 'right';
 
     const wrapper = document.createElement('div');
     wrapper.id = 'sidebar-wrapper';
@@ -206,7 +207,8 @@ function inyectarSidebarHTML(prefs) {
     // Event Listeners UI
     document.getElementById('sidebar-overlay').onclick = () => toggleSidebar(false);
     document.getElementById('close-sidebar').onclick = () => toggleSidebar(false);
-    document.getElementById('sidebar-nav-btn').addEventListener('click', () => {navigateTo(navUrl, navDirection);});
+    document.getElementById('sidebar-nav-btn').addEventListener('click', () => {
+        navigateTo(navUrl, navDirection);});
     document.getElementById('open-prefs').onclick = () => togglePrefs(true);
     document.getElementById('back-to-main').onclick = () => togglePrefs(false);
     
