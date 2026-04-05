@@ -8,7 +8,7 @@ import { mostrarNotificacion } from '../utils/notificaciones.js';
 import { abrirModal, cerrarModal } from '../components/productos.js';
 
 import { loadComponent } from '../utils/components.js';
-import { inicializarSidebar } from '../components/sidebar.js';
+import { inicializarSidebar } from '../components/sidebar.js?v=2';
 
 // ========== SESIÓN Y PERFIL ==========
 document.addEventListener('DOMContentLoaded', async function() {

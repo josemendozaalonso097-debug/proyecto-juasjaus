@@ -7,7 +7,7 @@ import { inicializarModalesGlobales } from '../components/modales.js?v=1';
 import { inicializarPapeleria } from '../components/papeleria.js?v=1';
 import { loadComponent } from '../utils/components.js?v=1';
 import { obtenerHistorial } from '../utils/storage.js?v=1';
-import { inicializarSidebar } from '../components/sidebar.js?v=1';
+import { inicializarSidebar } from '../components/sidebar.js?v=2';
 // Nota: splash es manejado por inline script en <head> de index.html
 
 document.addEventListener('DOMContentLoaded', async function() {

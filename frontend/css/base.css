@@ -7,13 +7,13 @@
 
 /* Soporte para Texto Grande */
 html.large-text {
-    font-size: 110% !important;
+    font-size: 130% !important;
 }
 
 /* Forzar modo oscuro sobre CSS heredado */
 html.dark body {
-    background: #211111 !important;
-    background-color: #211111 !important;
+    background: #242323 !important;
+    background-color: #242323 !important;
     color: #f8f6f6 !important;
 }
 

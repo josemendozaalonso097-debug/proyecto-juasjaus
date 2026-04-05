@@ -1,4 +1,4 @@
-import { navigateTo } from '../utils/pageTransition.js?v=1';
+import { navigateTo } from '../utils/pageTransition.js?v=2';
 
 let sidebarInicializado = false;
 
