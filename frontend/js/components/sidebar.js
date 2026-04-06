@@ -138,6 +138,13 @@ function inyectarSidebarHTML(prefs) {
                         <span class="font-bold text-slate-700 dark:text-slate-200">Preferencias</span>
                         <span class="material-symbols-outlined ml-auto text-slate-300 group-hover:translate-x-1 transition-transform">chevron_right</span>
                     </button>
+
+                    <button id="sidebar-chatbot-btn" class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group text-left">
+                        <div class="p-2.5 bg-red-50 dark:bg-red-900/20 rounded-xl group-hover:bg-red-100 dark:group-hover:bg-red-900/40 transition-colors">
+                            <span class="material-symbols-outlined text-red-500 text-[22px] group-hover:scale-110 transition-transform">smart_toy</span>
+                        </div>
+                        <span class="font-bold text-slate-700 dark:text-slate-200">Cobra Asistente</span>
+                    </button>
                 </div>
             </div>
             
@@ -210,6 +217,10 @@ function inyectarSidebarHTML(prefs) {
     document.getElementById('sidebar-nav-btn').addEventListener('click', () => {
         navigateTo(navUrl, navDirection);});
     document.getElementById('open-prefs').onclick = () => togglePrefs(true);
+    document.getElementById('sidebar-chatbot-btn').onclick = () => {
+        toggleSidebar(false);
+        if (typeof window.abrirChatbot === 'function') window.abrirChatbot();
+    };
     document.getElementById('back-to-main').onclick = () => togglePrefs(false);
     
     document.getElementById('sidebar-logout').onclick = () => {

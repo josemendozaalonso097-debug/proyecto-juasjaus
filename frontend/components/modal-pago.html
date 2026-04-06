@@ -80,15 +80,6 @@
                 </div>
             </button>
 
-            <!-- Efectivo -->
-            <button onclick="seleccionarMetodo('efectivo')" style="display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 2px solid #e2e8f0; border-radius: 14px; background: #f8f9fa; cursor: pointer; width: 100%; text-align: left; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#f20d0d';this.style.background='#fff5f5'" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f8f9fa'">
-                <span class="material-symbols-outlined" style="color: #f20d0d; font-size: 30px;">payments</span>
-                <div>
-                    <div style="font-weight: 700; color: #1e293b; font-size: 1em;">Pago en Efectivo</div>
-                    <div style="font-size: 0.82em; color: #64748b; margin-top: 2px;">Dirígete a la caja de la institución</div>
-                </div>
-            </button>
-
             <!-- Transferencia -->
             <button onclick="seleccionarMetodo('transferencia')" style="display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 2px solid #e2e8f0; border-radius: 14px; background: #f8f9fa; cursor: pointer; width: 100%; text-align: left; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#f20d0d';this.style.background='#fff5f5'" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f8f9fa'">
                 <span class="material-symbols-outlined" style="color: #f20d0d; font-size: 30px;">account_balance</span>
@@ -98,12 +89,21 @@
                 </div>
             </button>
 
-            <!-- OXXO -->
+            <!-- OXXO Clásico -->
             <button onclick="seleccionarMetodo('oxxo')" style="display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 2px solid #e2e8f0; border-radius: 14px; background: #f8f9fa; cursor: pointer; width: 100%; text-align: left; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#f20d0d';this.style.background='#fff5f5'" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f8f9fa'">
                 <span class="material-symbols-outlined" style="color: #f20d0d; font-size: 30px;">store</span>
                 <div>
                     <div style="font-weight: 700; color: #1e293b; font-size: 1em;">Depósito OXXO</div>
-                    <div style="font-size: 0.82em; color: #64748b; margin-top: 2px;">Paga en cualquier OXXO con referencia</div>
+                    <div style="font-size: 0.82em; color: #64748b; margin-top: 2px;">Sube tu comprobante de pago</div>
+                </div>
+            </button>
+
+            <!-- Oxxo Pay Simulado -->
+            <button onclick="seleccionarMetodo('oxxopay')" style="display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 2px solid #e2e8f0; border-radius: 14px; background: #f8f9fa; cursor: pointer; width: 100%; text-align: left; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#f20d0d';this.style.background='#fff5f5'" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f8f9fa'">
+                <span class="material-symbols-outlined" style="color: #f20d0d; font-size: 30px;">qr_code_scanner</span>
+                <div>
+                    <div style="font-weight: 700; color: #1e293b; font-size: 1em;">Pago OXXO Pay</div>
+                    <div style="font-size: 0.82em; color: #64748b; margin-top: 2px;">Escanea el código de barras en caja</div>
                 </div>
             </button>
         </div>
@@ -291,6 +291,44 @@
                     </button>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE OXXO PAY (SIMULADO) -->
+<div class="modal-oxxopay" id="modalOxxoPay" style="display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 20px; width: 90%; max-width: 500px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); animation: slideDown 0.3s ease;">
+        <div style="background: linear-gradient(135deg, #f20d0d, #6e0404); padding: 22px 28px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-outlined" style="color: white; font-size: 28px;">qr_code_scanner</span>
+                <h2 style="color: white; font-size: 1.35em; font-weight: 700; margin: 0;">OXXO Pay</h2>
+            </div>
+            <button type="button" onclick="cerrarModalOxxoPay()" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+        </div>
+
+        <div style="padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <h3 style="margin: 0; color: #1e293b; font-size: 1.2em;">Total a pagar: <span id="montoOxxoPay" style="color: #f20d0d; font-weight: bold;">$0.00 MXN</span></h3>
+            
+            <div style="background: #f8f9fa; border: 2px dashed #e2e8f0; padding: 20px; border-radius: 14px; text-align: center; width: 100%;">
+                <p style="margin-top: 0; color: #64748b; font-size: 0.9em; margin-bottom: 10px;">Dicta o escanea este código en caja</p>
+                <div style="display: flex; justify-content: center; background: white; padding: 10px; border-radius: 10px;">
+                    <svg id="barcode"></svg>
+                </div>
+            </div>
+
+            <div id="scanner-container" style="display: none; width: 100%; border-radius: 14px; overflow: hidden; border: 2px solid #e2e8f0; position: relative; background: black;">
+                <video id="scanner-video" style="width: 100%; height: auto; max-height: 300px; display: block; object-fit: cover;"></video>
+                <div style="position: absolute; top: 10px; right: 10px;">
+                    <button onclick="detenerEscaneoOxxo()" style="background: rgba(255,0,0,0.8); color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Cerrar Cámara</button>
+                </div>
+            </div>
+
+            <button id="btn-escanear-oxxopay" onclick="iniciarEscaneoOxxo()" style="width: 100%; background: #f20d0d; color: white; font-weight: 700; padding: 15px; border: none; border-radius: 12px; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s;" onmouseover="this.style.background='#c00000'" onmouseout="this.style.background='#f20d0d'">
+                <span class="material-symbols-outlined">center_focus_strong</span>
+                Simular Escaneo (WebCam)
+            </button>
+            
+            <p style="text-align: center; color: #94a3b8; font-size: 0.8em; margin: 0;">Presiona el botón para abrir la cámara web y escanear el código de barras generado para simular el pago en Oxxo.</p>
         </div>
     </div>
 </div>

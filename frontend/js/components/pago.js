@@ -172,6 +172,10 @@ export function inicializarPago(modo = 'principal') {
         window.cerrarModalTransferencia = cerrarModalTransferencia;
         window.seleccionarMetodo = seleccionarMetodo;
         window.cerrarModalMetodo = cerrarModalMetodo;
+        window.abrirModalOxxoPay = abrirModalOxxoPay;
+        window.cerrarModalOxxoPay = cerrarModalOxxoPay;
+        window.iniciarEscaneoOxxo = iniciarEscaneoOxxo;
+        window.detenerEscaneoOxxo = detenerEscaneoOxxo;
 
         window.enviarComprobante = () => {
             if (!window.archivoComprobanteDeposito) { alert('Sube un comprobante de pago.'); return; }
@@ -321,16 +325,94 @@ export function seleccionarMetodo(metodo) {
         const totalElement = document.querySelector('.form h3');
         if (totalElement) totalElement.textContent = `Total a pagar: $${total.toFixed(2)} MXN`;
         if (modalPago) { modalPago.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-    } else if (metodo === 'efectivo') {
-        cerrarModalMetodo();
-        alert(`💵 Pago en Efectivo\n\nTotal a pagar: $${total.toFixed(2)} MXN\n\nDirígete a la caja de la institución para realizar tu pago.`);
     } else if (metodo === 'transferencia') {
         cerrarModalMetodo();
         abrirModalTransferencia();
     } else if (metodo === 'oxxo') {
         cerrarModalMetodo();
-        abrirModalDeposito(); 
+        abrirModalDeposito();
+    } else if (metodo === 'oxxopay') {
+        cerrarModalMetodo();
+        abrirModalOxxoPay();
     }
+}
+
+export function abrirModalOxxoPay() {
+    const total = calcularTotal();
+    document.getElementById('montoOxxoPay').textContent = `$${total.toFixed(2)} MXN`;
+    
+    // Generamos un string muy corto para que CODE128 sea fácil y rápido de escanear por cualquier cámara
+    const compraMeta = `OXXOPAY-${total}`;
+    
+    if (typeof JsBarcode !== 'undefined') {
+        const svg = document.getElementById('barcode');
+        if(svg) {
+            JsBarcode(svg, compraMeta, {
+                format: "CODE128",
+                displayValue: true,
+                width: 1.5,
+                height: 60,
+                fontSize: 14
+            });
+        }
+    } else {
+        console.warn("JsBarcode no está cargado");
+    }
+
+    const modal = document.getElementById('modalOxxoPay');
+    if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+
+export function cerrarModalOxxoPay() {
+    detenerEscaneoOxxo();
+    const modal = document.getElementById('modalOxxoPay');
+    if (modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
+}
+
+let codeReader = null;
+
+export function iniciarEscaneoOxxo() {
+    const scannerContainer = document.getElementById('scanner-container');
+    const btnEscanear = document.getElementById('btn-escanear-oxxopay');
+    if(scannerContainer) scannerContainer.style.display = 'block';
+    if(btnEscanear) btnEscanear.style.display = 'none';
+
+    if (typeof ZXing === 'undefined') {
+        alert("La librería del escáner no cargó correctamente.");
+        detenerEscaneoOxxo();
+        return;
+    }
+
+    if (!codeReader) {
+        codeReader = new ZXing.BrowserMultiFormatReader();
+    }
+    
+    codeReader.decodeFromVideoDevice(null, 'scanner-video', (result, err) => {
+        if (result) {
+            console.log("Código leído: ", result.text);
+            detenerEscaneoOxxo();
+            const modal = document.getElementById('modalOxxoPay');
+            if (modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
+            procesarCompraExitosa('Oxxo Pay');
+        }
+        if (err && !(err instanceof ZXing.NotFoundException)) {
+            console.error(err);
+        }
+    }).catch((err) => {
+        console.error("Error al iniciar cámara: ", err);
+        alert("No se pudo acceder a la cámara o no hay permisos.");
+        detenerEscaneoOxxo();
+    });
+}
+
+export function detenerEscaneoOxxo() {
+    if (codeReader) {
+        codeReader.reset();
+    }
+    const scannerContainer = document.getElementById('scanner-container');
+    const btnEscanear = document.getElementById('btn-escanear-oxxopay');
+    if(scannerContainer) scannerContainer.style.display = 'none';
+    if(btnEscanear) btnEscanear.style.display = 'flex';
 }
 
 export function abrirModalDeposito() {
@@ -371,7 +453,7 @@ export function procesarCompraExitosa(metodoPago) {
             tallaSeleccionada: item.tallaSeleccionada
         })),
         total: total,
-        estado: metodoPago === 'Tarjeta' ? 'Completado' : 'Pendiente'
+        estado: (metodoPago === 'Tarjeta' || metodoPago === 'Tarjeta Bancaria' || metodoPago === 'Oxxo Pay') ? 'Completado' : 'Pendiente'
     };
     guardarEnHistorial(compra);
     
@@ -382,7 +464,7 @@ export function procesarCompraExitosa(metodoPago) {
 }
 
 export function mostrarConfirmacionExt(metodo) {
-    const esTarjeta = metodo === 'Tarjeta' || metodo === 'Tarjeta Bancaria';
+    const esTarjeta = metodo === 'Tarjeta' || metodo === 'Tarjeta Bancaria' || metodo === 'Oxxo Pay';
     const titulo = esTarjeta ? "¡Pago Exitoso!" : "¡Comprobante recibido!";
     const mensaje = esTarjeta 
         ? `Tu pago con ${metodo} se procesó correctamente.<br><strong>Estado: Completado</strong>`
