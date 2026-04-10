@@ -13,60 +13,100 @@ export function generarPDFHistorial() {
         alert('No hay compras en el historial');
         return;
     }
+
+    // --- CONFIGURACIÓN DE ESTILO ---
+    // COLOR_PRIMARIO_PDF: [227, 30, 36] (#E31E24 - Rojo vivo)
+    const primaryRGB = [227, 30, 36];
     
     // Encabezado
-    doc.setFillColor(148, 39, 44);
-    doc.rect(0, 0, 210, 40, 'F');
+    doc.setFillColor(...primaryRGB);
+    doc.rect(0, 0, 210, 45, 'F');
+    
+    // LOGO_PDF: Dibujar el logo
+    try {
+        // Usamos la ruta relativa al servidor o una absoluta si fuera necesario
+        doc.addImage("/imgs/dgeti_red-removebg-preview.png", "PNG", 10, 5, 30, 30);
+    } catch (e) {
+        console.warn("No se pudo cargar el logo en el PDF:", e);
+    }
+
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.text('CBTis 258', 105, 20, { align: 'center' });
-    doc.setFontSize(14);
-    doc.text('HISTORIAL DE FACTURAS', 105, 32, { align: 'center' });
+    doc.setFontSize(26);
+    doc.setFont(undefined, 'bold');
+    doc.text('CBTis 258', 115, 22, { align: 'center' });
     
-    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    doc.text('CENTRO DE BACHILLERATO TECNOLÓGICO industrial y de servicios No. 258', 115, 30, { align: 'center' });
+    doc.text('HISTORIAL DE COMPRAS', 115, 38, { align: 'center' });
+    
+    doc.setTextColor(100, 100, 100);
     doc.setFontSize(10);
-    doc.text(`Generado: ${new Date().toLocaleDateString('es-MX')}`, 105, 50, { align: 'center' });
+    doc.text(`Documento generado el: ${new Date().toLocaleString('es-MX')}`, 20, 55);
     
-    let y = 65;
-    let totalGastado = 0;
+    let y = 70;
+    let totalAcumulado = 0;
+
+    // Table Header
+    doc.setFillColor(245, 245, 245);
+    doc.rect(20, y, 170, 8, 'F');
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(50, 50, 50);
+    doc.text('DESCRIPCIÓN', 25, y + 6);
+    doc.text('FECHA', 100, y + 6);
+    doc.text('MÉTODO', 140, y + 6);
+    doc.text('TOTAL', 170, y + 6);
+    y += 15;
     
     historial.forEach((compra, i) => {
-        if (y > 250) {
+        if (y > 260) {
             doc.addPage();
             y = 20;
         }
         
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'bold');
-        doc.text(`Compra #${i + 1} - ${compra.fecha}`, 20, y);
-        doc.setFont(undefined, 'normal');
         doc.setFontSize(10);
-        doc.text(`Método: ${compra.metodoPago}`, 20, y + 7);
-        doc.text(`Estado: ${compra.estado}`, 20, y + 14);
-        
-        compra.productos.forEach((prod, j) => {
-            doc.text(`• ${prod.nombre} x${prod.cantidad} - $${(prod.precio * prod.cantidad).toFixed(2)}`, 25, y + 21 + (j * 6));
-        });
-        
         doc.setFont(undefined, 'bold');
-        doc.text(`Subtotal: $${compra.total.toFixed(2)} MXN`, 20, y + 21 + (compra.productos.length * 6) + 5);
+        doc.setTextColor(...primaryRGB);
+        doc.text(`Ticket #${String(i + 1).padStart(4, '0')}`, 20, y);
+        y += 6;
+
+        compra.productos.forEach((prod) => {
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(80, 80, 80);
+            doc.text(`• ${prod.nombre} (x${prod.cantidad})`, 25, y);
+            doc.text(`$${(prod.precio * prod.cantidad).toFixed(2)}`, 170, y);
+            y += 6;
+        });
+
+        doc.setFontSize(9);
+        doc.setTextColor(120, 120, 120);
+        doc.text(compra.fecha, 100, y - (compra.productos.length * 3));
+        doc.text(compra.metodoPago, 140, y - (compra.productos.length * 3));
         
-        doc.setDrawColor(200, 200, 200);
-        doc.line(20, y + 28 + (compra.productos.length * 6), 190, y + 28 + (compra.productos.length * 6));
+        y += 2;
+        doc.setDrawColor(230, 230, 230);
+        doc.line(20, y, 190, y);
+        y += 10;
         
-        totalGastado += compra.total;
-        y += 35 + (compra.productos.length * 6);
+        totalAcumulado += compra.total;
     });
     
-    // Total final
-    doc.setFillColor(240, 240, 240);
-    doc.rect(0, y, 210, 20, 'F');
-    doc.setFontSize(16);
+    // Resumen Final
+    if (y > 250) { doc.addPage(); y = 20; }
+    doc.setFillColor(...primaryRGB);
+    doc.rect(120, y, 70, 15, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
-    doc.setTextColor(148, 39, 44);
-    doc.text(`TOTAL GASTADO: $${totalGastado.toFixed(2)} MXN`, 105, y + 13, { align: 'center' });
+    doc.text(`TOTAL GENERAL: $${totalAcumulado.toFixed(2)}`, 155, y + 9, { align: 'center' });
     
-    doc.save('historial_facturas.pdf');
+    // Footer
+    doc.setFontSize(10);
+    doc.setTextColor(150, 150, 150);
+    doc.setFont(undefined, 'italic');
+    doc.text('"Un motivo de orgullo"', 105, 285, { align: 'center' });
+
+    doc.save('CBTis258_Historial_Facturas.pdf');
 }
 
 export function generarPDFComprobante(metodo, fechaFormato, total, carritoActual) {
@@ -76,45 +116,95 @@ export function generarPDFComprobante(metodo, fechaFormato, total, carritoActual
         return;
     }
     const doc = new jsPDF();
-    const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || 'No especificado';
-    const numeroTarjeta = document.getElementById('serialCardNumber')?.value || 'XXXX XXXX XXXX XXXX';
     
-    doc.setFillColor(148, 39, 44);
-    doc.rect(0, 0, 210, 40, 'F');
+    // Obtener nombre del usuario logueado
+    const userRaw = localStorage.getItem('user');
+    let nombreUsuario = 'Usuario';
+    try {
+        if (userRaw) {
+            const user = JSON.parse(userRaw);
+            nombreUsuario = user.nombre || 'Usuario';
+        }
+    } catch (e) {
+        console.error('Error al obtener nombre de usuario para PDF:', e);
+    }
+
+    const nombreTarjeta = document.querySelector('input[name="input-name"]')?.value || nombreUsuario;
+    
+    // COLOR_PRIMARIO_PDF: [227, 30, 36] (#E31E24 - Rojo vivo)
+    const primaryRGB = [227, 30, 36];
+
+    // Header Color Block
+    doc.setFillColor(...primaryRGB);
+    doc.rect(0, 0, 210, 50, 'F');
+    
+    // LOGO_PDF: Dibujar el logo
+    try {
+        doc.addImage("/imgs/dgeti_red-removebg-preview.png", "PNG", 10, 8, 35, 35);
+    } catch (e) {
+        console.warn("No se pudo cargar el logo en el PDF:", e);
+    }
+
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.text('CBTis 258', 105, 20, { align: 'center' });
-    doc.setFontSize(14);
-    doc.text('COMPROBANTE DE PAGO', 105, 32, { align: 'center' });
-    
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.text(`Método: ${metodo}`, 20, 55);
-    doc.text(`Titular: ${nombreTarjeta}`, 20, 65);
-    doc.text(`Tarjeta: ${numeroTarjeta}`, 20, 75);
-    doc.text(`Fecha: ${fechaFormato}`, 20, 85);
-    
-    doc.setFontSize(14);
+    doc.setFontSize(28);
     doc.setFont(undefined, 'bold');
-    doc.text('PRODUCTOS:', 20, 100);
+    doc.text('CBTis 258', 115, 25, { align: 'center' });
+    doc.setFontSize(14);
     doc.setFont(undefined, 'normal');
-    doc.setFontSize(11);
+    doc.text('COMPROBANTE OFICIAL DE PAGO', 115, 35, { align: 'center' });
     
-    let y = 110;
+    // Info Section
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.text('DETALLES DE LA TRANSACCIÓN', 20, 65);
+    
+    doc.setFont(undefined, 'normal');
+    doc.text(`Cliente:`, 20, 75);
+    doc.text(nombreTarjeta, 60, 75);
+    doc.text(`Fecha:`, 20, 82);
+    doc.text(fechaFormato, 60, 82);
+    doc.text(`Método:`, 20, 89);
+    doc.text(metodo, 60, 89);
+    
+    doc.setDrawColor(...primaryRGB);
+    doc.setLineWidth(0.5);
+    doc.line(20, 95, 190, 95);
+    
+    // Items
+    doc.setFont(undefined, 'bold');
+    doc.text('PRODUCTO', 25, 105);
+    doc.text('CANTIDAD', 120, 105);
+    doc.text('SUBTOTAL', 165, 105);
+    
+    let y = 115;
+    doc.setFont(undefined, 'normal');
     carritoActual.forEach(item => {
-        doc.text(`• ${item.nombre} x${item.cantidad}${item.tallaSeleccionada ? ` (${item.tallaSeleccionada})` : ''} - $${(item.precio * item.cantidad).toFixed(2)}`, 25, y);
+        const itemTotal = item.precio * item.cantidad;
+        doc.text(`• ${item.nombre} ${item.tallaSeleccionada ? `(${item.tallaSeleccionada})` : ''}`, 25, y);
+        doc.text(`${item.cantidad}`, 125, y);
+        doc.text(`$${itemTotal.toFixed(2)}`, 165, y);
         y += 8;
     });
     
-    doc.setLineWidth(0.5);
-    doc.line(20, y + 5, 190, y + 5);
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text(`TOTAL: $${total.toFixed(2)} MXN`, 105, y + 15, { align: 'center' });
+    // Total Box
+    y += 10;
+    doc.setFillColor(248, 249, 250);
+    doc.rect(130, y, 60, 20, 'F');
+    doc.setDrawColor(200, 200, 200);
+    doc.rect(130, y, 60, 20, 'S');
     
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(...primaryRGB);
+    doc.text(`TOTAL: $${total.toFixed(2)}`, 160, y + 13, { align: 'center' });
+    
+    // Slogan and Footer
     doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text('Gracias por tu compra', 105, y + 30, { align: 'center' });
-    doc.save(`comprobante_${metodo}.pdf`);
+    doc.setFont(undefined, 'italic');
+    doc.setTextColor(150, 150, 150);
+    doc.text('Gracias por su preferencia', 105, y + 40, { align: 'center' });
+    doc.text('"Un motivo de orgullo"', 105, y + 46, { align: 'center' });
+    
+    doc.save(`Comprobante_CBTis258_${metodo}.pdf`);
 }
