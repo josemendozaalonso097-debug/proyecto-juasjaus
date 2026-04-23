@@ -1,11 +1,11 @@
-import { checkSessionToken } from '../api/auth.js';
-import { navigateTo, initPageReveal } from '../utils/pageTransition.js';
-import { cargarDatosPerfil, actualizarPerfil, cambiarFotoPerfil } from '../components/perfil.js';
-import { inicializarPapeleria } from '../components/papeleria.js';
-import { inicializarCarrito } from '../components/carrito.js';
-import { inicializarPago } from '../components/pago.js';
-import { mostrarNotificacion } from '../utils/notificaciones.js';
-import { abrirModal, cerrarModal } from '../components/productos.js';
+import { checkSessionToken } from '../api/auth.js?v=2';
+import { navigateTo, initPageReveal } from '../utils/pageTransition.js?v=2';
+import { cargarDatosPerfil, actualizarPerfil, cambiarFotoPerfil } from '../components/perfil.js?v=2';
+import { inicializarPapeleria } from '../components/papeleria.js?v=2';
+import { inicializarCarrito } from '../components/carrito.js?v=2';
+import { inicializarPago } from '../components/pago.js?v=5';
+import { mostrarNotificacion } from '../utils/notificaciones.js?v=2';
+import { abrirModal, cerrarModal } from '../components/productos.js?v=2';
 
 import { loadComponent } from '../utils/components.js';
 import { inicializarSidebar } from '../components/sidebar.js?v=2';
@@ -26,18 +26,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 2. Verificar Sesión
     const token = localStorage.getItem('access_token');
     if (!token) {
-        alert('Debes iniciar sesión primero');
-        window.location.href = '../login.html';
+        showToast('Debes iniciar sesión primero', 'warning');
+        setTimeout(() => { window.location.href = '../login.html'; }, 1200);
         return;
     }
     
     try {
         const response = await checkSessionToken(token);
         if (!response.ok) {
-            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+            showToast('Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 'error');
             localStorage.removeItem('access_token');
             localStorage.removeItem('user');
-            window.location.href = '../login.html';
+            setTimeout(() => { window.location.href = '../login.html'; }, 1500);
             return;
         }
         
@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
                     localStorage.removeItem('access_token');
                     localStorage.removeItem('user');
-                    alert('Sesión cerrada correctamente');
-                    window.location.href = '../login.html';
+                    showToast('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => { window.location.href = '../login.html'; }, 1000);
                 }
             });
         }
@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al verificar la sesión');
-        window.location.href = '../login.html';
+        showToast('Error al verificar la sesión', 'error');
+        setTimeout(() => { window.location.href = '../login.html'; }, 1200);
     }
 });
 

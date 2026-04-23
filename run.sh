@@ -23,6 +23,7 @@ FRONTEND_PID=$!
 echo "✅ Todo corriendo"
 echo "Backend PID: $BACKEND_PID"
 echo "Frontend PID: $FRONTEND_PID"
+echo "🔗 URL del Login: http://localhost:5501/login.html"
 
 wait
 

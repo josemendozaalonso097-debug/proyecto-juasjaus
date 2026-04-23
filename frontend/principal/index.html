@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <!-- SPLASH LOGIC -->
     <script>
@@ -35,10 +35,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CBTis258 Financieros | Principal</title>
-    <link rel="stylesheet" href="principal.css?v=125">
-    <link rel="icon" href="../imgs/yameharte.png" type="image">
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -58,6 +54,14 @@
             },
         }
     </script>
+    <link rel="stylesheet" href="principal.css?v=125">
+    <link rel="icon" href="../imgs/yameharte.png" type="image">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#94272C">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    
 <style>
 /* Reset for modals */
 .modal-historial, .modal-informacion, .modal-detalle, .modal-papeleria {
@@ -69,6 +73,7 @@
     <link rel="stylesheet" href="../css/base.css?v=4">
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<div class="mesh-bg" aria-hidden="true"></div>
 
 <script>
     (function () {
@@ -144,7 +149,7 @@
 <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
 <div class="mb-12">
 <h2 class="text-5xl font-black leading-tight tracking-[-0.033em] mb-3 bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent inline-block transform transition-transform hover:scale-[1.02] cursor-default">
-                Bienvenid@, <span id="user-name">Usuario</span>
+                Bienvenid@, <span id="user-name"><span class="inline-block h-10 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse align-middle"></span></span>
             </h2>
 <p class="text-slate-500 dark:text-slate-400 text-lg font-medium leading-normal ml-1">
                 Revisa tu estado de cuenta y realiza pagos escolares.
@@ -160,20 +165,11 @@
 </div>
                         Estados de pago
                     </h3>
-<div class="flex-grow flex flex-col items-center justify-center p-10 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 mb-8 text-center relative z-10">
-<div class="relative inline-flex items-center justify-center w-36 h-36 rounded-full mb-6">
-<svg class="w-full h-full text-slate-200 dark:text-slate-700" viewBox="0 0 36 36">
-<path class="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-linecap="round" stroke-width="2.5"></path>
-</svg>
-<svg class="w-full h-full text-green-500 absolute top-0 left-0" viewBox="0 0 36 36">
-<path class="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="100, 100" stroke-linecap="round" stroke-width="2.5"></path>
-</svg>
-<div class="absolute bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-5xl text-green-500">check</span>
+<div class="flex-grow flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-xl border border-slate-100 dark:border-slate-800 relative overflow-hidden glass-card relative z-10" id="estado-container-global">
+<div class="relative inline-flex items-center justify-center w-36 h-36 rounded-full mb-6 bg-slate-200 dark:bg-slate-700 animate-pulse">
 </div>
-</div>
-<h4 class="text-2xl font-bold leading-tight tracking-[-0.015em] mb-3 text-slate-800 dark:text-slate-100">Tienes <strong id="pendientes" class="text-primary">1</strong> pagos pendientes</h4>
-<p class="text-slate-500 dark:text-slate-400 text-base max-w-md">Tu cuenta está al corriente. ¡Gracias por tu puntualidad y compromiso con tu educación!</p>
+<div class="h-8 bg-slate-200 dark:bg-slate-700 rounded w-48 mb-3 animate-pulse"></div>
+<div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-64 max-w-md animate-pulse"></div>
 </div>
 <div class="flex flex-col sm:flex-row gap-5 mt-auto relative z-10">
 <button id="info-btn" class="flex-1 flex cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-gradient-to-r from-primary to-red-600 text-white text-base font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all focus:ring-4 focus:ring-primary/20"><span class="material-symbols-outlined mr-3 text-[22px]">info</span>Información</button>
@@ -195,7 +191,7 @@
 <div class="space-y-5">
 <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700/50">
 <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Semestre Actual</span>
-<span class="text-sm font-bold text-slate-800 dark:text-slate-200" id="status-badge">Cuenta activa</span>
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200" id="status-badge"><span class="inline-block h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></span></span>
 </div>
 <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700/50">
 <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Colegiatura Mes</span>
@@ -203,7 +199,7 @@
 </div>
 <div class="flex justify-between items-center p-4 bg-primary/5 rounded-xl border border-primary/10">
 <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Próximo Vencimiento</span>
-<span class="text-sm font-black text-primary" id="next-date">1 de Enero del 2026</span>
+<span class="text-sm font-black text-primary" id="next-date"><span class="inline-block h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></span></span>
 </div>
 </div>
 </section>
@@ -261,7 +257,8 @@
 <div id="modal-confirmacion-container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script type="module" src="../js/pages/principal.js?v=11"></script>
+    <script src="../js/utils/toast.js?v=2"></script>
+    <script type="module" src="../js/pages/principal.js?v=13"></script>
     <script src="../js/components/chatbot.js?v=1"></script>
 </body> 
 </html>

@@ -1,0 +1,121 @@
+========================================================================
+             CBTIS 258 - SISTEMA DE SERVICIOS FINANCIEROS
+========================================================================
+
+Este documento contiene toda la información necesaria para entender, instalar, 
+ejecutar y extender el proyecto del Sistema de Servicios Financieros del CBTis 258.
+
+------------------------------------------------------------------------
+1. ARQUITECTURA DEL SISTEMA
+------------------------------------------------------------------------
+
+El proyecto está dividido en tres capas principales:
+
+A. BACKEND (/backend):
+   - Motor del sistema encargado de procesar datos, autenticación y base de datos.
+   - Basado en FastAPI (Python).
+   - Base de datos: SQLite (cbtis258.db).
+
+B. FRONTEND (/frontend):
+   - Interfaz web para administradores y usuarios.
+   - Tecnologías: HTML5, CSS3, JavaScript (Vanilla) y Vite para el empaquetado.
+   - Se sirve por defecto en el puerto 5501.
+
+C. MOBILE (/mobile):
+   - Aplicación móvil para consulta y gestiones rápidas.
+   - Tecnologías: React Native con Expo y TypeScript.
+
+------------------------------------------------------------------------
+2. REQUERIMIENTOS PREVIOS
+------------------------------------------------------------------------
+
+Para ejecutar este proyecto necesitas tener instalado:
+- Python 3.10 o superior (para el Backend).
+- Node.js y npm (para el Frontend y Mobile).
+- Git (para el control de versiones).
+
+------------------------------------------------------------------------
+3. GUÍA DE INSTALACIÓN RÁPIDA
+------------------------------------------------------------------------
+
+1. Clonar el repositorio.
+2. Crear un entorno virtual de Python en la raíz del proyecto:
+   Windows: python -m venv .venv
+   Linux/Mac: python3 -m venv .venv
+3. Activar el entorno virtual:
+   Windows: .venv\Scripts\activate
+   Linux/Mac: source .venv/bin/activate
+4. Instalar las dependencias del backend:
+   pip install -r backend/requirements.txt
+5. Instalar dependencias del frontend (opcional si usas Vite directamente):
+   cd frontend && npm install && cd ..
+
+------------------------------------------------------------------------
+4. CÓMO EJECUTAR EL PROYECTO
+------------------------------------------------------------------------
+
+El proyecto cuenta con scripts automáticos para iniciar todo al mismo tiempo:
+
+EN LINUX / CHROMEOS:
+- Ejecuta: ./run.sh
+- Accede a: http://localhost:5501/login.html
+
+EN WINDOWS:
+- Ejecuta con doble clic: run.bat
+- Accede a: http://localhost:5501/login.html
+
+MANUALMENTE (Si los scripts fallan):
+- Terminal 1 (Backend): 
+  cd backend
+  uvicorn app.main:app --reload --port 8000
+- Terminal 2 (Frontend):
+  cd frontend
+  python -m http.server 5501  (O usa 'npm run dev' si prefieres Vite)
+
+------------------------------------------------------------------------
+5. ESTRUCTURA DE CARPETAS
+------------------------------------------------------------------------
+
+/backend
+  ├── /app                    # Lógica central (Rutas, Modelos, Config)
+  │     ├── /routers          # Endpoints de la API
+  │     ├── /models           # Definición de tablas de base de datos
+  │     └── main.py           # Punto de entrada de la API
+  ├── cbtis258.db             # Base de datos SQLite
+  └── requirements.txt        # Librerías de Python requeridas
+
+/frontend
+  ├── /js                     # Lógica de JavaScript (API calls, UI)
+  ├── /css                    # Archivos de estilos (incluyendo glassmorphism)
+  ├── login.html              # Página principal de acceso
+  └── package.json            # Configuración de Node/Vite
+
+/mobile
+  ├── /app                    # Pantallas y navegación de la app móvil
+  ├── /components             # Componentes reutilizables de React Native
+  └── package.json            # Configuración de Expo
+
+------------------------------------------------------------------------
+6. NOTAS PARA DESARROLLADORES
+------------------------------------------------------------------------
+
+- BASE DE DATOS: Si necesitas modificar la base de datos, los modelos están en 
+  backend/app/models. SQLite es ideal para desarrollo local.
+- SEGURIDAD: Los archivos .env contienen claves secretas y configuraciones 
+  sensibles. NUNCA los subas a Git (están protegidos por .gitignore).
+- API BASE: El frontend se comunica con el backend a través de una URL base 
+  que suele configurarse en frontend/js/api/config.js o similar.
+- MOBILE: Para probar la app móvil, instala la app "Expo Go" en tu celular 
+  y ejecuta 'npx expo start' dentro de la carpeta /mobile.
+
+------------------------------------------------------------------------
+7. CONCLUSIÓN
+------------------------------------------------------------------------
+
+Este sistema está diseñado para ser ligero, rápido y fácil de desplegar. 
+Si tienes dudas sobre una función específica, revisa los comentarios 
+dentro del código en la carpeta correspondiente.
+
+========================================================================
+                    CBTIS 258 - 2026
+========================================================================

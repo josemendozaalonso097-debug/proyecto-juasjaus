@@ -1,6 +1,6 @@
-import { generarPDFComprobante } from '../utils/pdf.js';
-import { carrito, calcularTotal, vaciarCarrito } from './carrito.js';
-import { guardarEnHistorial, obtenerHistorial } from '../utils/storage.js';
+import { generarPDFComprobante } from '../utils/pdf.js?v=2';
+import { carrito, calcularTotal, vaciarCarrito } from './carrito.js?v=2';
+import { guardarEnHistorial, obtenerHistorial } from '../utils/storage.js?v=2';
 
 export function inicializarPago(modo = 'principal') {
     const cardNumberInput = document.getElementById('serialCardNumber');
@@ -178,12 +178,12 @@ export function inicializarPago(modo = 'principal') {
         window.detenerEscaneoOxxo = detenerEscaneoOxxo;
 
         window.enviarComprobante = () => {
-            if (!window.archivoComprobanteDeposito) { alert('Sube un comprobante de pago.'); return; }
+            if (!window.archivoComprobanteDeposito) { showToast('Sube un comprobante de pago.', 'warning'); return; }
             procesarCompraExitosa('Depósito'); 
             cerrarModalDeposito(); 
         };
         window.enviarComprobanteTransferencia = () => { 
-            if (!window.archivoComprobanteTransferencia) { alert('Sube un comprobante de pago.'); return; }
+            if (!window.archivoComprobanteTransferencia) { showToast('Sube un comprobante de pago.', 'warning'); return; }
             procesarCompraExitosa('Transferencia'); 
             cerrarModalTransferencia(); 
         };
@@ -297,7 +297,7 @@ export function cerrarModalPago() {
 // ========== TIENDA PAYMENT EXTENSIONS ==========
 export function abrirModalMetodo() {
     if (carrito.length === 0) {
-        alert('Tu carrito está vacío. Agrega productos antes de pagar.');
+        showToast('Tu carrito está vacío. Agrega productos antes de pagar.', 'warning');
         return;
     }
     const modalMetodo = document.getElementById('modalMetodoPago');
@@ -378,7 +378,7 @@ export function iniciarEscaneoOxxo() {
     if(btnEscanear) btnEscanear.style.display = 'none';
 
     if (typeof ZXing === 'undefined') {
-        alert("La librería del escáner no cargó correctamente.");
+        showToast("La librería del escáner no cargó correctamente.", 'error');
         detenerEscaneoOxxo();
         return;
     }
@@ -400,7 +400,7 @@ export function iniciarEscaneoOxxo() {
         }
     }).catch((err) => {
         console.error("Error al iniciar cámara: ", err);
-        alert("No se pudo acceder a la cámara o no hay permisos.");
+        showToast("No se pudo acceder a la cámara o no hay permisos.", 'error');
         detenerEscaneoOxxo();
     });
 }

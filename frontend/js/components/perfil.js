@@ -111,7 +111,7 @@ export function actualizarPerfil() {
     const nuevoSemestre = inputSemestre ? inputSemestre.value      : '';
     const nuevoRol      = inputRol      ? inputRol.value           : '';
 
-    if (!nuevoNombre) { alert('El nombre no puede estar vacío.'); return; }
+    if (!nuevoNombre) { showToast('El nombre no puede estar vacío.', 'warning'); return; }
 
     const perfilKey = `perfil_${userId}`;
     const perfilRaw = localStorage.getItem(perfilKey);
@@ -125,11 +125,11 @@ export function actualizarPerfil() {
 
     // Lógica de validación de límites
     if (rolCambiado && cambiosRol >= LIMIT_ROL) {
-        alert('Has alcanzado el límite de cambios de rol.');
+        showToast('Has alcanzado el límite de cambios de rol.', 'error');
         return;
     }
     if (semestreCambiado && cambiosSemestre >= LIMIT_SEMESTRE) {
-        alert('Has alcanzado el límite de cambios de semestre.');
+        showToast('Has alcanzado el límite de cambios de semestre.', 'error');
         return;
     }
 
@@ -241,7 +241,7 @@ export function verificarCambioAutomatico() {
         cargarDatosPerfil(user);
         
         // Opcional: Notificación visual
-        alert(`¡Felicidades! Has pasado al ${semestreActual}° semestre.`);
+        showToast(`¡Felicidades! Has pasado al ${semestreActual}° semestre.`, 'success');
     }
 }
 
@@ -250,7 +250,7 @@ export function cambiarFotoPerfil(event) {
     if (!file) return;
 
     if (file.size > 3 * 1024 * 1024) {
-        alert('La imagen es demasiado grande. Máximo 3MB.');
+        showToast('La imagen es demasiado grande. Máximo 3MB.', 'error');
         return;
     }
 

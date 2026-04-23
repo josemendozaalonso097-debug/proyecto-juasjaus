@@ -8,8 +8,17 @@ __pycache__/
 *$py.class
 .pytest_cache/
 
+# Node.js
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # Entornos virtuales (si usas venv)
 venv/
-env/.env
-.env
+.venv/
+env/
 backend/.env
+.env

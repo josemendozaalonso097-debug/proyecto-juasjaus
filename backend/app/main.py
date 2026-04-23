@@ -4,6 +4,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .database import init_db
 from .routers import auth, index, tienda
+import logging
+from logging.handlers import RotatingFileHandler
+
+# ============================================
+# CONFIGURACIÓN DE LOGGING
+# ============================================
+log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler = RotatingFileHandler("backend.log", maxBytes=5*1024*1024, backupCount=3, encoding="utf-8")
+file_handler.setFormatter(log_formatter)
+
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(log_formatter)
+
+logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
+logger = logging.getLogger(__name__)
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -14,15 +29,18 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# ============================================
-# CONFIGURACIÓN DE CORS - ULTRA PERMISIVA
-# ============================================
+# Configuraremos los orígenes permitidos
+origins = [
+    settings.FRONTEND_URL,
+    "http://127.0.0.1:5501",
+    "http://localhost:5501",
+    "http://localhost:5173",  # Puerto por defecto de Vite
+    "http://127.0.0.1:5173"
+]
 
-
-# También mantener el middleware estándar
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,24 +62,23 @@ app.include_router(tienda.router, prefix="/api")
 @app.on_event("startup")
 async def startup_event():
     """Se ejecuta al iniciar el servidor"""
-    print("\n" + "="*60)
-    print("🚀 FASTAPI SERVER STARTING")
-    print("="*60)
+    logger.info("="*60)
+    logger.info("🚀 FASTAPI SERVER STARTING")
+    logger.info("="*60)
     
     # Inicializar base de datos
     init_db()
     
-    print(f"📍 API URL: http://localhost:8000")
-    print(f"📚 Docs: http://localhost:8000/docs")
-    print(f"🌐 Frontend: {settings.FRONTEND_URL}")
-    print(f"🔐 CORS: PERMITIDO PARA TODOS LOS ORÍGENES (desarrollo)")
-    print(f"!!!!!!!!!!SERVIDOR CORRECTO NUEVO: http://127.0.0.1:5501/login.html")
-    print("="*60 + "\n")
+    logger.info(f"📍 API URL: http://localhost:8000")
+    logger.info(f"📚 Docs: http://localhost:8000/docs")
+    logger.info(f"🌐 Frontend: {settings.FRONTEND_URL}")
+    logger.info(f"🔐 CORS configurado de forma segura.")
+    logger.info("="*60)
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Se ejecuta al cerrar el servidor"""
-    print("\n👋 Servidor cerrado correctamente\n")
+    logger.info("👋 Servidor cerrado correctamente")
 
 # ============================================
 # RUTA RAÍZ

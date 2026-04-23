@@ -1,7 +1,7 @@
 import { 
     registerUser, loginUser, loginWithGoogleToken, 
     checkSessionToken, checkBackendHealth, sendForgotPasswordLink
-} from '../api/auth.js';
+} from '../api/auth.js?v=2';
 
 const container = document.getElementById('container');
 const loginBtn = document.getElementById('login');
@@ -61,7 +61,7 @@ signUpForm.addEventListener('submit', async (e) => {
     console.log('📝 Datos:', { nombre, email, rol });
     
     if (!nombre || !email || !password || !rol) {
-        alert('Por favor llena todos los campos, incluyendo tu rol');
+        showToast('Por favor llena todos los campos, incluyendo tu rol', 'warning');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
@@ -70,7 +70,7 @@ signUpForm.addEventListener('submit', async (e) => {
     if (rol === 'estudiante') {
         semestre = semestreSelect ? semestreSelect.value : '';
         if (!semestre) {
-            alert('Por favor selecciona tu semestre');
+            showToast('Por favor selecciona tu semestre', 'warning');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
             return;
@@ -79,7 +79,7 @@ signUpForm.addEventListener('submit', async (e) => {
     }
     
     if (password.length < 6) {
-        alert('La contraseña debe tener al menos 6 caracteres');
+        showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
@@ -108,20 +108,22 @@ signUpForm.addEventListener('submit', async (e) => {
             localStorage.setItem('user', JSON.stringify(userProfile));
             localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(userProfile));
 
-            alert('¡Cuenta creada exitosamente! 🎉');
+            showToast('¡Cuenta creada exitosamente! 🎉', 'success');
             console.log('🔄 Redirigiendo...');
             
             localStorage.setItem('just_registered', 'true');
-            window.location.href = 'principal/index.html';
+            setTimeout(() => {
+                window.location.href = 'principal/index.html';
+            }, 1000);
         } else {
             console.log('❌ Error:', data.detail);
-            alert(data.detail || 'Error al crear cuenta');
+            showToast(data.detail || 'Error al crear cuenta', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
     } catch (error) {
         console.error('❌ Error:', error);
-        alert('Error de conexión. Verifica que el backend esté corriendo');
+        showToast('Error de conexión. Verifica que el backend esté corriendo', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
@@ -150,7 +152,7 @@ signInForm.addEventListener('submit', async (e) => {
     console.log('📝 Email:', email);
     
     if (!email || !password) {
-        alert('Por favor llena todos los campos');
+        showToast('Por favor llena todos los campos', 'warning');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
         return;
@@ -176,17 +178,19 @@ signInForm.addEventListener('submit', async (e) => {
                 }
             }
             
-            alert(`¡Bienvenid@ ${data.user.nombre}! 🎉`);
-            window.location.href = 'principal/index.html?splash=1';
+            showToast(`¡Bienvenid@ ${data.user.nombre}! 🎉`, 'success');
+            setTimeout(() => {
+                window.location.href = 'principal/index.html?splash=1';
+            }, 1000);
         } else {
             console.log('❌ Error:', data.detail);
-            alert(data.detail || 'Email o contraseña incorrectos');
+            showToast(data.detail || 'Email o contraseña incorrectos', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }
     } catch (error) {
         console.error('❌ Error:', error);
-        alert('Error de conexión con el servidor');
+        showToast('Error de conexión con el servidor', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
@@ -248,14 +252,16 @@ async function sendGoogleToken(id_token) {
         if (res.ok) {
             localStorage.setItem('access_token', data.access_token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            alert(`¡Bienvenido ${data.user.nombre}! 🎉`);
-            window.location.href = 'principal/index.html?splash=1';
+            showToast(`¡Bienvenido ${data.user.nombre}! 🎉`, 'success');
+            setTimeout(() => {
+                window.location.href = 'principal/index.html?splash=1';
+            }, 1000);
         } else {
-            alert('Error con Google: ' + (data.detail || 'Intenta de nuevo'));
+            showToast('Error con Google: ' + (data.detail || 'Intenta de nuevo'), 'error');
         }
     } catch (error) {
         console.error('❌ Error:', error);
-        alert('Error de conexión con el servidor');
+        showToast('Error de conexión con el servidor', 'error');
     }
 }
 
@@ -373,7 +379,7 @@ if (sendForgotBtn) {
         const email = emailForgotInput.value.trim();
         
         if (!email) {
-            alert('Por favor ingresa tu email');
+            showToast('Por favor ingresa tu email', 'warning');
             return;
         }
         
@@ -384,12 +390,12 @@ if (sendForgotBtn) {
             const response = await sendForgotPasswordLink(email);
             const data = await response.json();
             
-            alert('✅ Si el correo existe, recibirás un email con instrucciones');
+            showToast('Si el correo existe, recibirás un email con instrucciones', 'success');
             modalForgot.classList.remove('active');
             emailForgotInput.value = '';
         } catch (error) {
             console.error('❌ Error:', error);
-            alert('Error de conexión con el servidor');
+            showToast('Error de conexión con el servidor', 'error');
         } finally {
             sendForgotBtn.disabled = false;
             sendForgotBtn.textContent = 'Enviar Email';
@@ -421,6 +427,25 @@ document.querySelectorAll('.toggle-password').forEach(icon => {
             input.type = "password";
             icon.classList.remove("fa-eye-slash");
             icon.classList.add("fa-eye");
+        }
+    });
+});
+
+// ============================================
+// VALIDACIÓN EN TIEMPO REAL
+// ============================================
+
+document.querySelectorAll('.sign-in .input, .sign-up .input').forEach(input => {
+    input.addEventListener('input', () => {
+        const val = input.value.trim();
+        if (input.type === 'email') {
+            const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+            input.style.borderColor = val.length === 0 ? '' : valid ? '#22c55e' : '#ef4444';
+            input.style.boxShadow = val.length === 0 ? '' : valid ? '0 0 0 3px rgba(34,197,94,0.15)' : '0 0 0 3px rgba(239,68,68,0.15)';
+        } else if (input.type === 'password') {
+            const valid = val.length >= 6;
+            input.style.borderColor = val.length === 0 ? '' : valid ? '#22c55e' : '#ef4444';
+            input.style.boxShadow = val.length === 0 ? '' : valid ? '0 0 0 3px rgba(34,197,94,0.15)' : '0 0 0 3px rgba(239,68,68,0.15)';
         }
     });
 });

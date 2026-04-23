@@ -1,7 +1,7 @@
-import { productosData } from '../api/tienda.js';
-import { carrito, actualizarCarrito } from './carrito.js';
-import { mostrarNotificacion } from '../utils/notificaciones.js';
-import { verificarLimiteColegiatura } from './pago.js';
+import { productosData } from '../api/tienda.js?v=2';
+import { carrito, actualizarCarrito } from './carrito.js?v=2';
+import { mostrarNotificacion } from '../utils/notificaciones.js?v=2';
+import { verificarLimiteColegiatura } from './pago.js?v=5';
 
 export function abrirModal(categoria) { 
     const modal = document.getElementById('productModal');

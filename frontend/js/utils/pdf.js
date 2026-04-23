@@ -3,14 +3,14 @@ import { obtenerHistorial } from './storage.js';
 export function generarPDFHistorial() {
     const { jsPDF } = window.jspdf;
     if (!jsPDF) {
-        alert("jsPDF no se cargó correctamente");
+        showToast("jsPDF no se cargó correctamente", 'error');
         return;
     }
     const doc = new jsPDF();
     const historial = obtenerHistorial();
     
     if (historial.length === 0) {
-        alert('No hay compras en el historial');
+        showToast('No hay compras en el historial', 'warning');
         return;
     }
 
@@ -112,7 +112,7 @@ export function generarPDFHistorial() {
 export function generarPDFComprobante(metodo, fechaFormato, total, carritoActual) {
     const { jsPDF } = window.jspdf;
     if (!jsPDF) {
-        alert("jsPDF no se cargó correctamente");
+        showToast("jsPDF no se cargó correctamente", 'error');
         return;
     }
     const doc = new jsPDF();

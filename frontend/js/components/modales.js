@@ -227,13 +227,13 @@ export function enviarOrientacion(tipo) {
 
     if (tipo === 'reporte') {
         const texto = elVal('reporte-texto');
-        if (!texto) { alert("Por favor describe el incidente."); return; }
+        if (!texto) { showToast("Por favor describe el incidente.", 'warning'); return; }
         mensajeSuccess = "🚨 Reporte enviado con éxito. Orientación revisará el caso a la brevedad.";
         document.getElementById('reporte-texto').value = "";
     } else if (tipo === 'queja') {
         const tipoQueja = elVal('queja-tipo');
         const texto = elVal('queja-texto');
-        if (!tipoQueja) { alert("Por favor selecciona un tipo de queja."); return; }
+        if (!tipoQueja) { showToast("Por favor selecciona un tipo de queja.", 'warning'); return; }
         mensajeSuccess = "📢 Tu queja sobre \"" + tipoQueja + "\" ha sido recibida. Le daremos seguimiento inmediato.";
         document.getElementById('queja-tipo').value = "";
         document.getElementById('queja-texto').value = "";
@@ -244,13 +244,13 @@ export function enviarOrientacion(tipo) {
         document.getElementById('cita-motivo').value = "";
     } else if (tipo === 'buzon') {
         const texto = elVal('buzon-texto');
-        if (!texto) { alert("Por favor escribe tu sugerencia."); return; }
+        if (!texto) { showToast("Por favor escribe tu sugerencia.", 'warning'); return; }
         mensajeSuccess = "📥 ¡Gracias por tu sugerencia! Tu opinión nos ayuda a mejorar el plantel.";
         document.getElementById('buzon-texto').value = "";
     }
 
     if (mensajeSuccess) {
-        alert(mensajeSuccess);
+        showToast(mensajeSuccess, 'success');
         cerrarModalOrientacion();
     }
 }

@@ -1,4 +1,4 @@
-import { mostrarNotificacion } from '../utils/notificaciones.js';
+import { mostrarNotificacion } from '../utils/notificaciones.js?v=2';
 
 export let carrito = [];
 

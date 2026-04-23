@@ -21,3 +21,109 @@ INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [12001]
+2026-04-17 23:32:50,862 - app.main - INFO - ============================================================
+2026-04-17 23:32:50,862 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-17 23:32:50,862 - app.main - INFO - ============================================================
+2026-04-17 23:32:50,873 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-17 23:32:50,874 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-17 23:32:50,874 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501/login.htm    
+2026-04-17 23:32:50,874 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-17 23:32:50,875 - app.main - INFO - ============================================================
+2026-04-17 23:34:57,062 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-17 23:38:51,215 - app.main - INFO - ============================================================
+2026-04-17 23:38:51,226 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-17 23:38:51,226 - app.main - INFO - ============================================================
+2026-04-17 23:38:51,908 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-17 23:38:51,924 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-17 23:38:51,924 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501/login.html
+2026-04-17 23:38:51,925 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-17 23:38:51,926 - app.main - INFO - ============================================================
+2026-04-17 23:47:51,894 - app.main - INFO - ============================================================
+2026-04-17 23:47:51,906 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-17 23:47:51,907 - app.main - INFO - ============================================================
+2026-04-17 23:47:51,959 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-17 23:47:51,959 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-17 23:47:51,960 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501/login.html
+2026-04-17 23:47:51,960 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-17 23:47:51,961 - app.main - INFO - ============================================================
+2026-04-17 23:49:54,197 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-17 23:51:10,827 - app.main - INFO - ============================================================
+2026-04-17 23:51:10,828 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-17 23:51:10,828 - app.main - INFO - ============================================================
+2026-04-17 23:51:10,874 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-17 23:51:10,874 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-17 23:51:10,875 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-17 23:51:10,875 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-17 23:51:10,875 - app.main - INFO - ============================================================
+2026-04-17 23:57:10,837 - app.main - INFO - ============================================================
+2026-04-17 23:57:10,839 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-17 23:57:10,842 - app.main - INFO - ============================================================
+2026-04-17 23:57:10,853 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-17 23:57:10,853 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-17 23:57:10,858 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-17 23:57:10,860 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-17 23:57:10,860 - app.main - INFO - ============================================================
+2026-04-18 00:00:06,222 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-18 00:21:44,862 - app.main - INFO - ============================================================
+2026-04-18 00:21:44,874 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-18 00:21:44,874 - app.main - INFO - ============================================================
+2026-04-18 00:21:44,879 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-18 00:21:44,881 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-18 00:21:44,881 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-18 00:21:44,882 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-18 00:21:44,882 - app.main - INFO - ============================================================
+2026-04-18 00:23:47,441 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-18 00:24:05,423 - app.main - INFO - ============================================================
+2026-04-18 00:24:05,424 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-18 00:24:05,424 - app.main - INFO - ============================================================
+2026-04-18 00:24:05,431 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-18 00:24:05,431 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-18 00:24:05,431 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-18 00:24:05,431 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-18 00:24:05,431 - app.main - INFO - ============================================================
+2026-04-18 00:28:30,366 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-18 00:32:06,914 - app.main - INFO - ============================================================
+2026-04-18 00:32:06,920 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-18 00:32:06,921 - app.main - INFO - ============================================================
+2026-04-18 00:32:06,946 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-18 00:32:06,947 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-18 00:32:06,947 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-18 00:32:06,948 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-18 00:32:06,951 - app.main - INFO - ============================================================
+2026-04-18 00:36:13,684 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-18 00:43:55,489 - app.main - INFO - ============================================================
+2026-04-18 00:43:55,528 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-18 00:43:55,529 - app.main - INFO - ============================================================
+2026-04-18 00:43:55,657 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-18 00:43:55,658 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-18 00:43:55,658 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-18 00:43:55,658 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-18 00:43:55,658 - app.main - INFO - ============================================================
+2026-04-18 00:44:43,498 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-18 00:51:21,019 - app.main - INFO - ============================================================
+2026-04-18 00:51:21,020 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-18 00:51:21,020 - app.main - INFO - ============================================================
+2026-04-18 00:51:21,046 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-18 00:51:21,047 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-18 00:51:21,047 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-18 00:51:21,047 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-18 00:51:21,047 - app.main - INFO - ============================================================
+2026-04-18 00:55:30,154 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-23 12:31:21,240 - app.main - INFO - ============================================================
+2026-04-23 12:31:21,243 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-23 12:31:21,243 - app.main - INFO - ============================================================
+2026-04-23 12:31:21,251 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-23 12:31:21,251 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-23 12:31:21,251 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-23 12:31:21,252 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-23 12:31:21,252 - app.main - INFO - ============================================================
+2026-04-23 12:37:58,456 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-04-23 12:48:53,875 - app.main - INFO - ============================================================
+2026-04-23 12:48:53,876 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-04-23 12:48:53,877 - app.main - INFO - ============================================================
+2026-04-23 12:48:53,897 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-04-23 12:48:53,899 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-04-23 12:48:53,899 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-04-23 12:48:53,899 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-04-23 12:48:53,899 - app.main - INFO - ============================================================
+2026-04-23 12:56:56,191 - app.main - INFO - 👋 Servidor cerrado correctamente

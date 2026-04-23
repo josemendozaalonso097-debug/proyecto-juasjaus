@@ -47,7 +47,7 @@ export function inicializarPapeleria() {
             e.preventDefault();
             
             if (archivosSubidos.length === 0) {
-                alert('Debes subir al menos un archivo.');
+                showToast('Debes subir al menos un archivo.', 'warning');
                 return;
             }
             
@@ -147,14 +147,14 @@ function mostrarCampoOtro() {
 
 function agregarArchivos(files) {
     if (archivosSubidos.length >= 10) {
-        alert('Ya has alcanzado el máximo de 10 archivos.');
+        showToast('Ya has alcanzado el máximo de 10 archivos.', 'warning');
         return;
     }
     
     Array.from(files).forEach(file => {
         if (archivosSubidos.length >= 10) return;
         if (file.size > 5 * 1024 * 1024) {
-            alert(`El archivo "${file.name}" es demasiado grande. Máximo 5MB.`);
+            showToast(`El archivo "${file.name}" es demasiado grande. Máximo 5MB.`, 'error');
             return;
         }
         const tiposPermitidos = [
@@ -162,7 +162,7 @@ function agregarArchivos(files) {
             'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ];
         if (!tiposPermitidos.includes(file.type)) {
-            alert(`El archivo "${file.name}" no tiene un formato permitido.`);
+            showToast(`El archivo "${file.name}" no tiene un formato permitido.`, 'error');
             return;
         }
         archivosSubidos.push(file);
