@@ -519,14 +519,14 @@ const goToSignup = document.getElementById('go-to-signup');
 if (forgotLink) {
     forgotLink.addEventListener('click', function(e) {
         e.preventDefault();
-        modalForgot.classList.add('active');
+        modalForgot.classList.remove('hidden');
     });
 }
 
 if (modalForgot) {
     modalForgot.addEventListener('click', function(e) {
         if (e.target === modalForgot) {
-            modalForgot.classList.remove('active');
+            modalForgot.classList.add('hidden');
             if (emailForgotInput) emailForgotInput.value = '';
         }
     });
@@ -535,9 +535,9 @@ if (modalForgot) {
 if (goToSignup) {
     goToSignup.addEventListener('click', function(e) {
         e.preventDefault();
-        modalForgot.classList.remove('active');
+        modalForgot.classList.add('hidden');
         if (emailForgotInput) emailForgotInput.value = '';
-        container.classList.add('active');
+        document.getElementById('register').click();
     });
 }
 
@@ -558,7 +558,7 @@ if (sendForgotBtn) {
             const data = await response.json();
             
             showToast('Si el correo existe, recibirás un email con instrucciones', 'success');
-            modalForgot.classList.remove('active');
+            modalForgot.classList.add('hidden');
             emailForgotInput.value = '';
         } catch (error) {
             console.error('❌ Error:', error);

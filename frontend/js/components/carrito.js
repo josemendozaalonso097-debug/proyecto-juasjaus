@@ -45,10 +45,10 @@ export function actualizarCarrito() {
         total += subtotal;
         
         html += `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; margin-bottom: 8px;">
+            <div class="carrito-item-wrap" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; margin-bottom: 8px;">
                 <div>
-                    <h4 style="font-size: 0.95em; color: #94272C; margin-bottom: 4px;">${item.nombre}</h4>
-                    <p style="font-size: 0.85em; color: #666;">
+                    <h4 class="carrito-item-title" style="font-size: 0.95em; color: #94272C; margin-bottom: 4px;">${item.nombre}</h4>
+                    <p class="carrito-item-text" style="font-size: 0.85em; color: #666;">
                         $${item.precio} x ${item.cantidad}
                         ${item.tallaSeleccionada ? ` - Talla: ${item.tallaSeleccionada}` : ''}
                     </p>
@@ -60,7 +60,7 @@ export function actualizarCarrito() {
     
     html += '</div>';
     html += `
-        <div style="border-top: 2px solid #94272C; padding-top: 15px; margin-top: 15px;">
+        <div class="carrito-total" style="border-top: 2px solid #94272C; padding-top: 15px; margin-top: 15px;">
             <div style="display: flex; justify-content: space-between; font-size: 1.3em; font-weight: 700; color: #94272C;">
                 <span>Total:</span>
                 <span>$${total.toFixed(2)}</span>

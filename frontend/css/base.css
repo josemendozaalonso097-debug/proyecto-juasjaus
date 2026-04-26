@@ -82,7 +82,7 @@ button, a, .btn, .card, .info-card, section {
     100% { background-position: 10% 20%, 90% 80%, 50% 50%; }
 }
 
-/* ── Scroll suave global ───────────────────────── */
+/* ── scroll suave global ───────────────────────── */
 html {
     scroll-behavior: smooth;
 }
@@ -92,4 +92,153 @@ html {
     background: var(--color-primary);
     color: white;
 }
+
+/* ── Dark Mode para Modales Custom y Elementos ───── */
+html.dark .modal-historial-content,
+html.dark .modal-informacion-content,
+html.dark .modal-detalle-content,
+/* ── Dark Mode Global Overrides ───────────────────────── */
+html.dark .modal-historial-content,
+html.dark .modal-informacion-content,
+html.dark .modal-detalle-content,
+html.dark .modal-papeleria-content,
+html.dark .modal-productos-content,
+html.dark .modal-content,
+html.dark #modalMetodoPago > div,
+html.dark #modalOxxoPay > div,
+html.dark .modal-deposito-content,
+html.dark .modal-transferencia-content,
+html.dark .modal-oxxopay > div {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Remover fondos claros/fijos internos */
+html.dark .historial-layout,
+html.dark .info-grid,
+html.dark .deposito-container,
+html.dark .transferencia-container,
+html.dark .detalle-section,
+html.dark .faq-item,
+html.dark [style*="background: #f8f9fa"], 
+html.dark [style*="background:#f8f9fa"],
+html.dark [style*="background:white"],
+html.dark [style*="background: white"],
+html.dark [style*="background: #fff"] {
+    background-color: transparent !important;
+}
+
+/* Tarjetas y áreas de contenido internas */
+html.dark .compra-card, 
+html.dark .info-card-section, 
+html.dark .producto-card,
+html.dark .info-bancaria, 
+html.dark .instrucciones-transferencia, 
+html.dark .form-comprobante,
+html.dark .resumen-cuenta, 
+html.dark .faq-respuesta {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Forzar color de texto claro en TODO el contenido de modales oscuros */
+html.dark .modal-historial-content *,
+html.dark .modal-informacion-content *,
+html.dark .modal-detalle-content *,
+html.dark .modal-papeleria-content *,
+html.dark .modal-productos-content *,
+html.dark .modal-content *,
+html.dark #modalMetodoPago > div *,
+html.dark .modal-deposito-content *,
+html.dark .modal-transferencia-content *,
+html.dark .modal-oxxopay > div * {
+    color: #f1f5f9;
+}
+
+/* Inputs y Selects */
+html.dark input, html.dark select, html.dark textarea {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+/* Botones y Badges especiales */
+html.dark #modalMetodoPago button { background-color: #0f172a !important; border-color: #334155 !important; }
+html.dark .material-symbols-outlined { color: inherit !important; }
+html.dark .compra-total, html.dark #montoOxxoPay, html.dark #montoDeposito, html.dark #montoTransferencia { color: #fca5a5 !important; }
+
+/* Chatbot Dark Mode */
+html.dark #cb-panel, html.dark #cb-options, html.dark #cb-messages { background-color: #1e293b !important; }
+html.dark .cb-bubble.cb-bot { background-color: #334155 !important; }
+html.dark .cb-bubble.cb-usr { background-color: #94272C !important; color: white !important; }
+
+/* ── DISEÑO RESPONSIVO (MOBILE) ───────────────────────── */
+@media (max-width: 768px) {
+    /* Chatbot escalado para móvil */
+    #cb-panel {
+        width: 92% !important;
+        height: 65vh !important;
+        max-height: 500px !important;
+        bottom: 85px !important;
+        right: 4% !important;
+        border-radius: 20px !important;
+    }
+
+    /* Modales Estilo App (Sheet) */
+    .modal-historial-content,
+    .modal-informacion-content,
+    .modal-detalle-content,
+    .modal-papeleria-content,
+    .modal-productos-content,
+    .modal-content,
+    #modalMetodoPago > div,
+    #modalOxxoPay > div,
+    .modal-deposito-content,
+    .modal-transferencia-content,
+    .modal-oxxopay > div {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+        animation: slideUpMobile 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+    }
+
+    /* Fix historial overflow */
+    .compra-card {
+        grid-template-columns: 1fr auto !important;
+        padding: 12px 15px !important;
+        gap: 8px !important;
+    }
+    .compra-fecha { grid-column: span 2; font-size: 0.75rem; color: #71717a !important; }
+    .compra-info h3 { font-size: 0.95rem !important; margin: 0 !important; }
+    .compra-total { font-weight: 800; font-size: 1rem; text-align: right; }
+
+    /* Layouts internos */
+    .historial-layout, .info-grid, .deposito-container, .transferencia-container {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 15px !important;
+        gap: 15px !important;
+    }
+
+    @keyframes slideUpMobile {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    .modal-historial, .modal-informacion, .modal-detalle, .modal-papeleria, .modal-productos,
+    #modalMetodoPago, .modal-deposito, .modal-transferencia, .modal-oxxopay {
+        display: flex !important;
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+}
+
 
