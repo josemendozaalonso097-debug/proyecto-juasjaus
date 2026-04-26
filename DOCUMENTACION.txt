@@ -1,121 +1,100 @@
 ========================================================================
-             CBTIS 258 - SISTEMA DE SERVICIOS FINANCIEROS
+             CBTIS 258 FINANCIEROS - DOCUMENTACIÓN OFICIAL TÉCNICA
 ========================================================================
 
-Este documento contiene toda la información necesaria para entender, instalar, 
-ejecutar y extender el proyecto del Sistema de Servicios Financieros del CBTis 258.
+Este documento detalla la arquitectura completa, el flujo lógico, y la 
+estructura de código del Sistema de Servicios Financieros del CBTis 258.
 
 ------------------------------------------------------------------------
-1. ARQUITECTURA DEL SISTEMA
+1. VISIÓN GENERAL DE LA ARQUITECTURA
 ------------------------------------------------------------------------
+El sistema sigue la arquitectura Cliente-Servidor separada en dos carpetas 
+principales: "backend" (API en Python) y "frontend" (Cliente Web en Vanilla JS).
 
-El proyecto está dividido en tres capas principales:
+A. BACKEND (FastAPI - Python)
+   - Función: Gestiona la lógica de negocio, autenticación, conexión a 
+     base de datos y validaciones de seguridad.
+   - Base de Datos: SQLite (`cbtis258.db`), fácil de respaldar localmente.
+   - Seguridad: Restringe accesos externos mediante CORS, con tokens 
+     de sesión y logging de seguridad configurado.
+   - Puertos: Se ejecuta en el puerto 8000 mediante `uvicorn`.
 
-A. BACKEND (/backend):
-   - Motor del sistema encargado de procesar datos, autenticación y base de datos.
-   - Basado en FastAPI (Python).
-   - Base de datos: SQLite (cbtis258.db).
-
-B. FRONTEND (/frontend):
-   - Interfaz web para administradores y usuarios.
-   - Tecnologías: HTML5, CSS3, JavaScript (Vanilla) y Vite para el empaquetado.
-   - Se sirve por defecto en el puerto 5501.
-
-C. MOBILE (/mobile):
-   - Aplicación móvil para consulta y gestiones rápidas.
-   - Tecnologías: React Native con Expo y TypeScript.
-
-------------------------------------------------------------------------
-2. REQUERIMIENTOS PREVIOS
-------------------------------------------------------------------------
-
-Para ejecutar este proyecto necesitas tener instalado:
-- Python 3.10 o superior (para el Backend).
-- Node.js y npm (para el Frontend y Mobile).
-- Git (para el control de versiones).
+B. FRONTEND (Vanilla JS / HTML / CSS / PWA)
+   - Función: Interfaz de usuario "Premium" moderna.
+   - Tecnologías Clave:
+     * HTML5 con Tailwind CSS (vía CDN) para estilos rápidos.
+     * ES6 Modules (JavaScript Nativo) para estructurar el código sin Node.js.
+     * Service Workers (`sw.js`) y Manifest para funcionar como PWA.
+     * Librerías Externas: jsPDF (Recibos PDF), ZXing (Escáner de cámara), 
+       JsBarcode (Generación de código de barras Oxxo).
+   - Puertos: Se ejecuta en el puerto 5501 mediante `http.server`.
 
 ------------------------------------------------------------------------
-3. GUÍA DE INSTALACIÓN RÁPIDA
+2. ARQUITECTURA DEL FRONTEND (LÓGICA Y MÓDULOS)
 ------------------------------------------------------------------------
+El Frontend está 100% modularizado usando `import`/`export` de ES6.
 
-1. Clonar el repositorio.
-2. Crear un entorno virtual de Python en la raíz del proyecto:
-   Windows: python -m venv .venv
-   Linux/Mac: python3 -m venv .venv
-3. Activar el entorno virtual:
-   Windows: .venv\Scripts\activate
-   Linux/Mac: source .venv/bin/activate
-4. Instalar las dependencias del backend:
-   pip install -r backend/requirements.txt
-5. Instalar dependencias del frontend (opcional si usas Vite directamente):
-   cd frontend && npm install && cd ..
-
-------------------------------------------------------------------------
-4. CÓMO EJECUTAR EL PROYECTO
-------------------------------------------------------------------------
-
-El proyecto cuenta con scripts automáticos para iniciar todo al mismo tiempo:
-
-EN LINUX / CHROMEOS:
-- Ejecuta: ./run.sh
-- Accede a: http://localhost:5501/login.html
-
-EN WINDOWS:
-- Ejecuta con doble clic: run.bat
-- Accede a: http://localhost:5501/login.html
-
-MANUALMENTE (Si los scripts fallan):
-- Terminal 1 (Backend): 
-  cd backend
-  uvicorn app.main:app --reload --port 8000
-- Terminal 2 (Frontend):
-  cd frontend
-  python -m http.server 5501  (O usa 'npm run dev' si prefieres Vite)
+Estructura de Directorios Clave (`frontend/js/`):
+- `pages/`: Controladores principales por cada vista HTML.
+  * `login.js`: Transición, validación de login (Google y Normal) y alerts.
+  * `principal.js`: Inicializa el dashboard, carga historial, modales y perfil.
+  * `tienda.js`: Inicializa la tienda escolar, carritos de compra y PDFs.
+- `components/`: Módulos de interfaz reutilizables.
+  * `carrito.js`: Arreglo local que guarda los productos, calcula totales y renderiza el HTML del carrito.
+  * `pago.js`: Maneja simulación de la pasarela de pago (Tarjeta o Oxxo) y uso de la cámara.
+  * `productos.js`: Inyecta los catálogos en los modales, y gestiona semestres y tallas.
+  * `modales.js`: Lógica para abrir/cerrar modales y enviar reportes/quejas (Orientación).
+  * `papeleria.js`: Validación y visualización de subida de archivos (Max 5MB).
+  * `perfil.js`: Carga la foto, la muestra en la UI y maneja cambios.
+  * `sidebar.js`: Maneja la navegación lateral responsiva.
+- `api/`: Comunicación directa con el Backend (FastAPI).
+  * `auth.js`: Verificación periódica de la sesión (`check-session`), logins y logouts.
+  * Funciones de fetch con headers de seguridad y Bearer Tokens.
+- `utils/`: Utilidades genéricas.
+  * `toast.js`: Sistema de notificaciones moderno flotantes que reemplazó a los viejos `alert()`.
+  * `pdf.js`: Inyección y dibujado de Canvas para exportar los pagos a recibos PDF.
+  * `storage.js`: Administra datos en `localStorage` pero prioriza la API en línea.
+  * `pageTransition.js`: Animaciones tipo cortina roja al saltar entre páginas.
 
 ------------------------------------------------------------------------
-5. ESTRUCTURA DE CARPETAS
+3. FLUJO LÓGICO DEL SISTEMA (¿CÓMO FUNCIONA?)
 ------------------------------------------------------------------------
 
-/backend
-  ├── /app                    # Lógica central (Rutas, Modelos, Config)
-  │     ├── /routers          # Endpoints de la API
-  │     ├── /models           # Definición de tablas de base de datos
-  │     └── main.py           # Punto de entrada de la API
-  ├── cbtis258.db             # Base de datos SQLite
-  └── requirements.txt        # Librerías de Python requeridas
+A. INICIO DE SESIÓN
+1. El usuario entra a `http://localhost:5501` (que redirige a `login.html`).
+2. Digita sus credenciales o usa Google. `auth.js` envía un request POST al Backend.
+3. El Backend valida contra SQLite y devuelve un Token.
+4. El Frontend guarda el Token y via `pageTransition.js` muestra una cortina visual y navega a `principal/index.html`.
 
-/frontend
-  ├── /js                     # Lógica de JavaScript (API calls, UI)
-  ├── /css                    # Archivos de estilos (incluyendo glassmorphism)
-  ├── login.html              # Página principal de acceso
-  └── package.json            # Configuración de Node/Vite
-
-/mobile
-  ├── /app                    # Pantallas y navegación de la app móvil
-  ├── /components             # Componentes reutilizables de React Native
-  └── package.json            # Configuración de Expo
+B. FLUJO DE TIENDA Y COMPRA
+1. En `tienda/tienda.html`, el usuario da clic en una categoría (ej. "Uniformes").
+2. `productos.js` lee el catálogo en `api/tienda.js` y llena el HTML del modal correspondiente.
+3. Al agregar al carrito, `carrito.js` añade el ítem al arreglo general de productos.
+4. Al dar clic en "Pagar", `pago.js` despliega el simulador.
+5. Si elige OXXO, se genera un código de barras. Si elige pagar de forma manual, y aprueba, se genera éxito.
+6. A continuación, el sistema limpia el arreglo mediante `carrito.length = 0` (Para evitar bugs de caché y estado en memoria).
+7. Se usa `pdf.js` para crear un recibo digital automático en el navegador del usuario y se manda a la base de datos (y perfil) de Historial.
 
 ------------------------------------------------------------------------
-6. NOTAS PARA DESARROLLADORES
+4. EJECUCIÓN DEL SISTEMA
 ------------------------------------------------------------------------
+En Linux/macOS:
+$ ./run.sh
+Este script:
+1. Mata puertos remanentes viejos.
+2. Levanta Uvicorn en el puerto 8000 en segundo plano.
+3. Levanta http.server en el puerto 5501.
 
-- BASE DE DATOS: Si necesitas modificar la base de datos, los modelos están en 
-  backend/app/models. SQLite es ideal para desarrollo local.
-- SEGURIDAD: Los archivos .env contienen claves secretas y configuraciones 
-  sensibles. NUNCA los subas a Git (están protegidos por .gitignore).
-- API BASE: El frontend se comunica con el backend a través de una URL base 
-  que suele configurarse en frontend/js/api/config.js o similar.
-- MOBILE: Para probar la app móvil, instala la app "Expo Go" en tu celular 
-  y ejecuta 'npx expo start' dentro de la carpeta /mobile.
+En Windows:
+Ejecuta el archivo `run.bat`
 
 ------------------------------------------------------------------------
-7. CONCLUSIÓN
+5. DEPURACIÓN, CACHÉ Y CÓMO ESTÁ ESCRITO (NOTAS DE MANTENIMIENTO)
 ------------------------------------------------------------------------
-
-Este sistema está diseñado para ser ligero, rápido y fácil de desplegar. 
-Si tienes dudas sobre una función específica, revisa los comentarios 
-dentro del código en la carpeta correspondiente.
+- SISTEMA DE TOASTS: Totalmente prohibido usar `alert()` estándar. Al haber errores de validación (por ejemplo, archivo pesado) se debe llamar a `showToast(mensaje, 'error')`.
+- ACTUALIZACIONES Y CACHÉ: Cuando se suben correcciones al JavaScript (ej. `.js`), asegúrate de agregar o incrementar su sufijo de versión en los tags `<script src="...?v=5">` y en los `import`. Al no usar NodeJS ni Webpack, el navegador (Chrome/Edge) guarda en memoria intensa los ES6 Modules. Bumping al parámetro de versión fuerza la recarga.
+- ARTE Y DISEÑO: Se usan clases Tailwind. Para fondos usamos una animación de "mesh gradient" (CSS puro), tarjetas Glassmorphism (`backdrop-filter`) y sombras tenues.
 
 ========================================================================
-                    CBTIS 258 - 2026
+            PROYECTO MODERNIZADO Y REVISADO: MAYO 2026.
 ========================================================================

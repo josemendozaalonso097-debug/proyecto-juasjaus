@@ -74,13 +74,21 @@ export function cargarDatosPerfil(user) {
 
     // Actualizar badge de semestre en el dashboard (Cuenta Activa)
     const statusBadge = document.getElementById('status-badge');
-    if (statusBadge) {
-        if (rol === 'estudiante') {
-            statusBadge.textContent = semestre ? `${semestre}° Semestre` : 'Sin semestre';
-        } else {
-            statusBadge.textContent = 'No aplica';
-        }
-    }
+    const semestreText = rol === 'estudiante' ? (semestre ? `${semestre}° Semestre` : 'Sin semestre') : 'No aplica';
+    if (statusBadge) statusBadge.textContent = semestreText;
+
+    // -------- Mobile-specific IDs --------
+    const userNameMobile = document.getElementById('user-name-mobile');
+    if (userNameMobile) userNameMobile.textContent = nombre;
+
+    const statusBadgeMobile = document.getElementById('status-badge-mobile');
+    if (statusBadgeMobile) statusBadgeMobile.textContent = semestreText;
+
+    const statusMirror = document.getElementById('status-badge-desktop-mirror');
+    if (statusMirror) statusMirror.textContent = semestreText;
+
+    const emailMobile = document.getElementById('user-email-mobile');
+    if (emailMobile) emailMobile.textContent = email || '—';
 
     if (userId) {
         const foto = localStorage.getItem(`foto_perfil_${userId}`);
@@ -92,8 +100,13 @@ export function cargarDatosPerfil(user) {
 
         const headerPhoto = document.getElementById('header-user-photo');
         if (headerPhoto) headerPhoto.style.backgroundImage = `url("${fotoUrl}")`;
+
+        // Mobile photo
+        const headerPhotoMobile = document.getElementById('header-user-photo-mobile');
+        if (headerPhotoMobile) headerPhotoMobile.style.backgroundImage = `url("${fotoUrl}")`;
     }
 }
+
 
 export function actualizarPerfil() {
     console.log('DEBUG: inicializando actualizarPerfil()');

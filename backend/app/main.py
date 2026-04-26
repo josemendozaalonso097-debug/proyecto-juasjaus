@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .database import init_db
+from .database_otp import init_otp_db
 from .routers import auth, index, tienda
 import logging
 from logging.handlers import RotatingFileHandler
@@ -68,6 +69,7 @@ async def startup_event():
     
     # Inicializar base de datos
     init_db()
+    init_otp_db()
     
     logger.info(f"📍 API URL: http://localhost:8000")
     logger.info(f"📚 Docs: http://localhost:8000/docs")

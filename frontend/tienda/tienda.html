@@ -31,6 +31,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     
     <link rel="stylesheet" href="../css/base.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        /* Desktop: hide mobile section */
+        .tienda-mobile-only { display: none !important; }
+
+        /* Mobile (<1024px): hide desktop display, show mobile */
+        @media (max-width: 1023px) {
+            .tienda-mobile-only { display: block !important; }
+            #header-container, #footer-container { display: none !important; }
+            .layout-container { display: none !important; }
+            .mesh-bg { display: none !important; }
+            body { background: #f9f9fb !important; }
+        }
+
+        /* ===================== DARK MODE MOBILE ===================== */
+        .dark .tienda-mobile-only { background: #121316 !important; }
+        .dark .mob-header {
+            background: rgba(26,28,32,0.92) !important;
+            border-bottom-color: rgba(60,30,30,0.3) !important;
+        }
+        .dark .mob-card {
+            background: #1e2025 !important;
+            border-color: rgba(60,30,30,0.25) !important;
+        }
+        .dark .mob-title { color: #f1f1f3 !important; }
+        .dark .mob-sub { color: #9b7a78 !important; }
+        .dark .mob-nav {
+            background: rgba(26,28,32,0.95) !important;
+            border-top-color: rgba(60,30,30,0.3) !important;
+        }
+        .dark .mob-action-icon { background: rgba(175,16,26,0.15) !important; }
+        @keyframes tpulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
 <div class="mesh-bg" aria-hidden="true"></div>
@@ -183,6 +217,132 @@ Los comprobantes de pago digitales deben presentarse en ventanilla para la entre
 <div id="modal-pago-container"></div>
 <div id="modal-papeleria-container"></div>
 <div id="modal-perfil-container"></div>
+
+<!-- ======================== MOBILE STITCH TIENDA ======================== -->
+<div class="tienda-mobile-only" style="min-height:100dvh;background:#f9f9fb;padding-bottom:88px;">
+
+  <!-- Mobile Header -->
+  <header class="mob-header" style="position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(249,249,251,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(228,190,186,0.15);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;">
+    <a href="../principal/index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+      <img src="../imgs/yameharte.png" alt="Logo" style="width:28px;height:28px;object-fit:contain;">
+      <span class="mob-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1.1rem;color:#af101a;">CBTis 258</span>
+    </a>
+    <button onclick="document.getElementById('modalPerfil').classList.remove('hidden')" style="border:none;background:transparent;cursor:pointer;padding:0;">
+      <div id="header-user-photo-mobile" style="width:36px;height:36px;border-radius:50%;background:#e4beba center/cover no-repeat;border:2px solid rgba(175,16,26,0.2);"></div>
+    </button>
+  </header>
+
+  <div class="mobile-main-content" style="padding:80px 20px 0;">
+    <!-- Hero -->
+    <section style="margin-bottom:24px;margin-top:16px;">
+      <h2 class="mob-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.75rem;font-weight:800;letter-spacing:-0.02em;color:#1a1c1d;margin-bottom:6px;">Tienda Escolar</h2>
+      <p class="mob-sub" style="font-family:'Manrope',sans-serif;font-size:0.875rem;color:#5b403d;">Selecciona lo que necesites.</p>
+    </section>
+
+    <!-- Categories -->
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+
+      <!-- Papelería -->
+      <div onclick="abrirModalPapeleria()" class="mob-card" style="position:relative;overflow:hidden;background:white;border-radius:14px;padding:20px;border:1px solid rgba(228,190,186,0.15);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" onpointerdown="this.style.transform='scale(0.98)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''">
+        <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="mob-action-icon" style="width:48px;height:48px;border-radius:50%;background:rgba(175,16,26,0.05);display:flex;align-items:center;justify-content:center;color:#af101a;flex-shrink:0;">
+              <span class="material-symbols-outlined" style="font-size:24px;">edit_note</span>
+            </div>
+            <div>
+              <h3 class="mob-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a1c1d;margin:0 0 2px;">Papelería</h3>
+              <p class="mob-sub" style="font-family:'Manrope',sans-serif;font-size:12px;color:#5b403d;margin:0;">Sube tu documentación</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined mob-sub" style="color:#8f6f6c;">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- Uniformes -->
+      <div onclick="abrirModal('uniformes')" class="mob-card" style="position:relative;overflow:hidden;background:white;border-radius:14px;padding:20px;border:1px solid rgba(228,190,186,0.15);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" onpointerdown="this.style.transform='scale(0.98)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''">
+        <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(0,95,175,0.07);display:flex;align-items:center;justify-content:center;color:#005faf;flex-shrink:0;">
+              <span class="material-symbols-outlined" style="font-size:24px;">checkroom</span>
+            </div>
+            <div>
+              <h3 class="mob-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a1c1d;margin:0 0 2px;">Uniformes</h3>
+              <p class="mob-sub" style="font-family:'Manrope',sans-serif;font-size:12px;color:#5b403d;margin:0;">Tallas S, M, L disponibles</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined mob-sub" style="color:#8f6f6c;">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- Libros -->
+      <div onclick="abrirModal('Libros')" class="mob-card" style="position:relative;overflow:hidden;background:white;border-radius:14px;padding:20px;border:1px solid rgba(228,190,186,0.15);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" onpointerdown="this.style.transform='scale(0.98)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''">
+        <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(113,83,0,0.07);display:flex;align-items:center;justify-content:center;color:#715300;flex-shrink:0;">
+              <span class="material-symbols-outlined" style="font-size:24px;">menu_book</span>
+            </div>
+            <div>
+              <h3 class="mob-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a1c1d;margin:0 0 2px;">Libros</h3>
+              <p class="mob-sub" style="font-family:'Manrope',sans-serif;font-size:12px;color:#5b403d;margin:0;">Guías de estudio oficiales</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined mob-sub" style="color:#8f6f6c;">chevron_right</span>
+        </div>
+      </div>
+
+      <!-- Trámites -->
+      <div onclick="abrirModal('tramites')" class="mob-card" style="position:relative;overflow:hidden;background:white;border-radius:14px;padding:20px;border:1px solid rgba(228,190,186,0.15);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.15s;" onpointerdown="this.style.transform='scale(0.98)'" onpointerup="this.style.transform=''" onpointerleave="this.style.transform=''">
+        <div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="mob-action-icon" style="width:48px;height:48px;border-radius:50%;background:rgba(175,16,26,0.05);display:flex;align-items:center;justify-content:center;color:#af101a;flex-shrink:0;">
+              <span class="material-symbols-outlined" style="font-size:24px;">receipt_long</span>
+            </div>
+            <div>
+              <h3 class="mob-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a1c1d;margin:0 0 2px;">Trámites</h3>
+              <p class="mob-sub" style="font-family:'Manrope',sans-serif;font-size:12px;color:#5b403d;margin:0;">Constancias y certificados</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined mob-sub" style="color:#8f6f6c;">chevron_right</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Cart (mobile) - shown when there are items -->
+    <div id="carrito-mobile-widget" style="display:none;position:fixed;bottom:96px;left:16px;right:16px;z-index:44;">
+      <div class="mob-card" style="background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-radius:16px;padding:16px 20px;box-shadow:0 8px 32px -8px rgba(175,16,26,0.2);border:1px solid rgba(228,190,186,0.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="material-symbols-outlined" style="color:#af101a;font-size:20px;">shopping_bag</span>
+            <span class="mob-title" style="font-family:'Manrope',sans-serif;font-weight:700;color:#1a1c1d;font-size:0.875rem;">Productos seleccionados</span>
+          </div>
+        </div>
+        <div id="carritoContainer" style="max-height:120px;overflow-y:auto;margin-bottom:10px;"></div>
+        <button id="pay-button" class="pay-btn" style="width:100%;background:linear-gradient(135deg,#af101a,#d32f2f);color:white;border-radius:12px;padding:14px;font-weight:700;border:none;cursor:pointer;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.9rem;">
+          <span class="material-symbols-outlined" style="font-size:18px;">credit_card</span>
+          Pagar Ahora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="mob-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:45;display:flex;justify-content:space-around;align-items:center;padding:0 16px;height:80px;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-top:1px solid rgba(228,190,186,0.15);box-shadow:0 -8px 24px -4px rgba(175,16,26,0.08);border-radius:24px 24px 0 0;">
+    <a href="../principal/index.html" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#64748b;text-decoration:none;">
+      <span class="material-symbols-outlined" style="margin-bottom:4px;">dashboard</span>
+      <span style="font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Panel</span>
+    </a>
+    <a href="#" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#af101a;text-decoration:none;position:relative;">
+      <span style="position:absolute;width:64px;height:40px;background:rgba(175,16,26,0.08);border-radius:999px;z-index:-1;"></span>
+      <span class="material-symbols-outlined" style="margin-bottom:4px;font-variation-settings:'FILL' 1;">shopping_bag</span>
+      <span style="font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Tienda</span>
+    </a>
+    <a href="#" onclick="document.getElementById('modalPerfil').classList.remove('hidden');return false;" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#64748b;text-decoration:none;">
+      <span class="material-symbols-outlined" style="margin-bottom:4px;">settings</span>
+      <span style="font-family:'Manrope',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Ajustes</span>
+    </a>
+  </nav>
+</div>
+<!-- ======================== FIN MOBILE TIENDA ======================== -->
 
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>

@@ -1,7 +1,7 @@
 import { 
-    registerUser, loginUser, loginWithGoogleToken, 
+    registerSendOTP, registerVerifyOTP, loginUser, loginWithGoogleToken, 
     checkSessionToken, checkBackendHealth, sendForgotPasswordLink
-} from '../api/auth.js?v=2';
+} from '../api/auth.js?v=3';
 
 const container = document.getElementById('container');
 const loginBtn = document.getElementById('login');
@@ -86,48 +86,215 @@ signUpForm.addEventListener('submit', async (e) => {
     }
     
     try {
-        console.log('📡 Enviando registro');
-        const userData = { nombre, email, password, rol, semestre };
-        const response = await registerUser(userData);
+        console.log('📡 Solicitando OTP...');
+        const userData = { 
+            nombre, 
+            email, 
+            password, 
+            rol, 
+            semestre: semestre ? parseInt(semestre) : null  // null en vez de "" para cumplir Optional[int]
+        };
+        const response = await registerSendOTP(userData);
         
         console.log('📥 Status:', response.status);
         const data = await response.json();
         console.log('📦 Respuesta:', data);
         
         if (response.ok) {
-            console.log('✅ ¡REGISTRO EXITOSO!');
+            console.log('✅ OTP Enviado exitosamente');
+            showToast('Código enviado a tu correo', 'success');
             
-            localStorage.setItem('access_token', data.access_token);
-            const userProfile = {
-                id: data.user.id,
-                email: data.user.email,
-                nombre: nombre,
-                rol: rol,
-                semestre: rol === 'estudiante' ? semestre : null
-            };
-            localStorage.setItem('user', JSON.stringify(userProfile));
-            localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(userProfile));
-
-            showToast('¡Cuenta creada exitosamente! 🎉', 'success');
-            console.log('🔄 Redirigiendo...');
+            // Guardar para el modal
+            window.currentRegisterEmail = email;
+            window.currentRegisterUserParams = { nombre, rol, semestre: rol === 'estudiante' ? semestre : null };
             
-            localStorage.setItem('just_registered', 'true');
-            setTimeout(() => {
-                window.location.href = 'principal/index.html';
-            }, 1000);
+            // Abrir modal y disparar timer
+            openOtpModal();
+            
         } else {
             console.log('❌ Error:', data.detail);
-            showToast(data.detail || 'Error al crear cuenta', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            showToast(data.detail || 'Error al iniciar registro', 'error');
         }
     } catch (error) {
         console.error('❌ Error:', error);
         showToast('Error de conexión. Verifica que el backend esté corriendo', 'error');
+    } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
     }
 });
+
+// ============================================
+// FUNCIONALIDAD DE OTP MODAL
+// ============================================
+
+const modalOtp = document.getElementById('modal-otp');
+const otpInputs = document.querySelectorAll('.otp-input');
+const verifyOtpBtn = document.getElementById('verify-otp-btn');
+const resendOtpBtn = document.getElementById('resend-otp-btn');
+const cancelOtpBtn = document.getElementById('cancel-otp-btn');
+const otpTimerDisplay = document.getElementById('otp-timer');
+let otpTimerInterval;
+
+function openOtpModal() {
+    modalOtp.classList.remove('hidden');
+    // En Tailwind usamos 'hidden' para ocultar por lo general o manipulación de z-index
+    // Si usamos z-[9999] con hidden, remover 'hidden' es suficiente
+    startOtpTimer();
+    otpInputs.forEach(input => input.value = '');
+    verifyOtpBtn.disabled = true;
+    resendOtpBtn.disabled = true;
+    setTimeout(() => { if (otpInputs[0]) otpInputs[0].focus(); }, 100);
+}
+
+function closeOtpModal() {
+    modalOtp.classList.add('hidden');
+    clearInterval(otpTimerInterval);
+    window.currentRegisterEmail = null;
+}
+
+function startOtpTimer() {
+    clearInterval(otpTimerInterval);
+    let timeLeft = 120; // 2 minutes
+    resendOtpBtn.disabled = true;
+    
+    otpTimerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        otpTimerDisplay.textContent = `0${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(otpTimerInterval);
+            otpTimerDisplay.textContent = "00:00";
+            resendOtpBtn.disabled = false;
+        }
+    }, 1000);
+}
+
+// Lógica de Inputs OTP (Focus y Backspace)
+if (otpInputs) {
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            if (e.target.value.length > 1) {
+                e.target.value = e.target.value.slice(0, 1);
+            }
+            if (e.target.value !== '') {
+                if (index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            }
+            checkOtpReady();
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && e.target.value === '') {
+                if (index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            }
+        });
+        
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').trim().replace(/[^0-9]/g, '').slice(0, 6);
+            if (pastedData) {
+                pastedData.split('').forEach((char, i) => {
+                    if (otpInputs[i]) {
+                        otpInputs[i].value = char;
+                    }
+                });
+                const nextFocus = Math.min(pastedData.length, otpInputs.length - 1);
+                otpInputs[nextFocus].focus();
+                checkOtpReady();
+            }
+        });
+    });
+}
+
+function checkOtpReady() {
+    const isComplete = Array.from(otpInputs).every(input => input.value.trim() !== '');
+    verifyOtpBtn.disabled = !isComplete;
+}
+
+if (verifyOtpBtn) {
+    verifyOtpBtn.addEventListener('click', async () => {
+        if (verifyOtpBtn.disabled) return;
+        
+        const code = Array.from(otpInputs).map(input => input.value).join('');
+        if (code.length !== 6 || !window.currentRegisterEmail) return;
+        
+        const originalText = verifyOtpBtn.innerHTML;
+        verifyOtpBtn.disabled = true;
+        verifyOtpBtn.innerHTML = '<span class="material-symbols-outlined fa-spin">sync</span> Verificando...';
+        
+        try {
+            const response = await registerVerifyOTP(window.currentRegisterEmail, code);
+            const data = await response.json();
+            
+            if (response.ok) {
+                console.log('✅ ¡REGISTRO EXITOSO TRAS OTP!');
+                
+                // Guardar login automático igual que el flujo anterior
+                localStorage.setItem('access_token', data.access_token);
+                const userProfile = {
+                    id: data.user.id,
+                    email: data.user.email,
+                    nombre: window.currentRegisterUserParams.nombre,
+                    rol: window.currentRegisterUserParams.rol,
+                    semestre: window.currentRegisterUserParams.semestre
+                };
+                localStorage.setItem('user', JSON.stringify(userProfile));
+                localStorage.setItem(`perfil_${data.user.id}`, JSON.stringify(userProfile));
+                
+                showToast('¡Cuenta creada exitosamente! 🎉', 'success');
+                closeOtpModal();
+                
+                localStorage.setItem('just_registered', 'true');
+                setTimeout(() => {
+                    window.location.href = 'principal/index.html';
+                }, 1000);
+            } else {
+                showToast(data.detail || 'Código incorrecto o expirado', 'error');
+                verifyOtpBtn.disabled = false;
+                verifyOtpBtn.innerHTML = originalText;
+                
+                if (data.detail === "El código ha expirado") {
+                    resendOtpBtn.disabled = false;
+                }
+            }
+        } catch(error) {
+            console.error('❌ Error verifying OTP:', error);
+            showToast('Error de conexión', 'error');
+            verifyOtpBtn.disabled = false;
+            verifyOtpBtn.innerHTML = originalText;
+        }
+    });
+}
+
+if (resendOtpBtn) {
+    resendOtpBtn.addEventListener('click', async () => {
+        if (resendOtpBtn.disabled) return;
+        
+        resendOtpBtn.disabled = true;
+        const originalText = resendOtpBtn.textContent;
+        resendOtpBtn.textContent = 'Enviando...';
+        
+        // Disparamos la misma petición de registro escondida para generar el mismo OTP
+        const submitBtn = signUpForm.querySelector('button[type="submit"]');
+        submitBtn.click(); // Trigger form to create new OTP
+        
+        setTimeout(() => {
+            resendOtpBtn.textContent = 'Código reenviado';
+        }, 1000);
+    });
+}
+
+if (cancelOtpBtn) {
+    cancelOtpBtn.addEventListener('click', () => {
+        closeOtpModal();
+    });
+}
 
 // ============================================
 // FUNCIONALIDAD DE LOGIN

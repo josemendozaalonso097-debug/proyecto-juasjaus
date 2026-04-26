@@ -1,13 +1,23 @@
 export const API_BASE = 'http://127.0.0.1:8000';
 export const API_URL = `${API_BASE}/api/auth`;
 
-export async function registerUser(userData) {
-    return await fetch(`${API_URL}/register`, {
+export async function registerSendOTP(userData) {
+    return await fetch(`${API_URL}/register-send-otp`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData)
+    });
+}
+
+export async function registerVerifyOTP(email, code) {
+    return await fetch(`${API_URL}/register-verify-otp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, code })
     });
 }
 

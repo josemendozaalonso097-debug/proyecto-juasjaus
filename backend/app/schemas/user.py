@@ -11,6 +11,17 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=6)
 
+class UserRegisterOTP(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    rol: str = Field(..., min_length=2, max_length=50)
+    semestre: Optional[int] = None
+
+class VerifyOTP(BaseModel):
+    email: EmailStr
+    code: str = Field(..., min_length=6, max_length=6)
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

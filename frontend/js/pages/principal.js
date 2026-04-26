@@ -224,6 +224,58 @@ function actualizarProximoVencimiento() {
         nextDateElement.textContent = textoFecha;
         nextDateElement.style.color = '#e74c3c'; // Rojo
     }
+
+    // -------- Mobile next-date --------
+    const nextDateMobile = document.getElementById('next-date-mobile');
+    if (nextDateMobile) {
+        nextDateMobile.textContent = pagosPendientes === 0 ? 'Sin deuda' : textoFecha;
+    }
+
+    // -------- Mobile payment status card --------
+    const estadoMobile = document.getElementById('estado-container-global-mobile');
+    if (estadoMobile) {
+        if (pagosPendientes > 0) {
+            estadoMobile.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(228,190,186,0.15);">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+                        <div>
+                            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a1c1d;margin-bottom:6px;">Estados de pago</h3>
+                            <div style="display:inline-flex;align-items:center;background:#ffdad6;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;color:#93000a;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#ba1a1a;display:inline-block;margin-right:6px;"></span>
+                                ${pagosPendientes} pago(s) pendiente(s)
+                            </div>
+                        </div>
+                        <div style="width:52px;height:52px;border-radius:50%;background:#ffdad6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <span class="material-symbols-outlined" style="color:#ba1a1a;font-size:22px;">warning</span>
+                        </div>
+                    </div>
+                    <p style="font-family:'Manrope',sans-serif;font-size:0.8rem;color:#5b403d;margin-bottom:14px;">Tienes pagos atrasados. Regulariza tu situación a tiempo.</p>
+                    <button onclick="document.getElementById('info-btn').click()" style="width:100%;background:#af101a;color:white;padding:12px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:0.875rem;">
+                        Ver detalles
+                    </button>
+                </div>`;
+        } else {
+            estadoMobile.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(228,190,186,0.15);">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+                        <div>
+                            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a1c1d;margin-bottom:6px;">Estados de pago</h3>
+                            <div style="display:inline-flex;align-items:center;background:#e8f5e9;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;color:#1b5e20;">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#27ae60;display:inline-block;margin-right:6px;"></span>
+                                Al corriente
+                            </div>
+                        </div>
+                        <div style="width:52px;height:52px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <span class="material-symbols-outlined" style="color:#27ae60;font-size:22px;">check_circle</span>
+                        </div>
+                    </div>
+                    <p style="font-family:'Manrope',sans-serif;font-size:0.8rem;color:#5b403d;margin-bottom:14px;">Tu cuenta está al corriente. ¡Gracias por tu puntualidad!</p>
+                    <button disabled style="width:100%;background:#e2e2e4;color:#5b403d;padding:12px;border-radius:10px;font-weight:700;border:none;cursor:not-allowed;font-family:'Manrope',sans-serif;font-size:0.875rem;opacity:0.7;">
+                        Sin deuda
+                    </button>
+                </div>`;
+        }
+    }
 }
 
 window.actualizarProximoVencimiento = actualizarProximoVencimiento;
