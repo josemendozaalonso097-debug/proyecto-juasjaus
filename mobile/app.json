@@ -24,7 +24,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["nativewind/plugin"],
+    "plugins": ["expo-router"],
     "extra": {
       "apiUrl": "http://192.168.1.100:8000"
     }
