@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Sesión</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f20d0d",
+                        "background-light": "#f8f5f5",
+                        "background-dark": "#221010",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .box {
+            background: #2d2d2d;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #00ff00;
+            color: #1e1e1e;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .output {
+            background: #000;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warning { color: #ffff00; }
+        h1 { color: #00ff00; text-align: center; }
+        h3 { color: #00ccff; }
+        pre { margin: 0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 DEBUG - SISTEMA DE SESIONES</h1>
+    
+    <div class="box">
+        <h3>1. Probar Servidor</h3>
+        <button onclick="testServer()">🔌 Test Servidor</button>
+        <div id="server-output" class="output"></div>
+    </div>
+
+    <div class="box">
+        <h3>2. Crear Usuario de Prueba</h3>
+        <button onclick="testRegister()">✍️ Registrar Usuario</button>
+        <div id="register-output" class="output"></div>
+    </div>
+
+    <div class="box">
+        <h3>3. Verificar Sesión</h3>
+        <button onclick="testSession()">🔐 Check Session</button>
+        <div id="session-output" class="output"></div>
+    </div>
+
+    <div class="box">
+        <h3>4. Ver Cookies</h3>
+        <button onclick="showCookies()">🍪 Ver Cookies</button>
+        <div id="cookies-output" class="output"></div>
+    </div>
+
+    <div class="box">
+        <h3>5. Cerrar Sesión</h3>
+        <button onclick="testLogout()">🚪 Logout</button>
+        <div id="logout-output" class="output"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/auth';
+
+        function log(elementId, message, type = 'success') {
+            const output = document.getElementById(elementId);
+            output.innerHTML = `<pre class="${type}">${message}</pre>`;
+        }
+
+        async function testServer() {
+            log('server-output', '⏳ Probando servidor...', 'warning');
+            try {
+                const response = await fetch('http://localhost:5000/api/test');
+                const data = await response.json();
+                log('server-output', `✅ Servidor OK\n${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                log('server-output', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRegister() {
+            log('register-output', '⏳ Registrando usuario...', 'warning');
+            
+            const timestamp = Date.now();
+            const testUser = {
+                nombre: 'Test User',
+                email: `test_${timestamp}@example.com`,
+                password: 'password123'
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(testUser)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('register-output', 
+                        `✅ Usuario registrado exitosamente\n` +
+                        `Email: ${testUser.email}\n` +
+                        `Password: ${testUser.password}\n` +
+                        `\nRespuesta del servidor:\n${JSON.stringify(data, null, 2)}`,
+                        'success'
+                    );
+                } else {
+                    log('register-output', `❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log('register-output', `❌ Error de red: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSession() {
+            log('session-output', '⏳ Verificando sesión...', 'warning');
+            
+            try {
+                const response = await fetch(`${API_URL}/check-session`, {
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    log('session-output', 
+                        `✅ Sesión activa\n${JSON.stringify(data, null, 2)}`,
+                        'success'
+                    );
+                } else {
+                    log('session-output', 
+                        `⚠️ No hay sesión activa\n${JSON.stringify(data, null, 2)}`,
+                        'warning'
+                    );
+                }
+            } catch (error) {
+                log('session-output', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showCookies() {
+            const cookies = document.cookie;
+            
+            if (cookies) {
+                const cookieList = cookies.split(';').map(c => c.trim()).join('\n');
+                log('cookies-output', `🍪 Cookies del navegador:\n\n${cookieList}`, 'success');
+            } else {
+                log('cookies-output', '⚠️ No hay cookies almacenadas', 'warning');
+            }
+        }
+
+        async function testLogout() {
+            log('logout-output', '⏳ Cerrando sesión...', 'warning');
+            
+            try {
+                const response = await fetch(`${API_URL}/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    log('logout-output', `✅ Sesión cerrada\n${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    log('logout-output', `❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log('logout-output', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-ejecutar al cargar
+        window.onload = function() {
+            console.log('🔍 Página de debug cargada');
+            testServer();
+        };
+    </script>
+</body>
+</html>

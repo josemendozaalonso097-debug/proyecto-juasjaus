@@ -1,0 +1,260 @@
+================================================================
+CHATBOT CBTIS 258 — LÓGICA COMPLETA
+Asistente virtual "Cobra"
+================================================================
+
+REGLAS GENERALES
+----------------
+- Siempre se muestran 3 opciones a la vez
+- Hay 2 tipos de nodo:
+    [RESPUESTA]  → el bot muestra el texto y luego pregunta
+                   "¿Hay algo más en lo que te pueda ayudar?"
+                   El ícono cambia a CobraDespedida y vuelve al menú raíz
+    [SUBMENÚ]    → el bot muestra 3 opciones nuevas (un nivel más abajo)
+                   Aparece un botón "← Volver" para regresar
+- El ícono de la Cobra en el header cambia según el contexto (ver sección ÍCONOS)
+
+
+================================================================
+ÍCONOS DINÁMICOS
+================================================================
+
+CobraBienvenida   → Mensaje inicial + menú raíz (las 4 categorías)
+CobraDinero       → Todo lo relacionado con pagos, tienda y precios
+CobraPape         → Flujo de subida de papelería
+CobraOrienta      → Todo el flujo de Orientación Educativa
+CobraApoyo        → Preguntas sobre becas y apoyos económicos
+CobraDuda         → Perfil, navegación, contacto (fallback general)
+CobraDespedida    → Siempre que aparece el botón "Volver al inicio"
+                    (justo después de mostrar una RESPUESTA final)
+
+
+================================================================
+MENSAJE INICIAL
+================================================================
+
+Ícono: CobraBienvenida
+
+Bot dice:
+"Hola, soy Cobra, el asistente virtual del CBTis 258.
+¿En qué te puedo ayudar hoy?"
+
+Opciones del menú raíz:
+  1. Pagos y colegiaturas
+  2. Subir papelería escolar
+  3. Orientación educativa
+  4. Mi cuenta y perfil
+
+
+================================================================
+CATEGORÍA 1 — PAGOS Y COLEGIATURAS
+Ícono de categoría: CobraDinero
+================================================================
+
+Opciones:
+  1. ¿Cuánto cuesta la colegiatura?        [RESPUESTA]
+  2. ¿Cómo puedo pagar?                    [SUBMENÚ]
+  3. Ver historial y descargar facturas    [RESPUESTA]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P1. ¿Cuánto cuesta la colegiatura?
+    Ícono: CobraDinero
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "La colegiatura mensual es de $3,000 MXN. Los períodos de
+    cobro son en enero (1er semestre) y julio (2do semestre).
+    Revisa tu estado de pagos en la pantalla principal."
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P2. ¿Cómo puedo pagar?
+    Ícono: CobraDinero
+    Tipo: SUBMENÚ
+
+    Bot dice: "Claro, aquí tienes las opciones:"
+
+    Opciones:
+      2.1. Tarjeta de crédito/débito    [RESPUESTA]
+      2.2. OXXO o transferencia SPEI    [RESPUESTA]
+      2.3. Efectivo en caja escolar     [RESPUESTA]
+
+    P2.1. Tarjeta de crédito/débito
+          Ícono: CobraDinero
+          Tipo: RESPUESTA
+          Bot dice:
+          "Ve a Tienda → agrega al carrito → Pagar ahora → Tarjeta.
+          Aceptamos Visa, Mastercard y AMEX. El comprobante en PDF
+          se descarga automáticamente."
+
+    P2.2. OXXO o transferencia SPEI
+          Ícono: CobraDinero
+          Tipo: RESPUESTA
+          Bot dice:
+          "Selecciona Depósito OXXO o Transferencia bancaria.
+          Te mostramos los datos del CBTis 258. Sube tu comprobante
+          y quedará en estado Pendiente hasta verificación (1-2 días)."
+
+    P2.3. Efectivo en caja escolar
+          Ícono: CobraDinero
+          Tipo: RESPUESTA
+          Bot dice:
+          "Pasa a la caja con tu monto exacto de $3,000 MXN.
+          Horario: lun-vie 8:00-14:00 h, jueves hasta 18:00 h."
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P3. Ver historial y descargar facturas
+    Ícono: CobraDinero
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "En tu panel principal presiona Historial de Pagos. Verás
+    todas tus compras con fecha, monto y estado. Desde ahí puedes
+    descargar todas tus facturas en PDF."
+
+
+================================================================
+CATEGORÍA 2 — SUBIR PAPELERÍA ESCOLAR
+Ícono de categoría: CobraPape
+================================================================
+
+Opciones:
+  1. ¿Cómo subo mi papelería?    [RESPUESTA]
+  2. (solo hay una opción aquí, las otras 2 no aplican)
+
+NOTA: Esta categoría tiene respuesta directa, sin submenú.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P1. ¿Cómo subo mi papelería?
+    Ícono: CobraPape
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "Presiona Subir Papelería en tu panel (ícono naranja).
+    Llena datos del alumno y del tutor, selecciona el tipo de
+    trámite (inscripción, reinscripción, beca, constancia u otro),
+    arrastra tus archivos (PDF, JPG, PNG — máx 5 MB c/u, hasta
+    10 archivos) y presiona Enviar Documentos."
+
+
+================================================================
+CATEGORÍA 3 — ORIENTACIÓN EDUCATIVA
+Ícono de categoría: CobraOrienta
+================================================================
+
+Opciones:
+  1. Reportar un incidente          [RESPUESTA]
+  2. Presentar una queja formal     [RESPUESTA]
+  3. Cita con psicólogo o buzón     [SUBMENÚ]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P1. Reportar un incidente
+    Ícono: CobraOrienta
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "En el modal de Orientación, ve a la pestaña Reportes.
+    Describe lo ocurrido con detalle y presiona Enviar Reporte.
+    El área de Orientación Educativa revisará tu caso a la brevedad."
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P2. Presentar una queja formal
+    Ícono: CobraOrienta
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "Ve a la pestaña Quejas. Selecciona el tipo: bullying, mal
+    trato de trabajador, inconformidad académica, instalaciones
+    en mal estado u otro. Agrega detalles y presiona Enviar Queja."
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P3. Cita con psicólogo o buzón
+    Ícono: CobraOrienta
+    Tipo: SUBMENÚ
+
+    Bot dice: "Claro, aquí tienes las opciones:"
+
+    Opciones:
+      3.1. Solicitar cita con psicólogo    [RESPUESTA]
+      3.2. Enviar sugerencia al buzón      [RESPUESTA]
+      3.3. Becas y apoyos disponibles      [RESPUESTA]
+
+    P3.1. Solicitar cita con psicólogo
+          Ícono: CobraOrienta
+          Tipo: RESPUESTA
+          Bot dice:
+          "Ve a la pestaña Citas. Escribe el motivo (es 100%
+          confidencial) y elige turno matutino (7-13 h) o
+          vespertino (13-19 h). El psicólogo se pondrá en
+          contacto contigo."
+
+    P3.2. Enviar sugerencia al buzón
+          Ícono: CobraOrienta
+          Tipo: RESPUESTA
+          Bot dice:
+          "Ve a la pestaña Buzón en el modal de Orientación.
+          Escribe tu sugerencia para mejorar el plantel y
+          presiona Enviar al Buzón. Tu comentario llega
+          directo a la dirección del plantel."
+
+    P3.3. Becas y apoyos disponibles
+          Ícono: CobraApoyo
+          Tipo: RESPUESTA
+          Bot dice:
+          "Becas disponibles:
+          - Becarios de la Transformación: promedio >= 9.0, 50% descuento
+          - Beca Benito Juárez: situación económica comprobada, $1,900/mes
+          - Beca Deportiva/Cultural: participación activa, 30% descuento
+          - Beca Martínez Sada: 2 hermanos = 15% c/u, 3 o más = 20% c/u
+          Solicítalas en el Departamento de Becas al inicio del semestre."
+
+
+================================================================
+CATEGORÍA 4 — MI CUENTA Y PERFIL
+Ícono de categoría: CobraDuda
+================================================================
+
+Opciones:
+  1. Actualizar datos de perfil      [RESPUESTA]
+  2. Navegar entre panel y tienda    [RESPUESTA]
+  3. Información y contacto          [RESPUESTA]
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P1. Actualizar datos de perfil
+    Ícono: CobraDuda
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "Presiona tu foto de perfil en el header. Puedes cambiar
+    nombre (sin límite), rol (máx. 3 veces) y semestre (máx.
+    10 veces). También puedes subir una nueva foto (máx. 3 MB).
+    Los intentos restantes se muestran junto a cada campo."
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P2. Navegar entre panel y tienda
+    Ícono: CobraDuda
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "Desde el panel principal presiona Ingresar a Tienda.
+    Desde la tienda, abre el menú lateral tocando el logo del
+    CBTis 258 en el header y selecciona Ir al Tablero.
+    Tu sesión se mantiene activa en ambas páginas."
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+P3. Información y contacto
+    Ícono: CobraDuda
+    Tipo: RESPUESTA
+
+    Bot dice:
+    "Tel: +52 (81) 8397-1666
+    Email: cbtis258.dir@dgeti.sems.gob.mx
+    Horario: lun-vie 8:00-14:00 h, jueves hasta 18:00 h
+    Dirección: Dr. Plinio D. Ordóñez #801,
+    Col. Hacienda del Topo, Gral. Escobedo, N.L."
+
+
+================================================================
+FIN DEL DOCUMENTO
+Implementación: ver chatbot_cbtis258.html
+Diseño visual: Antigravity
+================================================================

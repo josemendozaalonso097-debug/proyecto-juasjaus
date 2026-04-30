@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Chatbot Demo — CBTis 258</title>
+<style>
+  body { font-family: 'Montserrat', sans-serif; background: #f0f0f0; margin: 0; min-height: 100vh; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     CHATBOT CBTis 258 — Componente autocontenido
+     Dependencias: ninguna (vanilla JS + CSS puro)
+     Para integrar: copia todo lo de abajo y pégalo antes de </body>
+     Reemplaza las rutas de CobraXxx.png con tus imágenes reales
+============================================================ -->
+
+<!-- FAB: botón flotante para abrir el chat -->
+<button id="chat-fab" aria-label="Abrir asistente">
+  <img src="CobraBienvenida.png" alt="Cobra"
+       onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+       style="width:32px;height:32px;object-fit:contain;border-radius:50%">
+  <span style="display:none;width:32px;height:32px;align-items:center;justify-content:center">
+    <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+    </svg>
+  </span>
+</button>
+
+<!-- Panel del chat -->
+<div id="chat-panel" aria-hidden="true">
+
+  <!-- Header -->
+  <div id="chat-header">
+    <div id="cobra-avatar">
+      <img id="cobra-img" src="CobraBienvenida.png" alt="Cobra"
+           onerror="this.style.display='none';document.getElementById('cobra-fallback').style.display='flex'">
+      <span id="cobra-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        </svg>
+      </span>
+    </div>
+    <div id="header-info">
+      <span id="header-name">Cobra — CBTis 258</span>
+      <span id="header-status"><span id="status-dot"></span>En línea</span>
+    </div>
+    <button id="chat-close" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="white" width="18" height="18">
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Área de mensajes -->
+  <div id="chat-messages">
+    <div class="date-divider"><span>Hoy</span></div>
+    <!-- Los mensajes se inyectan aquí por JS -->
+  </div>
+
+  <!-- Zona de opciones fija abajo -->
+  <div id="chat-options">
+    <div id="options-label">¿Sobre qué te ayudo?</div>
+    <div id="options-list"></div>
+  </div>
+
+</div>
+
+<!-- Overlay para cerrar en móvil -->
+<div id="chat-overlay"></div>
+
+
+<style>
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  --cobra-red:       #C0392B;
+  --cobra-red-dark:  #922B21;
+  --cobra-red-light: #FADBD8;
+  --chat-bg:         #ECE5DD;
+  --bubble-bot:      #FFFFFF;
+  --bubble-user:     #DCF8C6;
+  --options-bg:      #F7F3EF;
+  --opt-border:      #E8E0D8;
+  --text-main:       #111111;
+  --text-muted:      #8C8C8C;
+  --radius-bubble:   16px;
+  --panel-w:         340px;
+  --panel-h:         580px;
+}
+
+/* ── FAB ───────────────────────────────────────────────────── */
+#chat-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--cobra-red);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  box-shadow: 0 4px 16px rgba(192,57,43,0.45);
+  transition: transform .2s, box-shadow .2s;
+}
+#chat-fab:hover { transform: scale(1.08); box-shadow: 0 6px 22px rgba(192,57,43,0.55); }
+#chat-fab:active { transform: scale(0.96); }
+
+/* ── Overlay ───────────────────────────────────────────────── */
+#chat-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 9998;
+}
+#chat-overlay.visible { display: block; }
+
+/* ── Panel ─────────────────────────────────────────────────── */
+#chat-panel {
+  position: fixed;
+  bottom: 94px;
+  right: 24px;
+  width: var(--panel-w);
+  height: var(--panel-h);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+  transform: scale(0.85) translateY(30px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .25s cubic-bezier(.34,1.3,.64,1), opacity .2s ease;
+}
+#chat-panel.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+#chat-header {
+  background: var(--cobra-red);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+#cobra-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.35);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .3s;
+}
+#cobra-avatar img { width: 100%; height: 100%; object-fit: cover; }
+#header-info { flex: 1; display: flex; flex-direction: column; }
+#header-name { color: #fff; font-size: 14px; font-weight: 700; line-height: 1.2; }
+#header-status { color: rgba(255,255,255,0.8); font-size: 11px; display: flex; align-items: center; gap: 4px; }
+#status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #2ECC71;
+  display: inline-block;
+}
+#chat-close {
+  background: none; border: none; cursor: pointer;
+  padding: 4px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+#chat-close:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Mensajes ──────────────────────────────────────────────── */
+#chat-messages {
+  flex: 1;
+  background: var(--chat-bg);
+  overflow-y: auto;
+  padding: 12px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scroll-behavior: smooth;
+}
+#chat-messages::-webkit-scrollbar { width: 3px; }
+#chat-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+
+.date-divider {
+  text-align: center;
+  margin: 4px 0 6px;
+}
+.date-divider span {
+  background: #D4C9BF;
+  color: #6B5D53;
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+
+/* Fila de burbuja */
+.msg-row { display: flex; align-items: flex-end; gap: 6px; }
+.msg-row.user { justify-content: flex-end; }
+
+.msg-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--cobra-red);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.bubble-wrap { display: flex; flex-direction: column; max-width: 210px; }
+.bubble-wrap.user { align-items: flex-end; }
+
+.bubble {
+  padding: 8px 11px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-main);
+  word-break: break-word;
+}
+.bubble.bot {
+  background: var(--bubble-bot);
+  border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.09);
+}
+.bubble.user {
+  background: var(--bubble-user);
+  border-radius: var(--radius-bubble) var(--radius-bubble) 4px var(--radius-bubble);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.09);
+}
+.bubble-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  padding: 0 2px;
+}
+
+/* Typing dots */
+.typing-dots {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--bubble-bot);
+  border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 4px;
+  width: fit-content;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.09);
+}
+.typing-dot {
+  width: 7px; height: 7px;
+  background: #B0B0B0;
+  border-radius: 50%;
+  animation: tdot 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .18s; }
+.typing-dot:nth-child(3) { animation-delay: .36s; }
+@keyframes tdot {
+  0%,80%,100% { opacity: 0.3; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* ── Opciones ──────────────────────────────────────────────── */
+#chat-options {
+  background: var(--options-bg);
+  border-top: 1px solid var(--opt-border);
+  padding: 10px 10px 12px;
+  flex-shrink: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+#chat-options::-webkit-scrollbar { width: 2px; }
+#chat-options::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); }
+#options-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+  padding-left: 2px;
+}
+.opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--opt-border);
+  border-radius: 22px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, transform .1s;
+  font-family: inherit;
+}
+.opt-btn:hover { background: #FDECEA; border-color: var(--cobra-red-light); }
+.opt-btn:active { transform: scale(0.98); }
+.opt-btn:last-child { margin-bottom: 0; }
+
+.opt-icon {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--cobra-red-light);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.opt-icon img { width: 18px; height: 18px; object-fit: contain; }
+.opt-icon svg { width: 14px; height: 14px; }
+
+.opt-text {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+.opt-chevron { color: var(--cobra-red); flex-shrink: 0; }
+.opt-chevron svg { width: 14px; height: 14px; display: block; }
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--cobra-red);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 2px 7px;
+  font-family: inherit;
+  width: 100%;
+}
+.back-btn svg { width: 12px; height: 12px; }
+
+/* ── Responsive móvil ──────────────────────────────────────── */
+@media (max-width: 420px) {
+  #chat-panel {
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 92vh;
+    border-radius: 20px 20px 0 0;
+  }
+  #chat-fab { bottom: 16px; right: 16px; }
+}
+</style>
+
+<script>
+(function () {
+
+  /* ── Árbol de conversación ─────────────────────────────── */
+  /* icon: nombre del archivo sin extensión, ej. "CobraDinero"
+     El sistema intenta cargar CobraDinero.png.
+     Si la imagen no existe muestra el fallback SVG. */
+
+  const TREE = {
+    label: "¿Sobre qué te ayudo?",
+    icon: "CobraBienvenida",
+    opts: [
+      {
+        text: "Pagos y colegiaturas",
+        icon: "CobraDinero",
+        sub: {
+          label: "Pagos — elige tu duda:",
+          icon: "CobraDinero",
+          opts: [
+            {
+              text: "¿Cuánto cuesta la colegiatura?",
+              icon: "CobraDinero",
+              answer: "La colegiatura mensual es de $3,000 MXN. Los períodos de cobro son en enero (1er semestre) y julio (2do semestre). Revisa tu estado de pagos en la pantalla principal."
+            },
+            {
+              text: "¿Cómo puedo pagar?",
+              icon: "CobraDinero",
+              sub: {
+                label: "Elige tu método de pago:",
+                icon: "CobraDinero",
+                opts: [
+                  {
+                    text: "Tarjeta de crédito/débito",
+                    icon: "CobraDinero",
+                    answer: "Ve a Tienda → agrega al carrito → Pagar ahora → Tarjeta. Aceptamos Visa, Mastercard y AMEX. El comprobante en PDF se descarga automáticamente."
+                  },
+                  {
+                    text: "OXXO o transferencia SPEI",
+                    icon: "CobraDinero",
+                    answer: "Selecciona Depósito OXXO o Transferencia bancaria. Te mostramos los datos del CBTis 258. Sube tu comprobante y quedará en estado Pendiente hasta verificación (1–2 días)."
+                  },
+                  {
+                    text: "Efectivo en caja escolar",
+                    icon: "CobraDinero",
+                    answer: "Pasa a la caja con tu monto exacto de $3,000 MXN. Horario: lun–vie 8:00–14:00 h, jueves hasta 18:00 h."
+                  }
+                ]
+              }
+            },
+            {
+              text: "Ver historial y descargar facturas",
+              icon: "CobraDinero",
+              answer: "En tu panel principal presiona Historial de Pagos. Verás todas tus compras con fecha, monto y estado. Desde ahí puedes descargar todas tus facturas en PDF."
+            }
+          ]
+        }
+      },
+      {
+        text: "Subir papelería escolar",
+        icon: "CobraPape",
+        answer: "Presiona Subir Papelería en tu panel (ícono naranja). Llena datos del alumno y del tutor, selecciona el tipo de trámite (inscripción, reinscripción, beca, etc.), arrastra tus archivos (PDF, JPG, PNG — máx 5 MB c/u, hasta 10 archivos) y presiona Enviar Documentos."
+      },
+      {
+        text: "Orientación educativa",
+        icon: "CobraOrienta",
+        sub: {
+          label: "Orientación — ¿qué necesitas?",
+          icon: "CobraOrienta",
+          opts: [
+            {
+              text: "Reportar un incidente",
+              icon: "CobraOrienta",
+              answer: "En el modal de Orientación, ve a la pestaña Reportes. Describe lo ocurrido con detalle y presiona Enviar Reporte. El área de Orientación Educativa revisará tu caso a la brevedad."
+            },
+            {
+              text: "Presentar una queja formal",
+              icon: "CobraOrienta",
+              answer: "Ve a la pestaña Quejas. Selecciona el tipo (bullying, mal trato de trabajador, inconformidad académica, instalaciones, etc.), agrega detalles y presiona Enviar Queja."
+            },
+            {
+              text: "Cita con psicólogo o buzón",
+              icon: "CobraOrienta",
+              sub: {
+                label: "¿Qué necesitas?",
+                icon: "CobraOrienta",
+                opts: [
+                  {
+                    text: "Solicitar cita con psicólogo",
+                    icon: "CobraOrienta",
+                    answer: "Ve a la pestaña Citas. Escribe el motivo de la cita (tu información es 100% confidencial) y elige turno matutino (7–13 h) o vespertino (13–19 h). El psicólogo se pondrá en contacto contigo."
+                  },
+                  {
+                    text: "Enviar sugerencia al buzón",
+                    icon: "CobraOrienta",
+                    answer: "Ve a la pestaña Buzón en el modal de Orientación. Escribe tu sugerencia para mejorar el plantel y presiona Enviar al Buzón. Tu comentario llega directo a la dirección."
+                  },
+                  {
+                    text: "Becas y apoyos disponibles",
+                    icon: "CobraApoyo",
+                    answer: "Becas disponibles: Becarios de la Transformación (promedio ≥ 9.0, 50% descuento), Beca Benito Juárez ($1,900/mes), Beca Deportiva/Cultural (30% descuento), Beca Martínez Sada (15–20% para hermanos). Solicítalas en el Departamento de Becas."
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        text: "Mi cuenta y perfil",
+        icon: "CobraDuda",
+        sub: {
+          label: "Cuenta — ¿qué necesitas?",
+          icon: "CobraDuda",
+          opts: [
+            {
+              text: "Actualizar datos de perfil",
+              icon: "CobraDuda",
+              answer: "Presiona tu foto de perfil en el header. Puedes cambiar nombre (sin límite), rol (máx. 3 veces) y semestre (máx. 10 veces). También puedes subir una nueva foto de perfil (máx. 3 MB). Los intentos restantes se muestran junto a cada campo."
+            },
+            {
+              text: "Navegar entre panel y tienda",
+              icon: "CobraDuda",
+              answer: "Desde el panel principal presiona Ingresar a Tienda. Desde la tienda, abre el menú lateral tocando el logo del CBTis 258 en el header y selecciona Ir al Tablero. Tu sesión se mantiene activa en ambas páginas."
+            },
+            {
+              text: "Información y contacto",
+              icon: "CobraDuda",
+              answer: "Tel: +52 (81) 8397-1666 · Email: cbtis258.dir@dgeti.sems.gob.mx · Horario: lun–vie 8:00–14:00 h, jueves hasta 18:00 h · Dirección: Dr. Plinio D. Ordóñez #801, Col. Hacienda del Topo, Gral. Escobedo, N.L."
+            }
+          ]
+        }
+      }
+    ]
+  };
+
+  /* ── Estado ────────────────────────────────────────────── */
+  let stack   = [];
+  let current = TREE;
+  let isOpen  = false;
+
+  /* ── Elementos ─────────────────────────────────────────── */
+  const fab       = document.getElementById('chat-fab');
+  const panel     = document.getElementById('chat-panel');
+  const overlay   = document.getElementById('chat-overlay');
+  const closeBtn  = document.getElementById('chat-close');
+  const msgArea   = document.getElementById('chat-messages');
+  const optArea   = document.getElementById('chat-options');
+  const optLabel  = document.getElementById('options-label');
+  const optList   = document.getElementById('options-list');
+  const cobraImg  = document.getElementById('cobra-img');
+  const cobraFb   = document.getElementById('cobra-fallback');
+
+  /* ── Helpers ───────────────────────────────────────────── */
+  function nowTime() {
+    const d = new Date();
+    return `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+
+  function scrollBottom() {
+    msgArea.scrollTop = msgArea.scrollHeight;
+  }
+
+  /* Cambia el ícono de la Cobra en el header */
+  function setCobra(iconName) {
+    const src = `${iconName}.png`;
+    cobraImg.style.display = '';
+    cobraFb.style.display  = 'none';
+    cobraImg.src = src;
+    cobraImg.onerror = function () {
+      this.style.display = 'none';
+      cobraFb.style.display = 'flex';
+    };
+  }
+
+  /* Crea el ícono pequeño para cada opción */
+  function makeOptIcon(iconName) {
+    const wrap = document.createElement('div');
+    wrap.className = 'opt-icon';
+    const img = document.createElement('img');
+    img.src = `${iconName}.png`;
+    img.alt = iconName;
+    img.onerror = function () {
+      this.remove();
+      wrap.innerHTML = `<svg viewBox="0 0 24 24" fill="#C0392B"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>`;
+    };
+    wrap.appendChild(img);
+    return wrap;
+  }
+
+  /* Crea una burbuja del bot */
+  function addBotBubble(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg viewBox="0 0 24 24" fill="white" width="14" height="14">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        </svg>
+      </div>
+      <div class="bubble-wrap">
+        <div class="bubble bot">${text}</div>
+        <div class="bubble-time">${nowTime()}</div>
+      </div>`;
+    msgArea.appendChild(row);
+    scrollBottom();
+  }
+
+  /* Crea una burbuja del usuario */
+  function addUserBubble(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = `
+      <div class="bubble-wrap user">
+        <div class="bubble user">${text}</div>
+        <div class="bubble-time" style="text-align:right">${nowTime()} ✓✓</div>
+      </div>`;
+    msgArea.appendChild(row);
+    scrollBottom();
+  }
+
+  /* Muestra animación de escritura y luego llama al callback */
+  function withTyping(ms, callback) {
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.id = 'typing-row';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg viewBox="0 0 24 24" fill="white" width="14" height="14">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        </svg>
+      </div>
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>`;
+    msgArea.appendChild(row);
+    scrollBottom();
+    setTimeout(() => {
+      row.remove();
+      callback();
+    }, ms);
+  }
+
+  /* Renderiza las opciones del nodo actual */
+  function renderOptions(node) {
+    optList.innerHTML = '';
+    optLabel.textContent = node.label || '¿Qué necesitas?';
+    setCobra(node.icon || 'CobraBienvenida');
+
+    if (stack.length > 0) {
+      const back = document.createElement('button');
+      back.className = 'back-btn';
+      back.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="#C0392B"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Volver`;
+      back.onclick = () => {
+        current = stack.pop();
+        renderOptions(current);
+      };
+      optList.appendChild(back);
+    }
+
+    node.opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.appendChild(makeOptIcon(opt.icon));
+
+      const label = document.createElement('span');
+      label.className = 'opt-text';
+      label.textContent = opt.text;
+      btn.appendChild(label);
+
+      const chev = document.createElement('span');
+      chev.className = 'opt-chevron';
+      chev.innerHTML = `<svg viewBox="0 0 24 24" fill="#C0392B"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>`;
+      btn.appendChild(chev);
+
+      btn.onclick = () => handleOption(opt);
+      optList.appendChild(btn);
+    });
+  }
+
+  /* Maneja el clic en una opción */
+  function handleOption(opt) {
+    addUserBubble(opt.text);
+    setCobra(opt.icon || 'CobraDuda');
+
+    /* Ocultar opciones mientras escribe */
+    optArea.style.opacity = '0.4';
+    optArea.style.pointerEvents = 'none';
+
+    withTyping(900, () => {
+      optArea.style.opacity = '';
+      optArea.style.pointerEvents = '';
+
+      if (opt.answer) {
+        addBotBubble(opt.answer);
+        /* Después de la respuesta, volver al inicio con CobraDespedida */
+        withTyping(700, () => {
+          addBotBubble('¿Hay algo más en lo que te pueda ayudar?');
+          setCobra('CobraDespedida');
+          stack = [];
+          current = TREE;
+          renderOptions(current);
+        });
+      } else if (opt.sub) {
+        addBotBubble('Claro, aquí tienes las opciones:');
+        stack.push(current);
+        current = opt.sub;
+        renderOptions(current);
+      }
+    });
+  }
+
+  /* ── Abrir / cerrar ─────────────────────────────────────── */
+  function openChat() {
+    isOpen = true;
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    overlay.classList.add('visible');
+    fab.style.transform = 'scale(0.85)';
+    fab.style.opacity   = '0.7';
+  }
+
+  function closeChat() {
+    isOpen = false;
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    overlay.classList.remove('visible');
+    fab.style.transform = '';
+    fab.style.opacity   = '';
+  }
+
+  fab.addEventListener('click', () => isOpen ? closeChat() : openChat());
+  closeBtn.addEventListener('click', closeChat);
+  overlay.addEventListener('click', closeChat);
+
+  /* Cerrar con Escape */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && isOpen) closeChat();
+  });
+
+  /* ── Inicializar ────────────────────────────────────────── */
+  addBotBubble('Hola, soy <b>Cobra</b>, el asistente virtual del CBTis 258. ¿En qué te puedo ayudar hoy?');
+  renderOptions(TREE);
+
+})();
+</script>
+
+</body>
+</html>
