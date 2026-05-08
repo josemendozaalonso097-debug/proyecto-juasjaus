@@ -186,7 +186,7 @@ html.dark .cb-bubble.cb-usr { background-color: #94272C !important; color: white
         border-radius: 20px !important;
     }
 
-    /* Modales Estilo App (Sheet) */
+    /* Modales Estilo App (Sheet) — content elements only */
     .modal-historial-content,
     .modal-informacion-content,
     .modal-detalle-content,
@@ -208,6 +208,7 @@ html.dark .cb-bubble.cb-usr { background-color: #94272C !important; color: white
         max-height: 88vh !important;
         overflow-y: auto !important;
         animation: slideUpMobile 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+        overscroll-behavior: contain;
     }
 
     /* Fix historial overflow */
@@ -233,12 +234,129 @@ html.dark .cb-bubble.cb-usr { background-color: #94272C !important; color: white
         to { transform: translateY(0); }
     }
 
-    .modal-historial, .modal-informacion, .modal-detalle, .modal-papeleria, .modal-productos,
-    #modalMetodoPago, .modal-deposito, .modal-transferencia, .modal-oxxopay {
+    /* ⚠️ NO usar display:flex !important en overlays.
+       Solo posicionar como flex cuando JS ya les puso display:block/flex */
+    .modal-historial[style*="display: block"],
+    .modal-historial[style*="display: flex"],
+    .modal-historial[style*="display:block"],
+    .modal-historial[style*="display:flex"],
+    .modal-informacion[style*="display: block"],
+    .modal-informacion[style*="display: flex"],
+    .modal-informacion[style*="display:block"],
+    .modal-informacion[style*="display:flex"],
+    .modal-detalle[style*="display: block"],
+    .modal-detalle[style*="display: flex"],
+    .modal-detalle[style*="display:block"],
+    .modal-detalle[style*="display:flex"],
+    .modal-papeleria[style*="display: block"],
+    .modal-papeleria[style*="display: flex"],
+    .modal-papeleria[style*="display:block"],
+    .modal-papeleria[style*="display:flex"],
+    .modal-productos[style*="display: block"],
+    .modal-productos[style*="display: flex"],
+    .modal-productos[style*="display:block"],
+    .modal-productos[style*="display:flex"],
+    #modalMetodoPago[style*="display: block"],
+    #modalMetodoPago[style*="display: flex"],
+    #modalMetodoPago[style*="display:block"],
+    #modalMetodoPago[style*="display:flex"],
+    .modal-deposito[style*="display: block"],
+    .modal-deposito[style*="display: flex"],
+    .modal-deposito[style*="display:block"],
+    .modal-deposito[style*="display:flex"],
+    .modal-transferencia[style*="display: block"],
+    .modal-transferencia[style*="display: flex"],
+    .modal-transferencia[style*="display:block"],
+    .modal-transferencia[style*="display:flex"],
+    .modal-oxxopay[style*="display: block"],
+    .modal-oxxopay[style*="display: flex"],
+    .modal-oxxopay[style*="display:block"],
+    .modal-oxxopay[style*="display:flex"],
+    #modalOxxoPay[style*="display: block"],
+    #modalOxxoPay[style*="display: flex"],
+    #modalOxxoPay[style*="display:block"],
+    #modalOxxoPay[style*="display:flex"] {
         display: flex !important;
         align-items: flex-end !important;
         padding: 0 !important;
     }
+
+    /* Producto modal grid: single column on phones */
+    .productos-modal-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        padding: 0 !important;
+    }
+
+    /* Form responsive inside modals */
+    .form {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .form .split {
+        flex-direction: column !important;
+        padding: 0 12px !important;
+    }
+
+    .form .split label {
+        width: 100% !important;
+    }
+
+    /* Add-card-page (tarjeta form) */
+    .add-card-page {
+        align-items: flex-end !important;
+    }
+    .add-card-page .form {
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+
+    /* Dato bancario stacked on mobile */
+    .dato-bancario {
+        flex-direction: column;
+        gap: 4px;
+    }
+    .valor-container {
+        justify-content: flex-start;
+    }
+
+    /* Metodos grid */
+    .metodos-grid {
+        grid-template-columns: 1fr !important;
+        padding: 16px !important;
+        gap: 12px !important;
+    }
 }
 
+/* ── Dark Mode for MOBILE modals & inline-styled elements ── */
+@media (max-width: 1023px) {
+    html.dark #modalMetodoPago > div,
+    html.dark #modalOxxoPay > div {
+        background-color: #1e293b !important;
+    }
+    html.dark #modalMetodoPago > div *,
+    html.dark #modalOxxoPay > div * {
+        color: #f1f5f9;
+    }
+    /* Payment method buttons in dark mode */
+    html.dark #modalMetodoPago button[onclick*="seleccionarMetodo"] {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+    }
+    html.dark #modalMetodoPago button[onclick*="seleccionarMetodo"]:hover {
+        background: #1e293b !important;
+        border-color: #f20d0d !important;
+    }
+    /* OxxoPay barcode area dark */
+    html.dark #modalOxxoPay [style*="background: #f8f9fa"] {
+        background-color: #0f172a !important;
+    }
+    /* Gradient headers keep color always */
+    html.dark [style*="background: linear-gradient(135deg, #f20d0d"] *,
+    html.dark [style*="background:linear-gradient(135deg, #f20d0d"] * {
+        color: white !important;
+    }
+}
 

@@ -3,7 +3,7 @@
  * Cache estático para assets y shell de la app.
  */
 
-const CACHE_NAME = 'cbtis258-v3';
+const CACHE_NAME = 'cbtis258-v4';
 const ASSETS_TO_CACHE = [
     '/login.html',
     '/login.css',

@@ -10,9 +10,10 @@
 body{
     background-color: #c9d6ff;
     background: linear-gradient(to right, #e2e2e2, #c9d6ff);
-    min-width: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 .cab-header{
@@ -586,6 +587,7 @@ body{
     0px 12px 26px rgba(0, 0, 0, 0.1),
     0px 0px 0px rgba(0, 0, 0, 0.1);
   width: 768px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -688,7 +690,8 @@ body{
 }
 
 .form .split label {
-  width: 2000px;
+  width: 100%;
+  min-width: 0;
 }
 .form .checkout-btn {
   margin: 20px auto 30px auto;
@@ -1353,7 +1356,8 @@ body{
 
   /* 1️⃣ ARREGLAR EL BODY */
   body {
-    min-width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
     overflow-x: hidden;
   }
 
@@ -1364,7 +1368,7 @@ body{
   }
 
   .logo {
-    height: 70px !important; /* antes 250px */
+    height: 70px !important;
   }
 
   .logo-section h1 {
@@ -1402,7 +1406,101 @@ body{
     font-size: 11px;
   }
 
-}
+  /* 8️⃣ FORMULARIO DE PAGO RESPONSIVE */
+  .form {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px;
+  }
 
+  .form .split {
+    flex-direction: column;
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .form .split label {
+    width: 100% !important;
+  }
+
+  .form .label {
+    padding: 0 12px;
+  }
+
+  .form .checkout-btn {
+    width: 80%;
+  }
+
+  .historial-header {
+    padding: 20px 16px;
+  }
+
+  .historial-header h2 {
+    font-size: 1.4em;
+  }
+
+  /* 9️⃣ MODALES - GRID INTERNO */
+  .info-grid {
+    grid-template-columns: 1fr !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  .historial-layout {
+    grid-template-columns: 1fr !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .papeleria-container {
+    padding: 16px !important;
+  }
+
+  .detalle-contenido {
+    padding: 16px !important;
+  }
+
+  /* 🔟 MODAL CONTENIDOS MÁS COMPACTOS */
+  .modal-historial-content,
+  .modal-informacion-content,
+  .modal-detalle-content,
+  .modal-papeleria-content {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-historial[style*="display: block"],
+  .modal-historial[style*="display: flex"],
+  .modal-historial[style*="display:block"],
+  .modal-historial[style*="display:flex"],
+  .modal-informacion[style*="display: block"],
+  .modal-informacion[style*="display: flex"],
+  .modal-informacion[style*="display:block"],
+  .modal-informacion[style*="display:flex"],
+  .modal-detalle[style*="display: block"],
+  .modal-detalle[style*="display: flex"],
+  .modal-detalle[style*="display:block"],
+  .modal-detalle[style*="display:flex"],
+  .modal-papeleria[style*="display: block"],
+  .modal-papeleria[style*="display: flex"],
+  .modal-papeleria[style*="display:block"],
+  .modal-papeleria[style*="display:flex"] {
+    display: flex !important;
+    align-items: flex-end !important;
+  }
+
+  .upload-zone {
+    padding: 20px 16px;
+  }
+}
 
 

@@ -27,13 +27,24 @@ export function eliminarDelCarrito(index) {
 }
 
 export function actualizarCarrito() {
-    const carritoContainer = document.getElementById('carritoContainer');
-    if(!carritoContainer) return;
+    const containers = document.querySelectorAll('.carrito-container-inst');
+    if(containers.length === 0) return;
 
     localStorage.setItem('carrito', JSON.stringify(carrito));
 
+    const mobileWidget = document.getElementById('carrito-mobile-widget');
+    if (mobileWidget) {
+        if (carrito.length === 0) {
+            mobileWidget.style.display = 'none';
+        } else {
+            mobileWidget.style.display = 'block';
+        }
+    }
+
     if (carrito.length === 0) {
-        carritoContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No hay productos seleccionados</p>';
+        containers.forEach(container => {
+            container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No hay productos seleccionados</p>';
+        });
         return;
     }
     
@@ -68,7 +79,9 @@ export function actualizarCarrito() {
         </div>
     `;
     
-    carritoContainer.innerHTML = html;
+    containers.forEach(container => {
+        container.innerHTML = html;
+    });
 
     document.querySelectorAll('.btn-eliminar-item').forEach(btn => {
         btn.addEventListener('click', function() {

@@ -24,13 +24,13 @@
         }
     </script>
     <link rel="icon" href="../imgs/yameharte.png" type="image">
-    <link rel="stylesheet" href="tienda.css?v=4">
+    <link rel="stylesheet" href="tienda.css?v=5">
     
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     
-    <link rel="stylesheet" href="../css/base.css?v=4">
+    <link rel="stylesheet" href="../css/base.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
@@ -192,7 +192,7 @@
 <p style="text-align: center; color: #999; padding: 20px;">No hay productos seleccionados</p>
 </div>
 
-<button id="pay-button" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] pay-btn mt-6">
+<button id="pay-button" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] pay-btn pay-btn-inst mt-6">
 <span class="material-symbols-outlined">credit_card</span> PAGAR AHORA
 </button>
 </div>
@@ -210,6 +210,7 @@ Los comprobantes de pago digitales deben presentarse en ventanilla para la entre
 </main>
 <!-- Footer Section -->
 <div id="footer-container" style="display: contents;"></div>
+</div>
 
 
 <!-- Injected Modal Containers -->
@@ -316,8 +317,8 @@ Los comprobantes de pago digitales deben presentarse en ventanilla para la entre
             <span class="mob-title" style="font-family:'Manrope',sans-serif;font-weight:700;color:#1a1c1d;font-size:0.875rem;">Productos seleccionados</span>
           </div>
         </div>
-        <div id="carritoContainer" style="max-height:120px;overflow-y:auto;margin-bottom:10px;"></div>
-        <button id="pay-button" class="pay-btn" style="width:100%;background:linear-gradient(135deg,#af101a,#d32f2f);color:white;border-radius:12px;padding:14px;font-weight:700;border:none;cursor:pointer;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.9rem;">
+        <div id="carritoContainerMobile" class="carrito-container-inst" style="max-height:120px;overflow-y:auto;margin-bottom:10px;"></div>
+        <button id="pay-button-mobile" class="pay-btn pay-btn-inst" style="width:100%;background:linear-gradient(135deg,#af101a,#d32f2f);color:white;border-radius:12px;padding:14px;font-weight:700;border:none;cursor:pointer;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.9rem;">
           <span class="material-symbols-outlined" style="font-size:18px;">credit_card</span>
           Pagar Ahora
         </button>

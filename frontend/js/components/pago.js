@@ -118,8 +118,8 @@ export function inicializarPago(modo = 'principal') {
     }
 
     if (modo === 'tienda') {
-        const payBtn = document.getElementById('pay-button');
-        if (payBtn) payBtn.addEventListener('click', abrirModalMetodo);
+        const payBtns = document.querySelectorAll('.pay-btn-inst');
+        payBtns.forEach(btn => btn.addEventListener('click', abrirModalMetodo));
 
         // Depósito
         const uploadAreaDep = document.getElementById('uploadArea');
