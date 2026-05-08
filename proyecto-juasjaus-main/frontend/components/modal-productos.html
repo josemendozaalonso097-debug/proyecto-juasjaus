@@ -1,0 +1,14 @@
+<div class="modal" id="productModal">
+    <div class="modal-content" style="padding: 0; overflow: hidden;">
+        <!-- Header con degradado rojo -->
+        <div style="background: linear-gradient(135deg, #f20d0d, #6e0404); padding: 22px 28px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span class="material-symbols-outlined" id="modalIcon" style="color: white; font-size: 28px;">shopping_bag</span>
+                <h2 class="modal-title" id="modalTitle" style="color: white; font-size: 1.35em; font-weight: 700; margin: 0;">Libros</h2>
+            </div>
+            <button onclick="cerrarModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+        </div>
+        <div id="modalTabsNav"></div>
+        <div class="productos-modal-grid" id="productosGrid" style="padding: 20px;"></div>
+    </div>
+</div>

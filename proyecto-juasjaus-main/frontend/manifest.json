@@ -1,0 +1,18 @@
+{
+    "name": "CBTis 258 Financieros",
+    "short_name": "CBTis258",
+    "description": "Sistema de pagos y servicios escolares del CBTis 258",
+    "start_url": "/login.html",
+    "display": "standalone",
+    "background_color": "#f8f5f5",
+    "theme_color": "#94272C",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "imgs/yameharte.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

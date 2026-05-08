@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/bin/python3",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/backend/venv/lib/python3.13/site-packages"
@@ -8,3 +9,7 @@
     ]
 }
 
+=======
+    "postman.settings.dotenv-detection-notification-visibility": false
+}
+>>>>>>> e06db37b92d7f8d1bdae0cd35ca6e25288d7eac0
