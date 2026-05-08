@@ -1,67 +1,44 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Float, Text
-from sqlalchemy.orm import relationship
+from pydantic import BaseModel, EmailStr, Field
+from typing import List, Optional
 from datetime import datetime
-from ..database import Base
 
-class User(Base):
-    __tablename__ = "users"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String(100), nullable=False)
-    email = Column(String(120), unique=True, index=True, nullable=False)
-    password_hash = Column(String(200), nullable=True)  # Nullable para usuarios de Google
-    google_id = Column(String(100), unique=True, nullable=True)
-    profile_picture = Column(String(300), nullable=True)
-    is_verified = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    last_login = Column(DateTime, nullable=True)
-    
-    # Relaciones
-    compras = relationship("Compra", back_populates="user", cascade="all, delete-orphan")
-    password_resets = relationship("PasswordReset", back_populates="user", cascade="all, delete-orphan")
+# --- ESQUEMAS PARA PRODUCTOS ---
+class ProductoCompraSchema(BaseModel):
+    nombre: str
+    descripcion: Optional[str] = None
+    cantidad: int = 1
+    precio_unitario: float
+    precio_total: float
 
+# --- MODELO DE USUARIO ---
+class User(BaseModel):
+    nombre: str
+    email: EmailStr
+    password_hash: Optional[str] = None
+    google_id: Optional[str] = None
+    profile_picture: Optional[str] = None
+    is_verified: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_login: Optional[datetime] = None
+    role: str = "alumno"  # Para lo que pidió el profe
+    saldo: float = 0.0
 
-class PasswordReset(Base):
-    __tablename__ = "password_resets"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    token = Column(String(100), unique=True, nullable=False, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    expires_at = Column(DateTime, nullable=False)
-    used = Column(Boolean, default=False)
-    
-    # Relación
-    user = relationship("User", back_populates="password_resets")
+# --- MODELO DE CONTRASEÑA/OTP ---
+class PasswordReset(BaseModel):
+    user_email: str
+    token: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    expires_at: datetime
+    used: bool = False
 
-
-class Compra(Base):
-    __tablename__ = "compras"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    total = Column(Float, nullable=False)
-    estado = Column(String(50), default="Pendiente")  # Pendiente, Completado, Cancelado
-    metodo_pago = Column(String(50), nullable=True)  # Tarjeta, Efectivo, Transferencia
-    comprobante_url = Column(String(300), nullable=True)  # URL del comprobante subido
-    factura_url = Column(String(300), nullable=True)  # URL de la factura PDF
-    created_at = Column(DateTime, default=datetime.utcnow)
-    
-    # Relaciones
-    user = relationship("User", back_populates="compras")
-    productos = relationship("ProductoCompra", back_populates="compra", cascade="all, delete-orphan")
-
-
-class ProductoCompra(Base):
-    __tablename__ = "productos_compra"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    compra_id = Column(Integer, ForeignKey("compras.id"), nullable=False)
-    nombre = Column(String(200), nullable=False)
-    descripcion = Column(Text, nullable=True)
-    cantidad = Column(Integer, default=1)
-    precio_unitario = Column(Float, nullable=False)
-    precio_total = Column(Float, nullable=False)
-    
-    # Relación
-    compra = relationship("Compra", back_populates="productos")
+# --- MODELO DE COMPRA (Lo más importante) ---
+class Compra(BaseModel):
+    user_id: str  # Aquí guardaremos el ID del usuario como string
+    total: float
+    estado: str = "Pendiente"
+    metodo_pago: Optional[str] = None
+    comprobante_url: Optional[str] = None
+    factura_url: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    # En Mongo, los productos van AQUÍ ADENTRO directamente
+    productos: List[ProductoCompraSchema] = []

@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import secrets
+import random
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from bson import ObjectId
 
-from ..database import get_db
-from ..database_otp import get_otp_db
-from ..models.user import User, PasswordReset
-from ..models.otp import OTPCode
+# Importamos 'db' directamente de tu nuevo database.py para MongoDB
+from ..database import db 
 from ..schemas.user import (
     UserRegister, UserRegisterOTP, VerifyOTP, UserLogin, GoogleLogin, UserResponse, 
     Token, ForgotPassword, ResetPassword
@@ -29,7 +28,7 @@ async def ping():
     """Ruta de prueba"""
     return {
         "success": True,
-        "message": "🔐 Router de autenticación funcionando",
+        "message": "🔐 Router de autenticación conectado a MongoDB",
         "router": "auth"
     }
 
@@ -38,104 +37,99 @@ async def ping():
 # ============================================
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(user_data: UserRegister, db: Session = Depends(get_db)):
+async def register(user_data: UserRegister):
     """Registrar nuevo usuario con email y contraseña"""
     
     # Verificar si el email ya existe
-    existing_user = db.query(User).filter(User.email == user_data.email).first()
+    existing_user = await db.usuarios.find_one({"email": user_data.email})
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Este correo ya está registrado"
         )
     
-    # Crear nuevo usuario
-    new_user = User(
-        nombre=user_data.nombre,
-        email=user_data.email,
-        password_hash=hash_password(user_data.password),
-        is_verified=True  # Auto-verificado en desarrollo
-    )
+    # Crear nuevo usuario en formato Diccionario (Documento Mongo)
+    new_user = {
+        "nombre": user_data.nombre,
+        "email": user_data.email,
+        "password_hash": hash_password(user_data.password),
+        "is_verified": True,  # Auto-verificado en desarrollo
+        "role": "alumno",
+        "saldo": 0.0,
+        "created_at": datetime.utcnow(),
+        "google_id": None,
+        "profile_picture": None,
+        "last_login": None
+    }
     
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    resultado = await db.usuarios.insert_one(new_user)
+    user_id = str(resultado.inserted_id)
     
-    print(f"✅ Usuario registrado: {new_user.email}")
+    print(f"✅ Usuario registrado en Mongo: {new_user['email']}")
     
-    # Enviar email de bienvenida (async, no bloquea)
+    # Enviar email de bienvenida
     try:
-        await send_welcome_email(new_user.email, new_user.nombre)
+        await send_welcome_email(new_user["email"], new_user["nombre"])
     except Exception as e:
         print(f"⚠️ Error enviando email: {str(e)}")
     
     # Crear token JWT
-    access_token = create_access_token(data={"sub": new_user.email})
+    access_token = create_access_token(data={"sub": new_user["email"]})
     
-    # Crear respuesta con headers CORS explícitos
-    response_data = {
+    return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
-            "id": new_user.id,
-            "nombre": new_user.nombre,
-            "email": new_user.email,
-            "profile_picture": new_user.profile_picture,
-            "is_verified": new_user.is_verified,
-            "created_at": new_user.created_at.isoformat()
+            "id": user_id,
+            "nombre": new_user["nombre"],
+            "email": new_user["email"],
+            "profile_picture": new_user["profile_picture"],
+            "is_verified": new_user["is_verified"],
+            "created_at": new_user["created_at"].isoformat()
         }
     }
-    
-    return response_data
-
 
 # ============================================
 # REGISTRO OTP
 # ============================================
 
-import random
-
 @router.post("/register-send-otp", status_code=status.HTTP_200_OK)
-async def register_send_otp(user_data: UserRegisterOTP, db: Session = Depends(get_db), otp_db: Session = Depends(get_otp_db)):
-    """Validates user doesn't exist, creates an OTP, stores it, and sends the email"""
-    # 1. Verificar si el email ya existe en User
-    existing_user = db.query(User).filter(User.email == user_data.email).first()
+async def register_send_otp(user_data: UserRegisterOTP):
+    """Valida que no exista, crea OTP, lo guarda y manda email"""
+    
+    existing_user = await db.usuarios.find_one({"email": user_data.email})
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Este correo ya está registrado"
         )
         
-    # 2. Limpiar códigos OTP anteriores para este email
-    otp_db.query(OTPCode).filter(OTPCode.email == user_data.email).delete()
-    # Y limpiar los vencidos de paso
-    otp_db.query(OTPCode).filter(OTPCode.expires_at < datetime.utcnow()).delete()
-    otp_db.commit()
+    # Limpiar códigos OTP anteriores (y vencidos) para este email
+    await db.otps.delete_many({"email": user_data.email})
+    await db.otps.delete_many({"expires_at": {"$lt": datetime.utcnow()}})
     
-    # 3. Generar nuevo OTP
+    # Generar nuevo OTP
     code = f"{random.randint(0, 999999):06d}"
     expires_at = datetime.utcnow() + timedelta(minutes=2)
     
-    # 4. Guardar en OTP DB temporalmente todo el registro
-    new_otp = OTPCode(
-        email=user_data.email,
-        code=code,
-        password_hash=hash_password(user_data.password),
-        nombre=user_data.nombre,
-        rol=user_data.rol,
-        semestre=user_data.semestre,
-        expires_at=expires_at
-    )
-    otp_db.add(new_otp)
-    otp_db.commit()
+    # Guardar en Mongo temporalmente
+    new_otp = {
+        "email": user_data.email,
+        "code": code,
+        "password_hash": hash_password(user_data.password),
+        "nombre": user_data.nombre,
+        "rol": user_data.rol,
+        "semestre": user_data.semestre,
+        "expires_at": expires_at
+    }
+    await db.otps.insert_one(new_otp)
     
-    # 5. Enviar el correo con OTP
+    # Enviar el correo
     try:
         await send_otp_email(user_data.email, user_data.nombre, code)
         print(f"✅ OTP email enviado a: {user_data.email} con código {code}")
     except Exception as e:
         print(f"⚠️ Error enviando email OTP: {str(e)}")
-        # Seguimos igual para el flujo dev, you could return an error here
     
     return {
         "success": True,
@@ -144,131 +138,115 @@ async def register_send_otp(user_data: UserRegisterOTP, db: Session = Depends(ge
     }
 
 @router.post("/register-verify-otp", status_code=status.HTTP_201_CREATED)
-async def register_verify_otp(verification_data: VerifyOTP, db: Session = Depends(get_db), otp_db: Session = Depends(get_otp_db)):
-    """Verifies OTP, and if valid, creates the user and logs them in."""
-    # 1. Obtener el código
-    otp_record = otp_db.query(OTPCode).filter(
-        OTPCode.email == verification_data.email,
-        OTPCode.code == verification_data.code
-    ).first()
+async def register_verify_otp(verification_data: VerifyOTP):
+    """Verifica OTP y crea usuario"""
+    
+    otp_record = await db.otps.find_one({
+        "email": verification_data.email,
+        "code": verification_data.code
+    })
     
     if not otp_record:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Código incorrecto"
-        )
+        raise HTTPException(status_code=400, detail="Código incorrecto")
         
-    if otp_record.expires_at < datetime.utcnow():
-        otp_db.delete(otp_record)
-        otp_db.commit()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El código ha expirado"
-        )
+    if otp_record["expires_at"] < datetime.utcnow():
+        await db.otps.delete_one({"_id": otp_record["_id"]})
+        raise HTTPException(status_code=400, detail="El código ha expirado")
     
-    # 2. Verificar que no se haya registrado justo en el medio
-    existing_user = db.query(User).filter(User.email == verification_data.email).first()
+    # Verificar colisión de último momento
+    existing_user = await db.usuarios.find_one({"email": verification_data.email})
     if existing_user:
-        otp_db.delete(otp_record)
-        otp_db.commit()
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Este correo ya está registrado"
-        )
+        await db.otps.delete_one({"_id": otp_record["_id"]})
+        raise HTTPException(status_code=400, detail="Este correo ya está registrado")
     
-    # 3. Crear el usuario final en la BD principal
-    new_user = User(
-        nombre=otp_record.nombre,
-        email=otp_record.email,
-        password_hash=otp_record.password_hash,
-        is_verified=True
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    # Crear usuario final
+    new_user = {
+        "nombre": otp_record["nombre"],
+        "email": otp_record["email"],
+        "password_hash": otp_record["password_hash"],
+        "is_verified": True,
+        "role": otp_record.get("rol", "alumno"),
+        "saldo": 0.0,
+        "created_at": datetime.utcnow(),
+        "google_id": None,
+        "profile_picture": None,
+        "last_login": datetime.utcnow()
+    }
+    resultado = await db.usuarios.insert_one(new_user)
+    user_id = str(resultado.inserted_id)
     
-    print(f"✅ Usuario registrado exitosamente tras OTP: {new_user.email}")
+    print(f"✅ Usuario registrado tras OTP: {new_user['email']}")
     
-    # Enviar email de bienvenida (async, no bloquea)
     try:
-        await send_welcome_email(new_user.email, new_user.nombre)
+        await send_welcome_email(new_user["email"], new_user["nombre"])
     except Exception as e:
         print(f"⚠️ Error enviando email de bienvenida: {str(e)}")
     
-    # 4. Eliminar el OTP
-    otp_db.delete(otp_record)
-    otp_db.commit()
+    # Eliminar el OTP usado
+    await db.otps.delete_one({"_id": otp_record["_id"]})
     
-    # 5. Login / Devolver Token
-    access_token = create_access_token(data={"sub": new_user.email})
+    access_token = create_access_token(data={"sub": new_user["email"]})
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
-            "id": new_user.id,
-            "nombre": new_user.nombre,
-            "email": new_user.email,
-            "profile_picture": new_user.profile_picture,
-            "is_verified": new_user.is_verified,
-            "created_at": new_user.created_at.isoformat()
+            "id": user_id,
+            "nombre": new_user["nombre"],
+            "email": new_user["email"],
+            "profile_picture": new_user["profile_picture"],
+            "is_verified": new_user["is_verified"],
+            "created_at": new_user["created_at"].isoformat()
         }
     }
-
 
 # ============================================
 # LOGIN
 # ============================================
 
 @router.post("/login")
-async def login(credentials: UserLogin, db: Session = Depends(get_db)):
+async def login(credentials: UserLogin):
     """Login con email y contraseña"""
     
-    # Buscar usuario
-    user = db.query(User).filter(User.email == credentials.email).first()
+    user = await db.usuarios.find_one({"email": credentials.email})
     
-    if not user or not verify_password(credentials.password, user.password_hash):
+    if not user or not verify_password(credentials.password, user["password_hash"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email o contraseña incorrectos"
         )
     
     # Actualizar último login
-    user.last_login = datetime.utcnow()
-    db.commit()
+    await db.usuarios.update_one(
+        {"_id": user["_id"]},
+        {"$set": {"last_login": datetime.utcnow()}}
+    )
     
-    print(f"✅ Login exitoso: {user.email}")
+    print(f"✅ Login exitoso: {user['email']}")
     
-    # Crear token JWT
-    access_token = create_access_token(data={"sub": user.email})
+    access_token = create_access_token(data={"sub": user["email"]})
     
-    # Crear respuesta con headers CORS explícitos
-    response_data = {
+    return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
-            "id": user.id,
-            "nombre": user.nombre,
-            "email": user.email,
-            "profile_picture": user.profile_picture,
-            "is_verified": user.is_verified,
-            "created_at": user.created_at.isoformat()
+            "id": str(user["_id"]),
+            "nombre": user["nombre"],
+            "email": user["email"],
+            "profile_picture": user.get("profile_picture"),
+            "is_verified": user.get("is_verified", True),
+            "created_at": user["created_at"].isoformat()
         }
     }
-    
-    return response_data
-
 
 # ============================================
 # LOGIN CON GOOGLE
 # ============================================
 
 @router.post("/login/google")
-async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
+async def google_login(google_data: GoogleLogin):
     """Login con Google OAuth"""
-    
     try:
-        # Verificar el token con Google
         idinfo = id_token.verify_oauth2_token(
             google_data.token,
             google_requests.Request(),
@@ -276,63 +254,67 @@ async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
         )
         
         if idinfo['aud'] != settings.GOOGLE_CLIENT_ID:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token inválido"
-            )
+            raise HTTPException(status_code=401, detail="Token inválido")
         
         google_id = idinfo['sub']
         email = idinfo['email']
         nombre = idinfo.get('name', '')
         profile_picture = idinfo.get('picture', '')
         
-        # Buscar usuario por Google ID o email
-        user = db.query(User).filter(
-            (User.google_id == google_id) | (User.email == email)
-        ).first()
+        # Buscar usuario por Google ID o email ($or en Mongo)
+        user = await db.usuarios.find_one({
+            "$or": [{"google_id": google_id}, {"email": email}]
+        })
         
         if user:
-            # Usuario existente
-            if not user.google_id:
-                user.google_id = google_id
-            if not user.profile_picture:
-                user.profile_picture = profile_picture
-            user.is_verified = True
-            user.last_login = datetime.utcnow()
-        else:
-            # Crear nuevo usuario
-            user = User(
-                nombre=nombre,
-                email=email,
-                google_id=google_id,
-                profile_picture=profile_picture,
-                is_verified=True
+            # Actualizar datos si faltaban
+            update_data = {"last_login": datetime.utcnow(), "is_verified": True}
+            if not user.get("google_id"):
+                update_data["google_id"] = google_id
+            if not user.get("profile_picture"):
+                update_data["profile_picture"] = profile_picture
+                
+            await db.usuarios.update_one(
+                {"_id": user["_id"]},
+                {"$set": update_data}
             )
-            db.add(user)
+            user_id = str(user["_id"])
+            created_at = user["created_at"]
+        else:
+            # Crear nuevo usuario con Google
+            new_user = {
+                "nombre": nombre,
+                "email": email,
+                "google_id": google_id,
+                "profile_picture": profile_picture,
+                "is_verified": True,
+                "password_hash": None,
+                "role": "alumno",
+                "saldo": 0.0,
+                "created_at": datetime.utcnow(),
+                "last_login": datetime.utcnow()
+            }
+            resultado = await db.usuarios.insert_one(new_user)
+            user_id = str(resultado.inserted_id)
+            created_at = new_user["created_at"]
+            user = new_user # Para poder leer los datos abajo
         
-        db.commit()
-        db.refresh(user)
+        print(f"✅ Login Google exitoso: {email}")
         
-        print(f"✅ Login Google exitoso: {user.email}")
+        access_token = create_access_token(data={"sub": email})
         
-        # Crear token JWT
-        access_token = create_access_token(data={"sub": user.email})
-        
-        response_data = {
+        return {
             "access_token": access_token,
             "token_type": "bearer",
             "user": {
-                "id": user.id,
-                "nombre": user.nombre,
-                "email": user.email,
-                "profile_picture": user.profile_picture,
-                "is_verified": user.is_verified,
-                "created_at": user.created_at.isoformat()
+                "id": user_id,
+                "nombre": nombre,
+                "email": email,
+                "profile_picture": profile_picture,
+                "is_verified": True,
+                "created_at": created_at.isoformat()
             }
         }
-        
-        return response_data
-
         
     except ValueError as e:
         raise HTTPException(
@@ -345,94 +327,87 @@ async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
 # ============================================
 
 @router.post("/forgot-password")
-async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
+async def forgot_password(data: ForgotPassword):
     """Solicitar recuperación de contraseña"""
     
-    # Buscar usuario
-    user = db.query(User).filter(User.email == data.email).first()
+    user = await db.usuarios.find_one({"email": data.email})
     
-    # Por seguridad, siempre retornamos success
     if not user:
-        return {
-            "success": True,
-            "message": "Si el correo existe, recibirás un email con instrucciones"
-        }
+        return {"success": True, "message": "Si el correo existe, recibirás un email con instrucciones"}
     
-    # Generar token seguro
     reset_token = secrets.token_urlsafe(32)
     expires_at = datetime.utcnow() + timedelta(hours=1)
     
-    # Guardar token en BD
-    password_reset = PasswordReset(
-        user_id=user.id,
-        token=reset_token,
-        expires_at=expires_at
-    )
-    db.add(password_reset)
-    db.commit()
+    # Guardar token en Mongo (colección password_resets)
+    await db.password_resets.insert_one({
+        "user_id": str(user["_id"]),
+        "token": reset_token,
+        "expires_at": expires_at,
+        "used": False,
+        "created_at": datetime.utcnow()
+    })
     
-    # Enviar email
     try:
-        await send_password_reset_email(user.email, user.nombre, reset_token)
-        print(f"✅ Email de recuperación enviado a: {user.email}")
+        await send_password_reset_email(user["email"], user["nombre"], reset_token)
+        print(f"✅ Email de recuperación enviado a: {user['email']}")
     except Exception as e:
         print(f"⚠️ Error enviando email: {str(e)}")
     
-    return {
-        "success": True,
-        "message": "Si el correo existe, recibirás un email con instrucciones"
-    }
+    return {"success": True, "message": "Si el correo existe, recibirás un email con instrucciones"}
 
 @router.post("/reset-password")
-async def reset_password(data: ResetPassword, db: Session = Depends(get_db)):
+async def reset_password(data: ResetPassword):
     """Resetear contraseña con token"""
     
-    # Buscar token
-    password_reset = db.query(PasswordReset).filter(
-        PasswordReset.token == data.token,
-        PasswordReset.used == False,
-        PasswordReset.expires_at > datetime.utcnow()
-    ).first()
+    # Buscar token válido
+    password_reset = await db.password_resets.find_one({
+        "token": data.token,
+        "used": False,
+        "expires_at": {"$gt": datetime.utcnow()} # Que sea mayor a la hora actual
+    })
     
     if not password_reset:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token inválido o expirado"
-        )
+        raise HTTPException(status_code=400, detail="Token inválido o expirado")
     
     # Actualizar contraseña
-    user = db.query(User).get(password_reset.user_id)
-    user.password_hash = hash_password(data.password)
+    await db.usuarios.update_one(
+        {"_id": ObjectId(password_reset["user_id"])},
+        {"$set": {"password_hash": hash_password(data.password)}}
+    )
     
     # Marcar token como usado
-    password_reset.used = True
+    await db.password_resets.update_one(
+        {"_id": password_reset["_id"]},
+        {"$set": {"used": True}}
+    )
     
-    db.commit()
-    
-    print(f"✅ Contraseña actualizada para: {user.email}")
-    
-    return {
-        "success": True,
-        "message": "Contraseña actualizada exitosamente"
-    }
+    print("✅ Contraseña actualizada exitosamente")
+    return {"success": True, "message": "Contraseña actualizada exitosamente"}
 
 # ============================================
 # VERIFICAR SESIÓN
 # ============================================
 
-@router.get("/check-session", response_model=UserResponse)
-async def check_session(current_user: User = Depends(get_current_user)):
+@router.get("/check-session")
+async def check_session(current_user: dict = Depends(get_current_user)):
     """Verificar si hay una sesión activa"""
-    return UserResponse.from_orm(current_user)
+    # current_user ahora será un diccionario de Mongo, extraemos los datos
+    return {
+        "id": str(current_user["_id"]),
+        "nombre": current_user["nombre"],
+        "email": current_user["email"],
+        "profile_picture": current_user.get("profile_picture"),
+        "is_verified": current_user.get("is_verified", False),
+        "created_at": current_user["created_at"].isoformat(),
+        "role": current_user.get("role", "alumno"),
+        "saldo": current_user.get("saldo", 0.0)
+    }
 
 # ============================================
-# LOGOUT (opcional, solo para limpiar)
+# LOGOUT
 # ============================================
 
 @router.post("/logout")
 async def logout():
-    """Cerrar sesión (el frontend debe eliminar el token)"""
-    return {
-        "success": True,
-        "message": "Sesión cerrada exitosamente"
-    }
+    """Cerrar sesión"""
+    return {"success": True, "message": "Sesión cerrada exitosamente"}

@@ -67,9 +67,8 @@ async def startup_event():
     logger.info("🚀 FASTAPI SERVER STARTING")
     logger.info("="*60)
     
-    # Inicializar base de datos
-    init_db()
-    init_otp_db()
+   # Si está dentro de una función con 'async'
+    await init_db()
     
     logger.info(f"📍 API URL: http://localhost:8000")
     logger.info(f"📚 Docs: http://localhost:8000/docs")

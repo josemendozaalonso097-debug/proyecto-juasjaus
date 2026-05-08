@@ -1,35 +1,29 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings
 
-# Crear engine de SQLAlchemy
-engine = create_engine(
-    settings.DATABASE_URL, 
-    connect_args={"check_same_thread": False}  # Solo para SQLite
-)
+# 1. Creamos el cliente de MongoDB usando la URL de tu .env
+# La URL ahora debe empezar con mongodb:// o mongodb+srv://
+client = AsyncIOMotorClient(settings.DATABASE_URL)
 
-# Crear SessionLocal
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# 2. Seleccionamos la base de datos (puedes ponerle el nombre que quieras)
+db = client.cbtis258_db
 
-# Base para los modelos
-Base = declarative_base()
-
-# Dependency para obtener la sesión de BD
+# Dependency para obtener la base de datos en las rutas
 def get_db():
     """
-    Genera una sesión de base de datos y la cierra automáticamente
+    Retorna la instancia de la base de datos.
+    En MongoDB asíncrono, no es necesario abrir/cerrar sesiones como en SQLite.
     """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    return db
 
-# Función para inicializar las tablas
-def init_db():
+# Función para inicializar (Opcional en Mongo)
+async def init_db():
     """
-    Crea todas las tablas definidas en los modelos
+    En MongoDB las colecciones se crean solas al insertar el primer dato.
+    Podemos usar esto para verificar la conexión.
     """
-    Base.metadata.create_all(bind=engine)
-    print("✅ Base de datos inicializada")
+    try:
+        await client.admin.command('ping')
+        print("✅ Conexión exitosa a MongoDB")
+    except Exception as e:
+        print(f"❌ Error conectando a MongoDB: {e}")
