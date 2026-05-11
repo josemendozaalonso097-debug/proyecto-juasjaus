@@ -1,61 +1,88 @@
-<section class="add-card-page" style="display: none;">
-  <form class="form">
-     <div style="background: linear-gradient(135deg, #f20d0d, #6e0404); padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; border-radius: 0; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="material-symbols-outlined" style="color: white; font-size: 28px;">credit_card</span>
-            <h2 style="color: white; font-size: 1.35em; font-weight: 700; margin: 0;">Proceso de pago</h2>
+<section class="add-card-page fixed inset-0 z-[10000] hidden items-center justify-center bg-black/60 backdrop-blur-sm" style="display: none;">
+  <form class="form relative w-[95%] max-w-[420px] bg-white dark:bg-slate-900 rounded-[24px] shadow-2xl overflow-hidden">
+     <!-- Header -->
+     <div class="bg-gradient-to-r from-[#f20d0d] to-[#6e0404] px-6 py-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-white text-3xl">credit_card</span>
+            <h2 class="text-white text-xl font-bold m-0">Pago Seguro</h2>
         </div>
-        <button type="button" onclick="cerrarModalPago()" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+        <button type="button" onclick="cerrarModalPago()" class="text-white bg-white/20 hover:bg-white/30 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
      </div>
-     <h3 style="padding: 0 30px; text-align: center; color: #97242c; font-size: 1.5em; margin: 10px 0;">Total a pagar: $0.00 MXN</h3>
-    <label for="name" class="label">
-      <span class="title">Nombre completo del titular</span>
-      <input
-        class="input-field"
-        type="text"
-        name="input-name"
-        placeholder="Ingresa tu nombre completo"
-      />
-    </label>
-    <label for="serialCardNumber" class="label">
-      <span class="title">Número de tarjeta</span>
-      <input
-        class="input-field"
-        type="text"
-        id="serialCardNumber"
-        name="serialCardNumber"
-        placeholder="0000 0000 0000 0000"
-        maxlength="19"
-      />
-    </label>
-    <div class="split">
-      <label for="ExDate" class="label">
-        <span class="title">Fecha de vencimiento</span>
-        <input
-          class="input-field"
-          type="text"
-          id="ExDate"
-          name="ExDate"
-          placeholder="MM/YY"
-          maxlength="5"
-        />
-      </label>
-      <label for="cvv" class="label">
-        <span class="title">CVV</span>
-        <input
-          class="input-field"
-          type="text"
-          id="cvv"
-          name="cvv"
-          placeholder="cvv"
-          maxlength="4"
-        />
-      </label>
-    </div>
-    <input class="checkout-btn" type="button" value="Verificar" />
+
+     <!-- Body -->
+     <div class="p-8 space-y-6">
+         <div class="text-center mb-6">
+            <p class="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-widest">Total a Pagar</p>
+            <h3 class="text-[2rem] font-black text-slate-800 dark:text-white mt-1 leading-none form-total">
+                $0.00 MXN
+            </h3>
+         </div>
+
+        <label for="name" class="label block relative">
+          <span class="block text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 mb-2 ml-1">Titular de la tarjeta</span>
+          <div class="relative">
+              <input
+                class="input-field w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#f20d0d] focus:ring-4 focus:ring-[#f20d0d]/10 transition-all font-medium"
+                type="text"
+                name="input-name"
+                placeholder="Nombre exacto"
+              />
+          </div>
+        </label>
+
+        <label for="serialCardNumber" class="label block relative">
+          <span class="block text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 mb-2 ml-1">Número de tarjeta</span>
+          <div class="relative">
+              <input
+                class="input-field w-full pl-4 pr-[70px] py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#f20d0d] focus:ring-4 focus:ring-[#f20d0d]/10 transition-all font-bold tracking-widest text-lg font-mono"
+                type="text"
+                id="serialCardNumber"
+                name="serialCardNumber"
+                placeholder="0000 0000 0000 0000"
+                maxlength="19"
+              />
+          </div>
+          <style>
+              .label .card-logo { position: absolute; right: 14px; bottom: 12px; z-index: 10; }
+              .label .validation-icon { position: absolute; right: -25px; bottom: 18px; font-weight: bold; }
+          </style>
+        </label>
+
+        <div class="split flex gap-5">
+          <label for="ExDate" class="label block relative w-1/2">
+            <span class="block text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 mb-2 ml-1">Expiración</span>
+            <div class="relative">
+                <input
+                  class="input-field w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#f20d0d] focus:ring-4 focus:ring-[#f20d0d]/10 transition-all font-medium text-center tracking-widest font-mono"
+                  type="text"
+                  id="ExDate"
+                  name="ExDate"
+                  placeholder="MM/YY"
+                  maxlength="5"
+                />
+            </div>
+          </label>
+          <label for="cvv" class="label block relative w-1/2">
+            <span class="block text-[11px] font-bold uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 mb-2 ml-1">C V V</span>
+            <div class="relative">
+                <input
+                  class="input-field w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-[#f20d0d] focus:ring-4 focus:ring-[#f20d0d]/10 transition-all font-medium text-center tracking-widest font-mono"
+                  type="password"
+                  id="cvv"
+                  name="cvv"
+                  placeholder="•••"
+                  maxlength="4"
+                />
+            </div>
+          </label>
+        </div>
+
+        <input class="checkout-btn w-full mt-2 bg-gradient-to-r from-[#f20d0d] to-[#af101a] text-white font-bold py-4 rounded-xl shadow-[0_8px_20px_rgba(242,13,13,0.25)] hover:shadow-[0_12px_28px_rgba(242,13,13,0.35)] hover:-translate-y-1 transition-all cursor-pointer text-base uppercase tracking-widest" type="button" value="Procesar Pago" />
+     </div>
   </form>
 </section>
-
 <!-- MODAL DE SELECCIÓN DE MÉTODO DE PAGO -->
 <div id="modalMetodoPago" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;">
     <div style="background: white; border-radius: 20px; width: 90%; max-width: 500px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); animation: slideDown 0.3s ease;">

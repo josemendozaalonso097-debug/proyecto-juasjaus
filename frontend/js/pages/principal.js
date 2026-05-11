@@ -160,13 +160,7 @@ function actualizarProximoVencimiento() {
     // Solo calculamos deuda para estudiantes
     if (rol === 'estudiante') {
         // En teoría, un alumno en Semestre N, debe haber pagado N colegiaturas en total su carrera.
-        // Pero depende de si ya pasamos la fecha de cobro del semestre actual.
-        // Simplificación: si estamos en semestre de cobro, se espera N pagos. Si no, N-1.
-        let pagosEsperados = semestreDelUsuario - 1; 
-        if (mostrarDeuda) {
-            pagosEsperados = semestreDelUsuario; // Estamos en época de cobro, ya debería pagar la actual
-        }
-        
+        let pagosEsperados = semestreDelUsuario;
         pagosPendientes = Math.max(0, pagosEsperados - pagosRealizados);
     }
     

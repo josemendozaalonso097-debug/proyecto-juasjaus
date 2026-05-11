@@ -377,3 +377,47 @@ INFO:     Finished server process [12001]
 2026-05-07 23:58:24,378 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-05-07 23:58:24,378 - app.main - INFO - ============================================================
 2026-05-08 00:08:08,411 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-05-10 23:33:23,146 - app.main - INFO - ============================================================
+2026-05-10 23:33:23,149 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-05-10 23:33:23,150 - app.main - INFO - ============================================================
+2026-05-10 23:33:23,160 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-05-10 23:33:23,160 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-05-10 23:33:23,161 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-05-10 23:33:23,161 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-05-10 23:33:23,161 - app.main - INFO - ============================================================
+2026-05-10 23:39:51,918 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-05-10 23:44:54,193 - app.main - INFO - ============================================================
+2026-05-10 23:44:54,196 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-05-10 23:44:54,197 - app.main - INFO - ============================================================
+2026-05-10 23:44:54,217 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-05-10 23:44:54,219 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-05-10 23:44:54,222 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-05-10 23:44:54,222 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-05-10 23:44:54,222 - app.main - INFO - ============================================================
+2026-05-10 23:45:54,699 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-05-11 00:33:48,616 - app.main - INFO - ============================================================
+2026-05-11 00:33:48,617 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-05-11 00:33:48,618 - app.main - INFO - ============================================================
+2026-05-11 00:33:48,626 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-05-11 00:33:48,626 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-05-11 00:33:48,626 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-05-11 00:33:48,626 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-05-11 00:33:48,626 - app.main - INFO - ============================================================
+2026-05-11 00:35:53,864 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-05-11 00:42:43,745 - app.main - INFO - ============================================================
+2026-05-11 00:42:43,747 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-05-11 00:42:43,747 - app.main - INFO - ============================================================
+2026-05-11 00:42:43,770 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-05-11 00:42:43,771 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-05-11 00:42:43,771 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-05-11 00:42:43,771 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-05-11 00:42:43,772 - app.main - INFO - ============================================================
+2026-05-11 01:19:36,299 - app.main - INFO - ============================================================
+2026-05-11 01:19:36,300 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-05-11 01:19:36,301 - app.main - INFO - ============================================================
+2026-05-11 01:19:36,334 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-05-11 01:19:36,334 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-05-11 01:19:36,334 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-05-11 01:19:36,335 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-05-11 01:19:36,335 - app.main - INFO - ============================================================
+2026-05-11 01:23:14,044 - app.main - INFO - 👋 Servidor cerrado correctamente

@@ -57,7 +57,7 @@ export function abrirModal(categoria) {
 
         if(tabsNav) {
             tabsNav.innerHTML = `
-                <div id="libros-tabs-nav" style="display: flex; border-bottom: 2px solid #e2e8f0; background: #fff; padding: 0 20px;">
+                <div id="libros-tabs-nav" class="dark:bg-slate-900" style="display: flex; border-bottom: 2px solid #e2e8f0; padding: 0 20px;">
                     ${semestresLabels.map((label, i) => `
                         <button class="libro-tab-btn" data-sem="${i + 1}" onclick="cambiarTabLibros(${i + 1})"
                             style="flex: 1; padding: 13px 6px; border: none; border-bottom: 3px solid ${i === 0 ? '#f20d0d' : 'transparent'};
@@ -112,7 +112,7 @@ export function abrirModal(categoria) {
 
 function crearProductoCard(producto, categoria) {
     const card = document.createElement('div');
-    card.className = 'product-card';
+    card.className = 'product-card producto-card dark:bg-slate-800 dark:border-slate-700';
     card.innerHTML = `
         <div class="product-image-container">
             <div class="product-image-placeholder">

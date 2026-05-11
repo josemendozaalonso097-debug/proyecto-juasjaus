@@ -24,8 +24,8 @@ html.large-text {
 
 /* ── Forzar modo oscuro sobre CSS heredado ─────── */
 html.dark body {
-    background: #242323 !important;
-    background-color: #242323 !important;
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
     color: #f8f6f6 !important;
 }
 html.dark {
@@ -109,9 +109,9 @@ html.dark #modalOxxoPay > div,
 html.dark .modal-deposito-content,
 html.dark .modal-transferencia-content,
 html.dark .modal-oxxopay > div {
-    background-color: #1e293b !important;
+    background-color: #121212 !important;
     color: #f1f5f9 !important;
-    border: 1px solid #334155 !important;
+    border: 1px solid #262626 !important;
 }
 
 /* Remover fondos claros/fijos internos */
@@ -121,12 +121,33 @@ html.dark .deposito-container,
 html.dark .transferencia-container,
 html.dark .detalle-section,
 html.dark .faq-item,
+html.dark .mob-card,
+html.dark .tienda-mobile-only {
+    background-color: #121212 !important;
+    background: #121212 !important;
+}
 html.dark [style*="background: #f8f9fa"], 
 html.dark [style*="background:#f8f9fa"],
+html.dark [style*="background: #f9f9fb"],
+html.dark [style*="background:#f9f9fb"],
+html.dark [style*="background:#fff"],
+html.dark [style*="background: #fff"],
+html.dark [style*="background:#ffffff"],
+html.dark [style*="background: #ffffff"],
 html.dark [style*="background:white"],
 html.dark [style*="background: white"],
-html.dark [style*="background: #fff"] {
+html.dark [style*="background:rgb(255,255,255)"],
+html.dark [style*="background: rgb(255, 255, 255)"],
+html.dark [style*="background-color:#fff"],
+html.dark [style*="background-color: #fff"],
+html.dark [style*="background-color:#ffffff"],
+html.dark [style*="background-color: #ffffff"],
+html.dark [style*="background-color:white"],
+html.dark [style*="background-color: white"],
+html.dark [style*="background-color:rgb(255,255,255)"],
+html.dark [style*="background-color: rgb(255, 255, 255)"] {
     background-color: transparent !important;
+    background: transparent !important;
 }
 
 /* Tarjetas y áreas de contenido internas */
@@ -137,10 +158,16 @@ html.dark .info-bancaria,
 html.dark .instrucciones-transferencia, 
 html.dark .form-comprobante,
 html.dark .resumen-cuenta, 
-html.dark .faq-respuesta {
-    background-color: #0f172a !important;
+html.dark .faq-respuesta,
+html.dark .detalle-section,
+html.dark .faq-item,
+html.dark .contacto-item,
+html.dark .product-card,
+html.dark .historial-item {
+    background-color: #050505 !important;
+    background: #050505 !important;
     color: #f1f5f9 !important;
-    border: 1px solid #334155 !important;
+    border: 1px solid #1a1a1a !important;
 }
 
 /* Forzar color de texto claro en TODO el contenido de modales oscuros */
@@ -149,12 +176,14 @@ html.dark .modal-informacion-content *,
 html.dark .modal-detalle-content *,
 html.dark .modal-papeleria-content *,
 html.dark .modal-productos-content *,
+html.dark .modal-pago-content *,
 html.dark .modal-content *,
-html.dark #modalMetodoPago > div *,
-html.dark .modal-deposito-content *,
-html.dark .modal-transferencia-content *,
-html.dark .modal-oxxopay > div * {
-    color: #f1f5f9;
+html.dark #modalMetodoPago *,
+html.dark #modalOxxoPay *,
+html.dark .modal-deposito *,
+html.dark .modal-transferencia *,
+html.dark .modal-oxxopay * {
+    color: #f1f5f9 !important;
 }
 
 /* Inputs y Selects */
