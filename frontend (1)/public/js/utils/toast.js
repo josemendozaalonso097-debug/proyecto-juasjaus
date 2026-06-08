@@ -32,7 +32,7 @@
     border-radius: 14px;
     min-width: 300px;
     max-width: 420px;
-    font-family: 'Lexend', 'Public Sans', sans-serif;
+    font-family: 'Montserrat', 'Inter', sans-serif;
     font-size: 13.5px;
     font-weight: 500;
     line-height: 1.4;

@@ -1,20 +1,15 @@
-@import "tailwindcss";
-
-@theme {
-  --color-primary: #f20d0d;
-  --color-primary-dark: #94272C;
-  --color-primary-darker: #6e0404;
-  --color-primary-gradient: #750616;
-  --color-background-light: #f8f6f6;
-  --color-background-dark: #211111;
-  --font-display: "Public Sans", sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --color-primary: #f20d0d;
   --color-primary-dark: #94272C;
   --color-primary-darker: #6e0404;
   --color-primary-gradient: #750616;
+  --color-background-light: #f8f6f6;
+  --color-background-dark: #211111;
+  --font-display: "Montserrat", "Inter", sans-serif;
 }
 
 /* ── Accesibilidad: Focus Visible ──────────────── */
