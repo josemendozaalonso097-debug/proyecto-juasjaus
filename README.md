@@ -111,3 +111,45 @@ Notas y recomendaciones
 - Si prefieres trabajar con dos terminales en foreground (ver logs en la terminal) usa la sección "Arrancar en modo desarrollo".
 - Si vas a compartir la app con dispositivos en la misma red, asegúrate de exponer host (`--host`) y/o usar la URL de red que muestre Vite (ej. http://100.115.92.205:5502/).
 - Si quieres automatizar, puedo añadir `start-dev.sh` y `stop-dev.sh` para arrancar/parar ambos con un solo comando.
+
+## Pasos realizados localmente (Windows)
+
+A continuación se documentan los pasos exactos que realicé durante la sesión para levantar el backend y frontend en un equipo con Windows. Útil como guía rápida para reproducir el entorno local.
+
+### Backend (Windows — Python 3.11)
+
+- Instalé Python 3.11 y creé un virtualenv llamado `.venv311`:
+	- `py -3.11 -m venv .venv311`
+	- `.\.venv311\Scripts\python.exe -m pip install --upgrade pip`
+- Instalé dependencias evitando `uvloop` (no compatible con Windows):
+	- `.\.venv311\Scripts\python.exe -m pip install -r backend/requirements_no_uvloop.txt`
+	- Si no existe `requirements_no_uvloop.txt`, instala `backend/requirements.txt` pero omite `uvloop`.
+- Creé un `.env` mínimo en `backend/.env` con al menos:
+	- `SECRET_KEY=dev_secret_for_local_dev`
+	- (No subir este archivo al repositorio ni compartir claves reales.)
+- Arrancar backend:
+	- `cd backend`
+	- `.\.venv311\Scripts\python.exe run.py`
+- Backend disponible en: `http://localhost:8000` (docs: `http://localhost:8000/docs`)
+
+### Frontend estático (opcional)
+
+- Para pruebas rápidas de HTML/CSS estático en `frontend/`:
+	- `cd frontend`
+	- `python -m http.server 5173`
+	- Abrir `http://localhost:5173`
+
+### Frontend React (Vite)
+
+- Entrar en `frontend-react`, instalar y arrancar el dev server:
+	- `cd frontend-react`
+	- `npm install`
+	- `npm run dev`
+- En esta sesión Vite se sirvió en `http://localhost:5502/` (puerto puede variar).
+
+### Notas y buenas prácticas
+
+- No subir `backend/.env` ni secretos al repositorio.
+- Si trabajas en Linux/macOS puedes usar `uvloop` y crear el venv con `python3 -m venv .venv`.
+- Si quieres, puedo añadir scripts (`start-dev.sh`, `stop-dev.sh`) para arrancar/parar ambos servicios automáticamente.
+

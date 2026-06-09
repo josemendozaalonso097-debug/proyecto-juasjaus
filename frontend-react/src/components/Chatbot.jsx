@@ -243,11 +243,11 @@ export default function Chatbot({ isOpen, onClose }) {
       {/* Panel */}
       <div 
         id="cb-panel" 
-        className="fixed top-50% left-50% translate-x-[-50%] translate-y-[-50%] w-[90%] md:w-[480px] h-[92vh] md:h-[700px] max-h-[700px] bg-white dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden flex flex-col z-[9999] opacity-100 pointer-events-all transition-all duration-300 md:bottom-auto md:right-auto md:rounded-2xl"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[420px] h-[86vh] md:h-[640px] max-h-[640px] bg-white dark:bg-slate-900 shadow-2xl rounded-2xl overflow-hidden flex flex-col z-[9999] opacity-100 pointer-events-all transition-all duration-300 md:bottom-auto md:right-auto md:rounded-2xl"
       >
         {/* Header */}
         <div id="cb-header" className="bg-[#C0392B] p-[12px_14px] flex items-center gap-[10px] shrink-0 text-white">
-          <div id="cb-avatar" className="w-[60px] h-[60px] md:w-[80px] md:h-[80px] rounded-full bg-white/15 border-[3px] border-white/40 shrink-0 overflow-hidden flex items-center justify-center">
+          <div id="cb-avatar" className="w-[52px] h-[52px] md:w-[64px] md:h-[64px] rounded-full bg-white/15 border-[3px] border-white/40 shrink-0 overflow-hidden flex items-center justify-center">
             <img 
               id="cb-cobra-img" 
               src={`${ICON_BASE}${cobraIcon}.png`} 

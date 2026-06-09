@@ -587,3 +587,11 @@ INFO:     Finished server process [12001]
 2026-06-08 17:48:48,549 - app.main - INFO - 🌐 Frontend: http://localhost:5173
 2026-06-08 17:48:48,549 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-06-08 17:48:48,550 - app.main - INFO - ============================================================
+2026-06-09 14:01:38,674 - app.main - INFO - ============================================================
+2026-06-09 14:01:38,674 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-09 14:01:38,675 - app.main - INFO - ============================================================
+2026-06-09 14:01:38,682 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-09 14:01:38,683 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-09 14:01:38,683 - app.main - INFO - 🌐 Frontend: http://localhost:5500
+2026-06-09 14:01:38,684 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-09 14:01:38,684 - app.main - INFO - ============================================================
