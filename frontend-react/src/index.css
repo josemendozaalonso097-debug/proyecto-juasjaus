@@ -1,0 +1,340 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #f20d0d;
+  --color-primary-dark: #94272C;
+  --color-primary-darker: #6e0404;
+  --color-primary-gradient: #750616;
+  --color-background-light: #f8f5f5;
+  --color-background-dark: #221010;
+  --font-display: "Lexend", sans-serif;
+}
+
+/* ── Accesibilidad: Focus Visible ──────────────── */
+*:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+    transition: outline-offset 0.15s ease;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* ── Soporte para Texto Grande ─────────────────── */
+html.large-text {
+    font-size: 130% !important;
+}
+
+/* ── Forzar modo oscuro sobre CSS heredado ─────── */
+html.dark body {
+    background: #0a0a0a !important;
+    background-color: #0a0a0a !important;
+    color: #f8f6f6 !important;
+}
+html.dark {
+    color-scheme: dark;
+}
+
+/* ── Glassmorphism: Clases Reutilizables ───────── */
+.glass-card {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+html.dark .glass-card {
+    background: rgba(30, 30, 30, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ── Micro-interacciones: Hover Premium ────────── */
+.hover-lift {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+.hover-lift:active {
+    transform: translateY(-1px) scale(0.99);
+}
+
+/* ── Transiciones Suaves Globales ──────────────── */
+button, a, .btn, .card, .info-card, section {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+/* ── Mesh Gradient Background ──────────────────── */
+.mesh-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: 
+        radial-gradient(ellipse at 10% 20%, rgba(148,39,44,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(242,13,13,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(117,6,22,0.03) 0%, transparent 60%);
+    animation: meshFloat 20s ease-in-out infinite alternate;
+}
+@keyframes meshFloat {
+    0%   { background-position: 0% 0%, 100% 100%, 50% 50%; }
+    50%  { background-position: 20% 40%, 80% 60%, 40% 60%; }
+    100% { background-position: 10% 20%, 90% 80%, 50% 50%; }
+}
+
+/* ── scroll suave global ───────────────────────── */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ── Mejora de selección de texto ──────────────── */
+::selection {
+    background: var(--color-primary);
+    color: white;
+}
+
+/* ── Material Symbols base ──────────────────────── */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ── Dark Mode para Modales Custom y Elementos ───── */
+html.dark .modal-content {
+    background-color: #121212 !important;
+    color: #f1f5f9 !important;
+    border: 1px solid #262626 !important;
+}
+
+html.dark input, html.dark select, html.dark textarea {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+html.dark .material-symbols-outlined { color: inherit !important; }
+
+/* ── Login page specific styles ──────────────────── */
+.login-input:hover,
+.login-input:focus {
+    border: 2px solid var(--color-primary-dark);
+    box-shadow: 0px 0px 0px 7px rgba(129, 32, 32, 0.2);
+    background-color: white;
+}
+
+/* ── Sliding Action Styles ──────────────────────── */
+.container-box { position: relative; overflow: hidden; }
+.form-container { position: absolute; top: 0; height: 100%; transition: all 0.6s ease-in-out; }
+
+.sign-in-container { left: 0; width: 50%; z-index: 2; }
+.container-box.active .sign-in-container { transform: translateX(100%); opacity: 0; z-index: 1; }
+
+.sign-up-container { left: 0; width: 50%; opacity: 0; z-index: 1; transform: translateX(0); }
+.container-box.active .sign-up-container { transform: translateX(100%); opacity: 1; z-index: 5; animation: show 0.6s; }
+
+@keyframes show {
+    0%, 49.99% { opacity: 0; z-index: 1; }
+    50%, 100% { opacity: 1; z-index: 5; }
+}
+
+.overlay-container {
+    position: absolute; top: 0; left: 50%; width: 50%; height: 100%; overflow: hidden; transition: transform 0.6s ease-in-out; z-index: 100;
+}
+.overlay-container { border-radius: 100px 0 0 100px; }
+.container-box.active .overlay-container { transform: translateX(-100%); border-radius: 0 100px 100px 0; }
+
+.overlay {
+    position: relative; left: -100%; height: 100%; width: 200%; transform: translateX(0); transition: transform 0.6s ease-in-out;
+}
+.container-box.active .overlay { transform: translateX(50%); }
+
+.overlay-panel {
+    position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; top: 0; height: 100%; width: 50%; transform: translateX(0); transition: transform 0.6s ease-in-out;
+}
+.overlay-left { transform: translateX(-20%); }
+.container-box.active .overlay-left { transform: translateX(0); }
+.overlay-right { right: 0; transform: translateX(0); }
+.container-box.active .overlay-right { transform: translateX(20%); }
+
+/* Mobile login logic */
+@media (max-width: 768px) {
+    .login-page body { overflow-x: hidden; }
+    .container-box { min-height: 100vh; width: 100%; display: flex; flex-direction: column; overflow-x: hidden; }
+    .form-container { position: relative; width: 100%; min-height: 100vh; height: auto; transition: none; opacity: 1; transform: none !important; }
+    .sign-in-container, .sign-up-container { width: 100%; flex-grow: 1; }
+    .overlay-container { display: none; }
+    .container-box.active .sign-in-container { display: none; }
+    .container-box:not(.active) .sign-up-container { display: none; }
+}
+
+/* ── DISEÑO RESPONSIVO (MOBILE) ───────────────────────── */
+@media (max-width: 768px) {
+    .modal-content-sheet {
+        position: absolute !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+        animation: slideUpMobile 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+        overscroll-behavior: contain;
+    }
+
+    @keyframes slideUpMobile {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+}
+
+/* ── Dark Mode for MOBILE ── */
+@media (max-width: 1023px) {
+    html.dark .mob-card {
+        background: #1e2025 !important;
+        border-color: rgba(60,30,30,0.25) !important;
+    }
+    html.dark .mob-title { color: #f1f1f3 !important; }
+    html.dark .mob-sub { color: #9b7a78 !important; }
+    html.dark .mob-nav {
+        background: rgba(26,28,32,0.95) !important;
+        border-top-color: rgba(60,30,30,0.3) !important;
+    }
+}
+
+/* ── Toast System ──────────────────────────────── */
+#toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast-item {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    min-width: 300px;
+    max-width: 420px;
+    font-family: 'Lexend', 'Public Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #fff;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateX(120%);
+    opacity: 0;
+    animation: toastSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast-item.toast-exit {
+    animation: toastSlideOut 0.35s ease forwards;
+}
+
+.toast-success {
+    background: linear-gradient(135deg, rgba(34,197,94,0.92), rgba(22,163,74,0.95));
+    border: 1px solid rgba(255,255,255,0.15);
+}
+.toast-error {
+    background: linear-gradient(135deg, rgba(239,68,68,0.92), rgba(220,38,38,0.95));
+    border: 1px solid rgba(255,255,255,0.15);
+}
+.toast-warning {
+    background: linear-gradient(135deg, rgba(245,158,11,0.92), rgba(217,119,6,0.95));
+    border: 1px solid rgba(255,255,255,0.15);
+}
+.toast-info {
+    background: linear-gradient(135deg, rgba(59,130,246,0.92), rgba(37,99,235,0.95));
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 0 0 14px 14px;
+    animation: toastProgress var(--toast-duration, 4s) linear forwards;
+}
+
+@keyframes toastSlideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastSlideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to   { transform: translateX(120%); opacity: 0; }
+}
+@keyframes toastProgress {
+    from { width: 100%; }
+    to   { width: 0%; }
+}
+
+@media (max-width: 480px) {
+    #toast-container {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+    }
+    .toast-item {
+        min-width: unset;
+        width: 100%;
+    }
+}
+
+/* ── Desktop: hide mobile-only ── */
+.mobile-only { display: none !important; }
+.tienda-mobile-only { display: none !important; }
+
+@media (max-width: 1023px) {
+    .mobile-only { display: block !important; }
+    .tienda-mobile-only { display: block !important; }
+    .desktop-only { display: none !important; }
+}
+
+/* ── Chatbot ── */
+html.dark #cb-panel, html.dark #cb-options, html.dark #cb-messages { background-color: #1e293b !important; }
+html.dark .cb-bubble.cb-bot { background-color: #334155 !important; }
+html.dark .cb-bubble.cb-usr { background-color: #94272C !important; color: white !important; }
+
+@media (max-width: 768px) {
+    #cb-panel {
+        width: 92% !important;
+        height: 65vh !important;
+        max-height: 500px !important;
+        bottom: 85px !important;
+        right: 4% !important;
+        border-radius: 20px !important;
+    }
+}
