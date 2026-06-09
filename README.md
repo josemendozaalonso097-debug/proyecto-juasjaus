@@ -149,7 +149,28 @@ A continuación se documentan los pasos exactos que realicé durante la sesión 
 
 ### Notas y buenas prácticas
 
-- No subir `backend/.env` ni secretos al repositorio.
-- Si trabajas en Linux/macOS puedes usar `uvloop` y crear el venv con `python3 -m venv .venv`.
-- Si quieres, puedo añadir scripts (`start-dev.sh`, `stop-dev.sh`) para arrancar/parar ambos servicios automáticamente.
+## Scripts de arranque rápido (añadidos)
+
+He añadido dos scripts en la raíz del repositorio para facilitar el arranque en desarrollo sin tocar nada existente:
+
+- `start-dev.sh` — script para Linux/macOS. Crea/activa `.venv-backend`, instala dependencias (usa `backend/requirements_no_uvloop.txt` si está presente), arranca el backend con `backend/run.py` y levanta el `frontend-react` (`npm run dev`) en background. Guarda logs en `backend/uvicorn.log` y `frontend-react/dev.log`, y PIDs en `backend/uvicorn.pid` y `frontend-react/vite.pid`.
+- `start-dev.bat` — script para Windows (cmd). Crea `.venv-backend`, instala dependencias e abre dos ventanas `cmd` separadas que ejecutan el backend y el frontend.
+
+Uso recomendado:
+
+Linux/macOS:
+```bash
+chmod +x start-dev.sh
+./start-dev.sh
+```
+
+Windows (cmd/PowerShell):
+```powershell
+start-dev.bat
+```
+
+Notas:
+- Los scripts no modifican archivos existentes del backend o frontend.
+- En Windows se usa `requirements_no_uvloop.txt` si existe para evitar instalar `uvloop` incompatibles.
+- Si prefieres una versión PowerShell o scripts para parar los procesos, puedo añadirlos.
 
