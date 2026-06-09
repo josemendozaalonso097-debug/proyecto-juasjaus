@@ -1,16 +1,73 @@
-fastapi==0.115.0
-uvicorn[standard]==0.32.0
-sqlalchemy==2.0.36
-pydantic==2.10.3
-pydantic-settings==2.6.1
-python-multipart==0.0.12
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-dotenv==1.0.1
-email-validator==2.2.0
-aiosmtplib==3.0.2
-jinja2==3.1.4
-google-auth==2.36.0
-requests==2.33.1
-itsdangerous==2.2.0
-bcrypt==4.0.1
+# ============================================
+# CBTis 258 - Servicios Financieros
+# Backend Requirements
+# ============================================
+
+# ============================================
+# CORE - Framework Web
+# ============================================
+fastapi==0.115.0                    # Framework web moderno
+uvicorn[standard]==0.32.0           # Servidor ASGI
+
+# ============================================
+# DATABASE - Base de Datos
+# ============================================
+sqlalchemy==2.0.36                  # ORM y herramientas de BD
+alembic==1.13.1                     # Migraciones de BD (NUEVO)
+
+# ============================================
+# VALIDATION - Validación y Configuración
+# ============================================
+pydantic==2.10.3                    # Validación de datos
+pydantic-settings==2.6.1            # Configuración con validación
+email-validator==2.2.0              # Validación de emails
+python-multipart==0.0.12            # Manejo de form data
+
+# ============================================
+# SECURITY - Seguridad y Autenticación
+# ============================================
+python-jose[cryptography]==3.3.0    # Tokens JWT
+passlib[bcrypt]==1.7.4              # Hashing de contraseñas
+bcrypt==4.0.1                       # Librería bcrypt
+cryptography==43.0.0                # Encriptación (ACTUALIZADO)
+
+# ============================================
+# EMAIL - Correo Electrónico
+# ============================================
+aiosmtplib==3.0.2                   # SMTP async
+jinja2==3.1.4                       # Templates de email
+python-dotenv==1.0.1                # Cargar variables de entorno
+
+# ============================================
+# GOOGLE AUTH - Autenticación con Google
+# ============================================
+google-auth==2.36.0                 # Google OAuth
+requests==2.33.1                    # HTTP requests
+itsdangerous==2.2.0                 # Tokens y serialización
+
+# ============================================
+# UTILITIES - Utilidades
+# ============================================
+python-dateutil==2.8.2              # Manejo de fechas (NUEVO)
+pytz==2024.1                        # Zonas horarias (NUEVO)
+
+# ============================================
+# TESTING - Pruebas (OPCIONAL)
+# ============================================
+pytest==7.4.4                       # Framework de testing (NUEVO)
+pytest-asyncio==0.23.3              # Testing async (NUEVO)
+httpx==0.26.0                       # Cliente HTTP para tests (NUEVO)
+
+# ============================================
+# DEVELOPMENT - Desarrollo (OPCIONAL)
+# ============================================
+black==24.3.0                       # Formateador de código (NUEVO)
+flake8==7.0.0                       # Linter (NUEVO)
+isort==5.13.2                       # Organizador de imports (NUEVO)
+mypy==1.9.0                         # Type checking (NUEVO)
+
+# ============================================
+# PRODUCTION - Producción (OPCIONAL)
+# ============================================
+gunicorn==21.2.0                    # Servidor WSGI alternativo (NUEVO)
+python-multipart==0.0.12            # Manejo de multipart (ya incluido)
