@@ -15,70 +15,99 @@ Este método levanta el backend y el frontend con un solo comando.
 **Pasos para ejecutar:**
 1. Abre una terminal en la raíz del proyecto.
 2. Da permisos (solo la primera vez): `chmod +x run.sh`
-3. Ejecuta: `./run.sh`
-4. Abre en tu navegador: `http://127.0.0.1:5501`
+# CBTis 258 - Servicios Financieros
 
-Para detener el proyecto, presiona `CTRL + C`. Si algún puerto se queda trabado, ejecuta `pkill -f uvicorn` y `pkill -f http.server`.
+Este README explica cómo arrancar el proyecto en desarrollo (frontend React con Vite y backend FastAPI) en Linux.
 
----
+Resumen rápido
+- Frontend (Vite) -> puerto por defecto usado en esta máquina: 5502 (ej. http://localhost:5502/)
+- Backend (Uvicorn/FastAPI) -> puerto por defecto: 8000 (http://localhost:8000/)
 
-## 🪟 Ejecutar en Windows
+Requisitos
+- Python 3.8+ (recomendado Python 3.10+)
+- Node.js y npm (o pnpm/yarn) para el frontend
 
-Si copiaste el proyecto desde Linux/ChromeOS a Windows, **NO copies la carpeta `.venv`**. Debes instalar el entorno virtual de nuevo en Windows porque los de Linux no son compatibles.
+Importante: en este repositorio se creó un entorno virtual de prueba `.venv-backend` y el archivo `backend/requirements.txt` fue actualizado con versiones pinneadas (backup: `backend/requirements.txt.bak`). Si prefieres crear tu propio venv, sigue las instrucciones abajo.
 
-### 🛠️ Paso 1: Configurar el entorno (Solo la primera vez)
-1. Instala Python desde [python.org](https://www.python.org). **⚠️ IMPORTANTE:** Al instalar, marca la casilla inferior que dice **"Add Python to PATH"**.
-2. Abre una terminal de comandos (`cmd`) en la carpeta del proyecto.
-3. Crea el entorno virtual en Windows:
-   `python -m venv .venv`
-4. Activa el entorno virtual:
-   `.venv\Scripts\activate`
-5. Instala las dependencias:
-   `pip install -r backend/requirements.txt`
+## 1) Arrancar en modo desarrollo (recomendado, ver logs en la terminal)
 
-### ▶️ Paso 2: Ejecutar el proyecto
-Tienes dos formas de iniciarlo en Windows una vez configurado el entorno:
+Frontend (terminal A)
 
-**Opción A: Ejecutar el script automático (Fácil)**
-Simplemente dale **doble clic** al archivo `run.bat` que está en la carpeta. Esto abrirá automáticamente el backend y el frontend.
-Si te sale un aviso de seguridad de Windows Protect, dale a "Más información" y "Ejecutar de todas formas".
-
-**Opción B: Método manual con 2 Terminales (La vieja confiable)**
-Si `run.bat` no te funciona, abre dos terminales (`cmd`) en la carpeta del proyecto:
-
-🖥️ **Terminal 1 – Backend:**
-```cmd
-.venv\Scripts\activate
-cd backend
-uvicorn app.main:app --reload
-```
-🖥️ **Terminal 2 – Frontend:**
-```cmd
-cd frontend
-python -m http.server 5501
+```bash
+cd /home/josemendozaalonso097/proyecto-juasjaus/frontend-react
+# Instalar solo la primera vez o si cambian dependencias
+npm ci
+# Levantar Vite (visible en la red local)
+npm run dev -- --host
 ```
 
-Tras iniciar, accede a: `http://127.0.0.1:5501/login.html`
+Backend (terminal B)
 
----
+```bash
+cd /home/josemendozaalonso097/proyecto-juasjaus
+# (opcional) crear venv si no existe
+python3 -m venv .venv-backend
+source .venv-backend/bin/activate
+# instalar dependencias (solo la primera vez o si cambian)
+pip install --upgrade pip
+pip install -r backend/requirements.txt
+# arrancar con autoreload (útil en desarrollo)
+python3 backend/run.py
+```
 
-## 📱 ¿Cómo ver la página en mi Celular?
+Después de arrancar, puedes abrir en tu navegador:
+- Frontend: http://localhost:5502/
+- Backend (docs): http://localhost:8000/docs
 
-Si estás ejecutando el proyecto en tu computadora o en la nube (como Antigravity), las URL `localhost` o `127.0.0.1` **solo funcionan dentro de ese mismo dispositivo**. Tu celular no puede ver el localhost de otro dispositivo.
+## 2) Ejecutarlos en background (como se hizo en esta sesión)
 
-### Opción A: Visual Studio Code (Solo si usas VS Code local)
-1. Abre este proyecto en **Visual Studio Code**.
-2. En el panel inferior (Terminal), ve a la pestaña **"Puertos"** (Ports).
-3. Agrega los puertos `5501` y `8000`.
-4. Cambia la visibilidad de Private a **Public** con clic derecho sobre el candado.
-5. VS Code te dará una URL larga (`https://...devtunnels.ms`). ¡Ábrela en tu celular!
+Frontend (background)
 
-### Opción B: Método Universal (Cualquier Editor / Antigravity) 🚀
-Si estás en este entorno o en un editor sin ports internos, usa este comando mágico:
-1. Abre dos terminales nuevas.
-2. Terminal 1 (Frontend): `npx localtunnel --port 5501`
-3. Terminal 2 (Backend): `npx localtunnel --port 8000`
-4. **Importante:** Recuerda que si usas esto, debes cambiar temporalmente el `API_BASE` en `frontend/js/api/auth.js` para que coincida con el link que te dio la Terminal 2.
-5. Abre el link de la Terminal 1 en tu celular y ¡listo! 📲
+```bash
+cd /home/josemendozaalonso097/proyecto-juasjaus/frontend-react
+# inicia en background y guarda logs y pid
+nohup npm run dev -- --host > dev.log 2>&1 & echo $! > vite.pid
+```
 
-*(Nota: La primera vez verás una página azul pidiendo tu IP, solo dale al botón "Click to continue").*
+Backend (background)
+
+```bash
+cd /home/josemendozaalonso097/proyecto-juasjaus
+# activar venv y arrancar sin autoreload
+. .venv-backend/bin/activate
+nohup python3 backend/run_no_reload.py > backend/uvicorn.log 2>&1 & echo $! > backend/uvicorn.pid
+```
+
+## Logs y control de procesos
+- Logs frontend: `frontend-react/dev.log`
+- Logs backend: `backend/uvicorn.log`
+- PID frontend: `frontend-react/vite.pid`
+- PID backend: `backend/uvicorn.pid`
+
+Ver logs en tiempo real:
+
+```bash
+tail -f frontend-react/dev.log
+tail -f backend/uvicorn.log
+```
+
+Parar procesos (si los iniciaste en background):
+
+```bash
+kill $(cat frontend-react/vite.pid) || true && rm -f frontend-react/vite.pid
+kill $(cat backend/uvicorn.pid) || true && rm -f backend/uvicorn.pid
+```
+
+Comandos útiles de reinicio
+
+```bash
+# Reiniciar backend (background)
+kill $(cat backend/uvicorn.pid) || true
+. .venv-backend/bin/activate
+nohup python3 backend/run_no_reload.py > backend/uvicorn.log 2>&1 & echo $! > backend/uvicorn.pid
+```
+
+Notas y recomendaciones
+- Si prefieres trabajar con dos terminales en foreground (ver logs en la terminal) usa la sección "Arrancar en modo desarrollo".
+- Si vas a compartir la app con dispositivos en la misma red, asegúrate de exponer host (`--host`) y/o usar la URL de red que muestre Vite (ej. http://100.115.92.205:5502/).
+- Si quieres automatizar, puedo añadir `start-dev.sh` y `stop-dev.sh` para arrancar/parar ambos con un solo comando.

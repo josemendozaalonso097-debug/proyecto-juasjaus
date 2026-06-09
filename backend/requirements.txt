@@ -6,68 +6,71 @@
 # ============================================
 # CORE - Framework Web
 # ============================================
-fastapi==0.115.0                    # Framework web moderno
-uvicorn[standard]==0.32.0           # Servidor ASGI
-
-# ============================================
-# DATABASE - Base de Datos
-# ============================================
-sqlalchemy==2.0.36                  # ORM y herramientas de BD
-alembic==1.13.1                     # Migraciones de BD (NUEVO)
-
-# ============================================
-# VALIDATION - Validación y Configuración
-# ============================================
-pydantic==2.10.3                    # Validación de datos
-pydantic-settings==2.6.1            # Configuración con validación
-email-validator==2.2.0              # Validación de emails
-python-multipart==0.0.12            # Manejo de form data
-
-# ============================================
-# SECURITY - Seguridad y Autenticación
-# ============================================
-python-jose[cryptography]==3.3.0    # Tokens JWT
-passlib[bcrypt]==1.7.4              # Hashing de contraseñas
-bcrypt==4.0.1                       # Librería bcrypt
-cryptography==43.0.0                # Encriptación (ACTUALIZADO)
-
-# ============================================
-# EMAIL - Correo Electrónico
-# ============================================
-aiosmtplib==3.0.2                   # SMTP async
-jinja2==3.1.4                       # Templates de email
-python-dotenv==1.0.1                # Cargar variables de entorno
-
-# ============================================
-# GOOGLE AUTH - Autenticación con Google
-# ============================================
-google-auth==2.36.0                 # Google OAuth
-requests==2.33.1                    # HTTP requests
-itsdangerous==2.2.0                 # Tokens y serialización
-
-# ============================================
-# UTILITIES - Utilidades
-# ============================================
-python-dateutil==2.8.2              # Manejo de fechas (NUEVO)
-pytz==2024.1                        # Zonas horarias (NUEVO)
-
-# ============================================
-# TESTING - Pruebas (OPCIONAL)
-# ============================================
-pytest==7.4.4                       # Framework de testing (NUEVO)
-pytest-asyncio==0.23.3              # Testing async (NUEVO)
-httpx==0.26.0                       # Cliente HTTP para tests (NUEVO)
-
-# ============================================
-# DEVELOPMENT - Desarrollo (OPCIONAL)
-# ============================================
-black==24.3.0                       # Formateador de código (NUEVO)
-flake8==7.0.0                       # Linter (NUEVO)
-isort==5.13.2                       # Organizador de imports (NUEVO)
-mypy==1.9.0                         # Type checking (NUEVO)
-
-# ============================================
-# PRODUCTION - Producción (OPCIONAL)
-# ============================================
-gunicorn==21.2.0                    # Servidor WSGI alternativo (NUEVO)
-python-multipart==0.0.12            # Manejo de multipart (ya incluido)
+aiosmtplib==3.0.2
+alembic==1.13.1
+annotated-types==0.7.0
+anyio==4.13.0
+bcrypt==4.0.1
+black==24.3.0
+cachetools==5.5.2
+certifi==2026.5.20
+cffi==2.0.0
+charset-normalizer==3.4.7
+click==8.4.1
+cryptography==43.0.0
+dnspython==2.8.0
+ecdsa==0.19.2
+email_validator==2.2.0
+fastapi==0.115.0
+flake8==7.0.0
+google-auth==2.36.0
+gunicorn==21.2.0
+h11==0.16.0
+httpcore==1.0.9
+httptools==0.8.0
+httpx==0.26.0
+idna==3.18
+iniconfig==2.3.0
+isort==5.13.2
+itsdangerous==2.2.0
+Jinja2==3.1.4
+Mako==1.3.12
+MarkupSafe==3.0.3
+mccabe==0.7.0
+mypy==1.9.0
+mypy_extensions==1.1.0
+packaging==26.2
+passlib==1.7.4
+pathspec==1.1.1
+platformdirs==4.10.0
+pluggy==1.6.0
+pyasn1==0.6.3
+pyasn1_modules==0.4.2
+pycodestyle==2.11.1
+pycparser==3.0
+pydantic-settings==2.6.1
+pydantic==2.10.3
+pydantic_core==2.27.1
+pyflakes==3.2.0
+pytest-asyncio==0.23.3
+pytest==7.4.4
+python-dateutil==2.8.2
+python-dotenv==1.0.1
+python-jose==3.3.0
+python-multipart==0.0.12
+pytz==2024.1
+PyYAML==6.0.3
+requests==2.33.1
+rsa==4.9.1
+setuptools==82.0.1
+six==1.17.0
+sniffio==1.3.1
+SQLAlchemy==2.0.36
+starlette==0.38.6
+typing_extensions==4.15.0
+urllib3==2.7.0
+uvicorn==0.32.0
+uvloop==0.22.1
+watchfiles==1.2.0
+websockets==16.0
+wheel==0.47.0

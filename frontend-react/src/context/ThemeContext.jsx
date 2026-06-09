@@ -29,24 +29,51 @@ export function ThemeProvider({ children }) {
     } else {
       document.documentElement.classList.remove('dark');
     }
+    // Persistir la preferencia para el usuario actual
+    try {
+      const user = localStorage.getItem('user');
+      if (user) {
+        const u = JSON.parse(user);
+        const prefsKey = `prefs_${u.id}`;
+        const prefsRaw = localStorage.getItem(prefsKey);
+        const prefs = prefsRaw ? JSON.parse(prefsRaw) : {};
+        prefs.darkMode = !!isDarkMode;
+        localStorage.setItem(prefsKey, JSON.stringify(prefs));
+      } else {
+        // fallback global key
+        localStorage.setItem('prefs_global', JSON.stringify({ darkMode: !!isDarkMode }));
+      }
+    } catch (e) {
+      console.error('Error persisting theme preference', e);
+    }
   }, [isDarkMode]);
 
   // Escuchar cambios en localStorage (cuando Sidebar cambia el modo oscuro)
   useEffect(() => {
     const handleStorageChange = () => {
-      const user = localStorage.getItem('user');
-      if (user) {
-        try {
+      try {
+        const user = localStorage.getItem('user');
+        if (user) {
           const u = JSON.parse(user);
           const prefs = localStorage.getItem(`prefs_${u.id}`);
           if (prefs) {
             const parsed = JSON.parse(prefs);
-            setIsDarkMode(parsed.darkMode || false);
+            setIsDarkMode(!!parsed.darkMode);
+            return;
           }
-        } catch (e) {
-          console.error('Error al detectar cambios:', e);
         }
+        // fallback to global prefs
+        const global = localStorage.getItem('prefs_global');
+        if (global) {
+          const p = JSON.parse(global);
+          setIsDarkMode(!!p.darkMode);
+          return;
+        }
+      } catch (e) {
+        console.error('Error al detectar cambios de storage:', e);
       }
+      // if nothing found, derive from DOM class
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
     };
 
     // Escuchar cambios en localStorage
@@ -54,18 +81,9 @@ export function ThemeProvider({ children }) {
     
     // Escuchar cambios en el DOM (cuando Sidebar actualiza las prefs)
     const observer = new MutationObserver(() => {
+      // Preferir la clase `dark` del DOM como fuente de verdad para la UI
       const isDark = document.documentElement.classList.contains('dark');
-      const user = localStorage.getItem('user');
-      if (user) {
-        try {
-          const u = JSON.parse(user);
-          const prefs = localStorage.getItem(`prefs_${u.id}`);
-          if (prefs) {
-            const parsed = JSON.parse(prefs);
-            setIsDarkMode(parsed.darkMode || false);
-          }
-        } catch (e) {}
-      }
+      setIsDarkMode(!!isDark);
     });
 
     observer.observe(document.documentElement, {
