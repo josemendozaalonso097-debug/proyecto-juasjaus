@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .database import init_db
 from .database_otp import init_otp_db
-from .routers import auth, index, tienda
+from .routers import auth, index, tienda, eventos
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -54,10 +54,12 @@ app.add_middleware(
 # REGISTRAR ROUTERS
 # ============================================
 from .models import user
+from .models import evento as evento_model
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(index.router, prefix="/api")
 app.include_router(tienda.router, prefix="/api")
+app.include_router(eventos.router, prefix="/api")
 
 # ============================================
 # EVENTOS DE INICIO Y CIERRE

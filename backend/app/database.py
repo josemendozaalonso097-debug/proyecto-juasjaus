@@ -41,4 +41,24 @@ def init_db():
             print("✅ Migración: columna 'rol' agregada a users")
         except Exception:
             pass  # La columna ya existe
+
+    # Migración: crear tabla eventos si no existe
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS eventos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    titulo VARCHAR(200) NOT NULL,
+                    fecha VARCHAR(50) NOT NULL,
+                    descripcion TEXT,
+                    created_by INTEGER NOT NULL REFERENCES users(id),
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """))
+            conn.commit()
+            print("✅ Tabla 'eventos' verificada/creada")
+        except Exception as e:
+            print(f"Info tabla eventos: {e}")
+
     print("✅ Base de datos inicializada")

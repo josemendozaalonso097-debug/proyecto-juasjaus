@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkSessionToken } from '../api/auth';
 import { showToast } from '../utils/toast';
 import { obtenerHistorial } from '../utils/storage';
+import { getEventos, createEvento, updateEvento, deleteEvento } from '../api/eventos';
 
 // Modals and components
 import Sidebar from '../components/Sidebar';
@@ -38,6 +39,16 @@ export default function Principal() {
   const [nextPaymentDateText, setNextPaymentDateText] = useState('—');
   const [nextPaymentDateColor, setNextPaymentDateColor] = useState('');
   const [profileAvatar, setProfileAvatar] = useState("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E");
+
+  // Carousel & eventos state
+  const [carouselSlide, setCarouselSlide] = useState(0);
+  const [eventos, setEventos] = useState([]);
+  const [eventoModal, setEventoModal] = useState(false);
+  const [editingEvento, setEditingEvento] = useState(null);
+  const [eventoForm, setEventoForm] = useState({ titulo: '', fecha: '', descripcion: '' });
+  const [savingEvento, setSavingEvento] = useState(false);
+  const touchStartX = useRef(null);
+  const isAdmin = (() => { try { return JSON.parse(localStorage.getItem('user'))?.rol === 'admin'; } catch { return false; } })();
 
   // Splash logic
   const [showSplash, setShowSplash] = useState(() => {
@@ -203,6 +214,66 @@ export default function Principal() {
       return () => clearTimeout(timer);
     }
   }, [showSplash]);
+
+  // Load eventos on mount
+  useEffect(() => {
+    getEventos()
+      .then(r => r.json())
+      .then(data => setEventos(Array.isArray(data) ? data : []))
+      .catch(() => setEventos([]));
+  }, []);
+
+  // Carousel helpers
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) setCarouselSlide(diff > 0 ? 1 : 0);
+    touchStartX.current = null;
+  };
+
+  // Evento CRUD helpers
+  const openCreateEvento = () => {
+    setEditingEvento(null);
+    setEventoForm({ titulo: '', fecha: '', descripcion: '' });
+    setEventoModal(true);
+  };
+  const openEditEvento = (ev) => {
+    setEditingEvento(ev);
+    setEventoForm({ titulo: ev.titulo, fecha: ev.fecha, descripcion: ev.descripcion || '' });
+    setEventoModal(true);
+  };
+  const handleSaveEvento = async () => {
+    if (!eventoForm.titulo.trim() || !eventoForm.fecha.trim()) {
+      showToast('El título y la fecha son obligatorios', 'error');
+      return;
+    }
+    setSavingEvento(true);
+    try {
+      const fn = editingEvento ? updateEvento(editingEvento.id, eventoForm) : createEvento(eventoForm);
+      const res = await fn;
+      if (!res.ok) throw new Error();
+      const refreshed = await getEventos();
+      const data = await refreshed.json();
+      setEventos(Array.isArray(data) ? data : []);
+      setEventoModal(false);
+      showToast(editingEvento ? 'Evento actualizado' : 'Evento creado', 'success');
+    } catch {
+      showToast('Error al guardar el evento', 'error');
+    } finally {
+      setSavingEvento(false);
+    }
+  };
+  const handleDeleteEvento = async (id) => {
+    if (!window.confirm('¿Eliminar este evento?')) return;
+    try {
+      await deleteEvento(id);
+      setEventos(prev => prev.filter(e => e.id !== id));
+      showToast('Evento eliminado', 'success');
+    } catch {
+      showToast('Error al eliminar', 'error');
+    }
+  };
 
   const handleProfileUpdate = () => {
     loadProfileData();
@@ -628,45 +699,130 @@ export default function Principal() {
             </div>
           </section>
 
-          {/* Payment Status Card */}
+          {/* Swipeable Carousel: Pagos + Eventos */}
           <section className="mb-5" id="estado-container-global-mobile">
-            <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm">
-              <div className="flex justify-between items-start mb-[14px]">
-                <div>
-                  <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-1.5">Estados de pago</h3>
-                  {pendingCount > 0 ? (
-                    <div className="inline-flex items-center gap-1.5 bg-[#ffdad6] dark:bg-red-950/40 rounded-full px-2.5 py-1 text-[11px] font-bold text-[#93000a] dark:text-red-300">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a] inline-block"></span>
-                      {pendingCount} pago(s) pendiente(s)
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-1.5 bg-[#e8f5e9] dark:bg-green-950/40 rounded-full px-2.5 py-1 text-[11px] font-bold text-[#1b5e20] dark:text-green-300">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#27ae60] inline-block"></span>
-                      Al corriente
-                    </div>
-                  )}
-                </div>
-                {pendingCount > 0 ? (
-                  <div className="w-[52px] h-[52px] rounded-full bg-[#ffdad6] dark:bg-red-950/40 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[#ba1a1a] dark:text-red-400 text-[22px]">warning</span>
-                  </div>
-                ) : (
-                  <div className="w-[52px] h-[52px] rounded-full bg-[#e8f5e9] dark:bg-green-950/40 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[#27ae60] dark:text-green-400 text-[22px]">check_circle</span>
-                  </div>
-                )}
-              </div>
-              <p className="mob-sub text-xs text-[#5b403d] dark:text-[#9b7a78] leading-relaxed mb-4">
-                {pendingCount > 0 
-                  ? 'Tienes pagos atrasados. Regulariza tu situación a tiempo.'
-                  : 'Tu cuenta está al corriente. ¡Gracias por tu puntualidad!'}
-              </p>
-              <button 
-                onClick={() => setInfoOpen(true)}
-                className="w-full bg-[#af101a] text-white py-3 rounded-xl font-bold text-sm border-none cursor-pointer"
+            {/* Dot indicators */}
+            <div className="flex justify-center gap-1.5 mb-2">
+              <button
+                onClick={() => setCarouselSlide(0)}
+                className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${carouselSlide === 0 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`}
+              />
+              <button
+                onClick={() => setCarouselSlide(1)}
+                className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${carouselSlide === 1 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`}
+              />
+            </div>
+
+            {/* Slides wrapper */}
+            <div
+              className="overflow-hidden rounded-2xl"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${carouselSlide * 100}%)` }}
               >
-                Ver detalles
-              </button>
+                {/* ── Slide 1: Estados de pago ── */}
+                <div className="min-w-full">
+                  <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm">
+                    <div className="flex justify-between items-start mb-[14px]">
+                      <div>
+                        <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-1.5">Estados de pago</h3>
+                        {pendingCount > 0 ? (
+                          <div className="inline-flex items-center gap-1.5 bg-[#ffdad6] dark:bg-red-950/40 rounded-full px-2.5 py-1 text-[11px] font-bold text-[#93000a] dark:text-red-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a] inline-block"></span>
+                            {pendingCount} pago(s) pendiente(s)
+                          </div>
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 bg-[#e8f5e9] dark:bg-green-950/40 rounded-full px-2.5 py-1 text-[11px] font-bold text-[#1b5e20] dark:text-green-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#27ae60] inline-block"></span>
+                            Al corriente
+                          </div>
+                        )}
+                      </div>
+                      {pendingCount > 0 ? (
+                        <div className="w-[52px] h-[52px] rounded-full bg-[#ffdad6] dark:bg-red-950/40 flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-[#ba1a1a] dark:text-red-400 text-[22px]">warning</span>
+                        </div>
+                      ) : (
+                        <div className="w-[52px] h-[52px] rounded-full bg-[#e8f5e9] dark:bg-green-950/40 flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-[#27ae60] dark:text-green-400 text-[22px]">check_circle</span>
+                        </div>
+                      )}
+                    </div>
+                    <p className="mob-sub text-xs text-[#5b403d] dark:text-[#9b7a78] leading-relaxed mb-4">
+                      {pendingCount > 0
+                        ? 'Tienes pagos atrasados. Regulariza tu situación a tiempo.'
+                        : 'Tu cuenta está al corriente. ¡Gracias por tu puntualidad!'}
+                    </p>
+                    <button
+                      onClick={() => setInfoOpen(true)}
+                      className="w-full bg-[#af101a] text-white py-3 rounded-xl font-bold text-sm border-none cursor-pointer"
+                    >
+                      Ver detalles
+                    </button>
+                  </div>
+                </div>
+
+                {/* ── Slide 2: Eventos / Anuncios ── */}
+                <div className="min-w-full">
+                  <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm min-h-[190px]">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3]">Eventos y Avisos</h3>
+                      {isAdmin && (
+                        <button
+                          onClick={openCreateEvento}
+                          className="w-8 h-8 rounded-full bg-[#af101a] text-white flex items-center justify-center border-none cursor-pointer shrink-0"
+                          title="Nuevo evento"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">add</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {eventos.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
+                        <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 text-[40px]">event_note</span>
+                        <p className="text-xs text-[#8f6f6c] dark:text-[#9b7a78]">Sin eventos por ahora</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3 max-h-[280px] overflow-y-auto pr-1">
+                        {eventos.map(ev => (
+                          <div key={ev.id} className="flex flex-col gap-0.5 pb-2.5 border-b border-slate-100 dark:border-[#3c1e1e]/20 last:border-0 last:pb-0">
+                            <div className="flex justify-between items-start gap-2">
+                              <p className="font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] leading-snug">{ev.titulo}</p>
+                              {isAdmin && (
+                                <div className="flex gap-1 shrink-0">
+                                  <button
+                                    onClick={() => openEditEvento(ev)}
+                                    className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center border-none cursor-pointer"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px] text-slate-600 dark:text-slate-300">edit</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteEvento(ev.id)}
+                                    className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center border-none cursor-pointer"
+                                  >
+                                    <span className="material-symbols-outlined text-[14px] text-[#ba1a1a] dark:text-red-400">delete</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#af101a] dark:text-red-400">
+                              <span className="material-symbols-outlined text-[12px]">calendar_month</span>
+                              {ev.fecha}
+                            </span>
+                            {ev.descripcion && (
+                              <p className="text-xs text-[#5b403d] dark:text-[#9b7a78] leading-relaxed mt-0.5">{ev.descripcion}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -835,6 +991,71 @@ export default function Principal() {
         isOpen={infoOpen} 
         onClose={() => setInfoOpen(false)} 
       />
+
+      {/* ── Admin Evento Modal ── */}
+      {eventoModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm" onClick={() => setEventoModal(false)}>
+          <div
+            className="bg-white dark:bg-[#1e2025] rounded-t-3xl w-full max-w-lg p-6 pb-10 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="font-bold text-lg text-[#1a1c1d] dark:text-[#f1f1f3]">
+                {editingEvento ? 'Editar Evento' : 'Nuevo Evento'}
+              </h2>
+              <button
+                onClick={() => setEventoModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center border-none cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[18px] text-slate-600 dark:text-slate-300">close</span>
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Título *</label>
+                <input
+                  type="text"
+                  placeholder="Ej. Junta de padres de familia"
+                  value={eventoForm.titulo}
+                  onChange={e => setEventoForm(f => ({ ...f, titulo: e.target.value }))}
+                  className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Fecha *</label>
+                <input
+                  type="text"
+                  placeholder="Ej. 15 de junio de 2026"
+                  value={eventoForm.fecha}
+                  onChange={e => setEventoForm(f => ({ ...f, fecha: e.target.value }))}
+                  className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Descripción</label>
+                <textarea
+                  rows={3}
+                  placeholder="Detalles adicionales del evento..."
+                  value={eventoForm.descripcion}
+                  onChange={e => setEventoForm(f => ({ ...f, descripcion: e.target.value }))}
+                  className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a] resize-none"
+                />
+              </div>
+
+              <button
+                onClick={handleSaveEvento}
+                disabled={savingEvento}
+                className="w-full bg-[#af101a] text-white py-3.5 rounded-xl font-bold text-sm border-none cursor-pointer disabled:opacity-60 mt-1"
+              >
+                {savingEvento ? 'Guardando...' : (editingEvento ? 'Guardar cambios' : 'Crear evento')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
