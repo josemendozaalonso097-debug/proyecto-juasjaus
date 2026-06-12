@@ -1,11 +1,10 @@
 # CBTis 258 — Servicios Financieros
 
+[![CI](https://github.com/josemendozaalonso097-debug/proyecto-juasjaus/actions/workflows/ci.yml/badge.svg)](https://github.com/josemendozaalonso097-debug/proyecto-juasjaus/actions)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Node](https://img.shields.io/badge/node-20.x-brightgreen)
 
-Descripción profesional y breve:
-
-Proyecto de demostración y laboratorio para el curso CBTis 258. Incluye un backend en Python (FastAPI) y un frontend moderno con React + Vite. Este README explica con claridad cómo preparar el entorno, ejecutar la aplicación y solucionar problemas comunes.
+Breve descripción: proyecto de laboratorio para CBTis 258 con backend en FastAPI y frontend en React + Vite. Este README ofrece pasos claros para instalar, ejecutar y depurar la aplicación en entornos locales.
 
 ---
 
