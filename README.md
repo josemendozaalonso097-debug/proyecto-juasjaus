@@ -56,6 +56,8 @@ git clone https://github.com/josemendozaalonso097-debug/proyecto-juasjaus.git
 cd proyecto-juasjaus
 ```
 
+> **Nota importante**: el repositorio está limpio — NO incluye `node_modules/`, `.venv/`, bases de datos ni logs. Debes instalar las dependencias en tu máquina. Esto es normal, seguro y evita problemas de compatibilidad entre sistemas.
+
 2. Backend: crear `venv` e instalar dependencias:
 
 ```bash
