@@ -16,4 +16,27 @@
     <p style="font-size:12px;opacity:0.7">Detalles técnicos: el token se entrega en el fragmento de la URL (<code>#id_token=...</code>) y la ventana principal lo leerá automáticamente.</p>
   </div>
 </body>
+  <script>
+    (function(){
+      try {
+        const hash = new URLSearchParams(window.location.hash.substring(1));
+        const id_token = hash.get('id_token');
+        if (id_token && window.opener) {
+          // Enviamos el token al opener de forma segura
+          const payload = { type: 'google-id-token', id_token };
+          try {
+            window.opener.postMessage(payload, window.location.origin);
+          } catch (e) {
+            // fallback: permitir envío amplio si por alguna razón el origin difiere
+            window.opener.postMessage(payload, '*');
+          }
+          // cerramos la ventana después de un breve retraso
+          setTimeout(() => window.close(), 700);
+        }
+      } catch (err) {
+        // mostrar error leve en consola
+        console.error('OAuth callback error', err);
+      }
+    })();
+  </script>
 </html>

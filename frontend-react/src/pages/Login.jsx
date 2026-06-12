@@ -296,20 +296,20 @@ export default function Login() {
         const left = (screen.width - width) / 2;
         const top = (screen.height - height) / 2;
         const popup = window.open(url, 'google-login', `width=${width},height=${height},top=${top},left=${left}`);
-        const interval = setInterval(() => {
-            try {
-                if (!popup || popup.closed) { clearInterval(interval); return; }
-                const popupUrl = popup.location.href;
-                if (popupUrl.includes('#')) {
-                    const hash = new URLSearchParams(popup.location.hash.substring(1));
-                    const id_token = hash.get('id_token');
-                    if (id_token) {
-                        popup.close(); clearInterval(interval);
-                        sendGoogleToken(id_token);
-                    }
-                }
-            } catch { /* cross-origin */ }
-        }, 200);
+
+        // Escuchar el mensaje que envía la página callback via postMessage
+        const handleMessage = (e) => {
+            if (e.origin !== window.location.origin) return; // seguridad
+            const data = e.data || {};
+            if (data.type === 'google-id-token' && data.id_token) {
+                try { sendGoogleToken(data.id_token); } catch (err) { console.error(err); }
+                window.removeEventListener('message', handleMessage);
+                try { popup?.close(); } catch {}
+            }
+        };
+        window.addEventListener('message', handleMessage, false);
+        // Auto-cleanup: quitar listener después de 2 minutos
+        setTimeout(() => window.removeEventListener('message', handleMessage), 120000);
     };
 
     const sendGoogleToken = async (id_token) => {
