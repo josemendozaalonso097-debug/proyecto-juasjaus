@@ -33,6 +33,10 @@ Este repositorio contiene:
 
 La carpeta legacy `frontend/` fue eliminada. Use `frontend-react/` para desarrollo y despliegue.
 
+### Vista previa
+
+![Demo preview](docs/assets/screenshot.svg)
+
 ---
 
 ## Requisitos
