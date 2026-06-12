@@ -251,3 +251,50 @@ npm install
 - No subas `backend/.env` ni el archivo de base de datos local.
 
 Si quieres, puedo agregar más información sobre cómo detener los procesos que se ejecutan en segundo plano y cómo limpiar el proyecto después de usarlo.
+
+---
+
+## Comandos rápidos (Copy & Paste) ⏱️
+
+- Linux / macOS / WSL (todo en uno):
+
+```bash
+chmod +x run.sh
+./run.sh
+```
+
+- Linux / macOS (arranque completo con logs):
+
+```bash
+chmod +x start-dev.sh
+./start-dev.sh
+# Logs: backend/uvicorn.log  frontend-react/dev.log
+```
+
+- Windows (CMD — todo en ventanas separadas):
+
+```cmd
+start-dev.bat
+```
+
+- Windows (PowerShell — crear venv y ejecutar manualmente):
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements.txt
+cd frontend-react
+npm install
+# En una terminal: .\.venv\Scripts\python.exe backend/run.py
+# En otra terminal: npm run dev -- --port 5501
+```
+
+- Parar procesos iniciados por `start-dev.sh`:
+
+```bash
+# matar por PID guardado
+kill "$(cat frontend-react/vite.pid)" || true && rm -f frontend-react/vite.pid
+kill "$(cat backend/uvicorn.pid)" || true && rm -f backend/uvicorn.pid
+```
+
