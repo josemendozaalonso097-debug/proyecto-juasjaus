@@ -5,11 +5,16 @@
 Este documento detalla la arquitectura completa, el flujo lógico, y la 
 estructura de código del Sistema de Servicios Financieros del CBTis 258.
 
+> Nota: la carpeta legacy `frontend/` fue eliminada; el frontend actual se encuentra en `frontend-react/`.
+
 ------------------------------------------------------------------------
 1. VISIÓN GENERAL DE LA ARQUITECTURA
 ------------------------------------------------------------------------
 El sistema sigue la arquitectura Cliente-Servidor separada en dos carpetas 
-principales: "backend" (API en Python) y "frontend" (Cliente Web en Vanilla JS).
+principales: "backend" (API en Python) y un frontend legacy que antes vivía en 
+"frontend".
+
+Actualmente el frontend React moderno se mantiene en `frontend-react/`.
 
 A. BACKEND (FastAPI - Python)
    - Función: Gestiona la lógica de negocio, autenticación, conexión a 

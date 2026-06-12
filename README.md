@@ -1,176 +1,101 @@
 # CBTis 258 - Servicios Financieros
 
-## 🐧 Ejecutar en Linux / ChromeOS (RECOMENDADO)
+Este README describe cómo arrancar el backend FastAPI y el frontend React/Vite en este repositorio.
 
-**Opción automática: `run.sh`**
+## Estado actual del proyecto
+- Backend: `backend/` usando FastAPI + Uvicorn.
+- Frontend React: `frontend-react/` usando Vite.
+- El script principal de arranque es `./run.sh`.
 
-Este método levanta el backend y el frontend con un solo comando.
+## Requisitos recomendados
+- Python 3.10+ (3.12 funciona bien aquí).
+- Node.js 20.x (se recomienda usar `nvm`).
+- npm o yarn.
 
-**Requisitos previos:**
-1. Python 3 instalado.
-2. Entorno virtual creado: `python3 -m venv .venv`
-3. Entorno activado: `source .venv/bin/activate`
-4. Dependencias instaladas: `pip install -r backend/requirements.txt`
+## 1) Arranque rápido (recomendado)
 
-**Pasos para ejecutar:**
-1. Abre una terminal en la raíz del proyecto.
-2. Da permisos (solo la primera vez): `chmod +x run.sh`
-# CBTis 258 - Servicios Financieros
-
-Este README explica cómo arrancar el proyecto en desarrollo (frontend React con Vite y backend FastAPI) en Linux.
-
-Resumen rápido
-- Frontend (Vite) -> puerto por defecto usado en esta máquina: 5502 (ej. http://localhost:5502/)
-- Backend (Uvicorn/FastAPI) -> puerto por defecto: 8000 (http://localhost:8000/)
-
-Requisitos
-- Python 3.8+ (recomendado Python 3.10+)
-- Node.js y npm (o pnpm/yarn) para el frontend
-
-Importante: en este repositorio se creó un entorno virtual de prueba `.venv-backend` y el archivo `backend/requirements.txt` fue actualizado con versiones pinneadas (backup: `backend/requirements.txt.bak`). Si prefieres crear tu propio venv, sigue las instrucciones abajo.
-
-## 1) Arrancar en modo desarrollo (recomendado, ver logs en la terminal)
-
-Frontend (terminal A)
+Desde la raíz del repositorio:
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus/frontend-react
-# Instalar solo la primera vez o si cambian dependencias
-npm ci
-# Levantar Vite (visible en la red local)
-npm run dev -- --host
+chmod +x run.sh
+./run.sh
 ```
 
-Backend (terminal B)
+Este script hace lo siguiente:
+- inicia el backend desde `backend/` usando el entorno virtual `.venv`.
+- carga `nvm` si está disponible y usa Node 20.
+- arranca el frontend desde `frontend-react/` en el puerto `5501`.
+
+## 2) Preparar el backend
+
+Si no tienes el entorno virtual creado todavía:
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus
-# (opcional) crear venv si no existe
-python3 -m venv .venv-backend
-source .venv-backend/bin/activate
-# instalar dependencias (solo la primera vez o si cambian)
+python3 -m venv .venv
+source .venv/bin/activate
 pip install --upgrade pip
 pip install -r backend/requirements.txt
-# arrancar con autoreload (útil en desarrollo)
-python3 backend/run.py
 ```
 
-Después de arrancar, puedes abrir en tu navegador:
-- Frontend: http://localhost:5502/
-- Backend (docs): http://localhost:8000/docs
+### Variables de entorno necesarias
+Crea `backend/.env` con al menos:
 
-## 2) Ejecutarlos en background (como se hizo en esta sesión)
+```env
+SECRET_KEY=alguna_clave_secreta_larga
+```
 
-Frontend (background)
+Sin este archivo, el backend no arrancará porque `SECRET_KEY` es obligatorio.
+
+## 3) Preparar el frontend
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus/frontend-react
-# inicia en background y guarda logs y pid
-nohup npm run dev -- --host > dev.log 2>&1 & echo $! > vite.pid
+cd frontend-react
+npm install
 ```
 
-Backend (background)
+Si usas Node 20 con `nvm`:
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus
-# activar venv y arrancar sin autoreload
-. .venv-backend/bin/activate
-nohup python3 backend/run_no_reload.py > backend/uvicorn.log 2>&1 & echo $! > backend/uvicorn.pid
+nvm install 20
+nvm use 20
+npm install
 ```
 
-## Logs y control de procesos
-- Logs frontend: `frontend-react/dev.log`
-- Logs backend: `backend/uvicorn.log`
-- PID frontend: `frontend-react/vite.pid`
-- PID backend: `backend/uvicorn.pid`
+## 4) Ejecución manual separada
 
-Ver logs en tiempo real:
+### Backend
 
 ```bash
-tail -f frontend-react/dev.log
-tail -f backend/uvicorn.log
+cd backend
+source ../.venv/bin/activate
+../.venv/bin/uvicorn app.main:app --reload
 ```
 
-Parar procesos (si los iniciaste en background):
+### Frontend
 
 ```bash
-kill $(cat frontend-react/vite.pid) || true && rm -f frontend-react/vite.pid
-kill $(cat backend/uvicorn.pid) || true && rm -f backend/uvicorn.pid
+cd frontend-react
+npm run dev -- --port 5501
 ```
 
-Comandos útiles de reinicio
+## 5) ¿Qué hacer si `vite` no se encuentra?
+
+Esto se corrige instalando dependencias en `frontend-react` y usando Node 20:
 
 ```bash
-# Reiniciar backend (background)
-kill $(cat backend/uvicorn.pid) || true
-. .venv-backend/bin/activate
-nohup python3 backend/run_no_reload.py > backend/uvicorn.log 2>&1 & echo $! > backend/uvicorn.pid
+cd frontend-react
+rm -rf node_modules package-lock.json
+npm install
+npm run dev -- --port 5501
 ```
 
-Notas y recomendaciones
-- Si prefieres trabajar con dos terminales en foreground (ver logs en la terminal) usa la sección "Arrancar en modo desarrollo".
-- Si vas a compartir la app con dispositivos en la misma red, asegúrate de exponer host (`--host`) y/o usar la URL de red que muestre Vite (ej. http://100.115.92.205:5502/).
-- Si quieres automatizar, puedo añadir `start-dev.sh` y `stop-dev.sh` para arrancar/parar ambos con un solo comando.
+## URLs importantes
+- Frontend: http://localhost:5501/
+- Backend: http://localhost:8000/
+- Documentación OpenAPI: http://localhost:8000/docs
 
-## Pasos realizados localmente (Windows)
-
-A continuación se documentan los pasos exactos que realicé durante la sesión para levantar el backend y frontend en un equipo con Windows. Útil como guía rápida para reproducir el entorno local.
-
-### Backend (Windows — Python 3.11)
-
-- Instalé Python 3.11 y creé un virtualenv llamado `.venv311`:
-	- `py -3.11 -m venv .venv311`
-	- `.\.venv311\Scripts\python.exe -m pip install --upgrade pip`
-- Instalé dependencias evitando `uvloop` (no compatible con Windows):
-	- `.\.venv311\Scripts\python.exe -m pip install -r backend/requirements_no_uvloop.txt`
-	- Si no existe `requirements_no_uvloop.txt`, instala `backend/requirements.txt` pero omite `uvloop`.
-- Creé un `.env` mínimo en `backend/.env` con al menos:
-	- `SECRET_KEY=dev_secret_for_local_dev`
-	- (No subir este archivo al repositorio ni compartir claves reales.)
-- Arrancar backend:
-	- `cd backend`
-	- `.\.venv311\Scripts\python.exe run.py`
-- Backend disponible en: `http://localhost:8000` (docs: `http://localhost:8000/docs`)
-
-### Frontend estático (opcional)
-
-- Para pruebas rápidas de HTML/CSS estático en `frontend/`:
-	- `cd frontend`
-	- `python -m http.server 5173`
-	- Abrir `http://localhost:5173`
-
-### Frontend React (Vite)
-
-- Entrar en `frontend-react`, instalar y arrancar el dev server:
-	- `cd frontend-react`
-	- `npm install`
-	- `npm run dev`
-- En esta sesión Vite se sirvió en `http://localhost:5502/` (puerto puede variar).
-
-### Notas y buenas prácticas
-
-## Scripts de arranque rápido (añadidos)
-
-He añadido dos scripts en la raíz del repositorio para facilitar el arranque en desarrollo sin tocar nada existente:
-
-- `start-dev.sh` — script para Linux/macOS. Crea/activa `.venv-backend`, instala dependencias (usa `backend/requirements_no_uvloop.txt` si está presente), arranca el backend con `backend/run.py` y levanta el `frontend-react` (`npm run dev`) en background. Guarda logs en `backend/uvicorn.log` y `frontend-react/dev.log`, y PIDs en `backend/uvicorn.pid` y `frontend-react/vite.pid`.
-- `start-dev.bat` — script para Windows (cmd). Crea `.venv-backend`, instala dependencias e abre dos ventanas `cmd` separadas que ejecutan el backend y el frontend.
-
-Uso recomendado:
-
-Linux/macOS:
-```bash
-chmod +x start-dev.sh
-./start-dev.sh
-```
-
-Windows (cmd/PowerShell):
-```powershell
-start-dev.bat
-```
-
-Notas:
-- Los scripts no modifican archivos existentes del backend o frontend.
-- En Windows se usa `requirements_no_uvloop.txt` si existe para evitar instalar `uvloop` incompatibles.
-- Si prefieres una versión PowerShell o scripts para parar los procesos, puedo añadirlos.
+## Notas adicionales
+- El frontend antiguo en `frontend/` fue eliminado; el app React actual está en `frontend-react/`.
+- `run.sh` ya está actualizado para arrancar `frontend-react` y cargar `nvm` si existe.
+- Si prefieres, puedo agregar una sección de `docker-compose` o un script de parada (`stop.sh`) también.
 

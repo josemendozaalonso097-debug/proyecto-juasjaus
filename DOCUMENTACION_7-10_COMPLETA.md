@@ -1,6 +1,8 @@
 # DOCUMENTACIÓN TÉCNICA COMPLETA - PUNTOS 7-10
 ## Sistema de Servicios Financieros - CBTis 258
 
+> Nota: este documento describe una versión legacy del frontend que estaba ubicada en `frontend/`. Ese directorio ha sido eliminado; el frontend actual se encuentra en `frontend-react/`.
+
 ---
 
 # 7. FLUJO DE DATOS EN EL PROCESO DE DIGITALIZACIÓN

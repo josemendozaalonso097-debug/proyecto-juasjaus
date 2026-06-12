@@ -21,4 +21,6 @@ venv/
 .venv/
 env/
 backend/.env
+backend/cbtis258.db
+backend/backend.log
 .env
