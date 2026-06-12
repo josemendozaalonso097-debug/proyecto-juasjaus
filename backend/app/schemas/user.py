@@ -35,6 +35,7 @@ class UserResponse(BaseModel):
     email: str
     profile_picture: Optional[str] = None
     is_verified: bool
+    rol: str = "alumno"
     created_at: datetime
     
     class Config:

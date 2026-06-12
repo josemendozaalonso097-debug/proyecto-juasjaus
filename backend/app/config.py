@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     
     # Google OAuth
     GOOGLE_CLIENT_ID: Optional[str] = None
+
+    # Admin whitelist (correos separados por coma)
+    ADMIN_EMAILS: str = ""
     
     class Config:
         env_file = ".env"

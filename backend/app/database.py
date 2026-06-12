@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
@@ -30,7 +30,15 @@ def get_db():
 # Función para inicializar las tablas
 def init_db():
     """
-    Crea todas las tablas definidas en los modelos
+    Crea todas las tablas definidas en los modelos y aplica migraciones pendientes
     """
     Base.metadata.create_all(bind=engine)
+    # Migración: agregar columna rol si no existe (para BDs existentes)
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN rol VARCHAR(20) NOT NULL DEFAULT 'alumno'"))
+            conn.commit()
+            print("✅ Migración: columna 'rol' agregada a users")
+        except Exception:
+            pass  # La columna ya existe
     print("✅ Base de datos inicializada")

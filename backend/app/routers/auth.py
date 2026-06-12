@@ -24,6 +24,11 @@ router = APIRouter(
     tags=["Autenticación"]
 )
 
+def get_rol(email: str) -> str:
+    """Devuelve 'admin' si el email está en la whitelist, si no 'alumno'"""
+    admin_emails = [e.strip().lower() for e in settings.ADMIN_EMAILS.split(',') if e.strip()]
+    return "admin" if email.strip().lower() in admin_emails else "alumno"
+
 @router.get("/ping")
 async def ping():
     """Ruta de prueba"""
@@ -54,14 +59,15 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
         nombre=user_data.nombre,
         email=user_data.email,
         password_hash=hash_password(user_data.password),
-        is_verified=True  # Auto-verificado en desarrollo
+        is_verified=True,
+        rol=get_rol(user_data.email)
     )
     
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     
-    print(f"✅ Usuario registrado: {new_user.email}")
+    print(f"✅ Usuario registrado: {new_user.email} (rol: {new_user.rol})")
     
     # Enviar email de bienvenida (async, no bloquea)
     try:
@@ -72,7 +78,6 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     # Crear token JWT
     access_token = create_access_token(data={"sub": new_user.email})
     
-    # Crear respuesta con headers CORS explícitos
     response_data = {
         "access_token": access_token,
         "token_type": "bearer",
@@ -82,6 +87,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
             "email": new_user.email,
             "profile_picture": new_user.profile_picture,
             "is_verified": new_user.is_verified,
+            "rol": new_user.rol,
             "created_at": new_user.created_at.isoformat()
         }
     }
@@ -181,13 +187,14 @@ async def register_verify_otp(verification_data: VerifyOTP, db: Session = Depend
         nombre=otp_record.nombre,
         email=otp_record.email,
         password_hash=otp_record.password_hash,
-        is_verified=True
+        is_verified=True,
+        rol=get_rol(otp_record.email)
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     
-    print(f"✅ Usuario registrado exitosamente tras OTP: {new_user.email}")
+    print(f"✅ Usuario registrado exitosamente tras OTP: {new_user.email} (rol: {new_user.rol})")
     
     # Enviar email de bienvenida (async, no bloquea)
     try:
@@ -211,6 +218,7 @@ async def register_verify_otp(verification_data: VerifyOTP, db: Session = Depend
             "email": new_user.email,
             "profile_picture": new_user.profile_picture,
             "is_verified": new_user.is_verified,
+            "rol": new_user.rol,
             "created_at": new_user.created_at.isoformat()
         }
     }
@@ -233,16 +241,16 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
             detail="Email o contraseña incorrectos"
         )
     
-    # Actualizar último login
+    # Actualizar último login y rol (por si cambia la whitelist)
     user.last_login = datetime.utcnow()
+    user.rol = get_rol(user.email)
     db.commit()
     
-    print(f"✅ Login exitoso: {user.email}")
+    print(f"✅ Login exitoso: {user.email} (rol: {user.rol})")
     
     # Crear token JWT
     access_token = create_access_token(data={"sub": user.email})
     
-    # Crear respuesta con headers CORS explícitos
     response_data = {
         "access_token": access_token,
         "token_type": "bearer",
@@ -252,6 +260,7 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
             "email": user.email,
             "profile_picture": user.profile_picture,
             "is_verified": user.is_verified,
+            "rol": user.rol,
             "created_at": user.created_at.isoformat()
         }
     }
@@ -310,10 +319,11 @@ async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
             )
             db.add(user)
         
+        user.rol = get_rol(user.email)
         db.commit()
         db.refresh(user)
         
-        print(f"✅ Login Google exitoso: {user.email}")
+        print(f"✅ Login Google exitoso: {user.email} (rol: {user.rol})")
         
         # Crear token JWT
         access_token = create_access_token(data={"sub": user.email})
@@ -327,6 +337,7 @@ async def google_login(google_data: GoogleLogin, db: Session = Depends(get_db)):
                 "email": user.email,
                 "profile_picture": user.profile_picture,
                 "is_verified": user.is_verified,
+                "rol": user.rol,
                 "created_at": user.created_at.isoformat()
             }
         }

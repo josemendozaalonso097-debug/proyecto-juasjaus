@@ -13,6 +13,7 @@ class User(Base):
     google_id = Column(String(100), unique=True, nullable=True)
     profile_picture = Column(String(300), nullable=True)
     is_verified = Column(Boolean, default=False)
+    rol = Column(String(20), default="alumno", nullable=False, server_default="alumno")
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)
     
