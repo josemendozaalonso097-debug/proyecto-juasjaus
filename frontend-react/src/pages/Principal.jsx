@@ -735,14 +735,14 @@ export default function Principal() {
               </button>
 
               <button 
-                onClick={() => navigate('/tienda')}
+                onClick={() => setOrientacionOpen(true)}
                 className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#715300]/5 dark:bg-[#715300]/15 flex items-center justify-center mb-2.5">
-                  <span className="material-symbols-outlined text-[#715300] dark:text-amber-400 text-[20px]">storefront</span>
+                <div className="w-10 h-10 rounded-xl bg-[#005f3a]/5 dark:bg-[#005f3a]/15 flex items-center justify-center mb-2.5">
+                  <span className="material-symbols-outlined text-[#005f3a] dark:text-emerald-400 text-[20px]">school</span>
                 </div>
-                <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Tienda</p>
-                <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Productos y trámites</p>
+                <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Orientación</p>
+                <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Reportes y citas</p>
               </button>
 
               <button 
