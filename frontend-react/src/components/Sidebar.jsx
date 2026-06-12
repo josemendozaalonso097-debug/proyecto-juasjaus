@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { showToast } from '../utils/toast';
 import { ThemeContext } from '../context/ThemeContext';
 
-export default function Sidebar({ isOpen, onClose, onOpenChatbot }) {
+export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientacion }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isTienda = location.pathname.includes('tienda');
