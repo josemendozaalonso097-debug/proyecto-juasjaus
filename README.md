@@ -82,6 +82,17 @@ npm install
 
 ---
 
+### Google OAuth — URIs para registrar (development)
+
+Registra en Google Cloud Console los valores exactos siguientes para evitar `redirect_uri_mismatch`:
+
+- **Authorized JavaScript origins**: `http://localhost:5501`
+- **Authorized redirect URIs**: `http://localhost:5501/oauth2-callback`
+
+Usamos una ruta fija `/oauth2-callback` en el frontend para que el `redirect_uri` sea predecible.
+
+---
+
 ## Ejecución (desarrollo)
 
 - Arranque rápido (Linux/macOS/WSL):

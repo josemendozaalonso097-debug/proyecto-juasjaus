@@ -287,7 +287,8 @@ export default function Login() {
 
     // Google OAuth
     const googleOAuthPopup = () => {
-        const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+        // Use a fixed callback path so the redirect URI is predictable and can be registered in Google Cloud
+        const redirectUri = encodeURIComponent(window.location.origin + '/oauth2-callback');
         const scope = encodeURIComponent('openid email profile');
         const nonce = Math.random().toString(36).substring(2);
         const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=id_token&scope=${scope}&nonce=${nonce}&prompt=select_account`;
