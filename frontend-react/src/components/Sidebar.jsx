@@ -35,8 +35,8 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot }) {
       const global = localStorage.getItem('prefs_global');
       if (global) {
         const parsed = JSON.parse(global);
-        setPrefs(prev => ({ ...prev, ...parsed }));
-        aplicarPreferencias({ ...prev, ...parsed });
+        setPrefs(p => ({ ...p, ...parsed }));
+        aplicarPreferencias({ ...prefs, ...parsed });
       }
     } catch (e) {
       console.error('Error parseando datos iniciales en Sidebar:', e);

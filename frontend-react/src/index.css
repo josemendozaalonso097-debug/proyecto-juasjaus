@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
+
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-primary: #f20d0d;

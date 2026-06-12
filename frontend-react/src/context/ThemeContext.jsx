@@ -48,7 +48,7 @@ export function ThemeProvider({ children }) {
     }
   }, [isDarkMode]);
 
-  // Escuchar cambios en localStorage (cuando Sidebar cambia el modo oscuro)
+  // Escuchar cambios en localStorage desde otras pestañas
   useEffect(() => {
     const handleStorageChange = () => {
       try {
@@ -72,28 +72,12 @@ export function ThemeProvider({ children }) {
       } catch (e) {
         console.error('Error al detectar cambios de storage:', e);
       }
-      // if nothing found, derive from DOM class
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
     };
 
-    // Escuchar cambios en localStorage
     window.addEventListener('storage', handleStorageChange);
-    
-    // Escuchar cambios en el DOM (cuando Sidebar actualiza las prefs)
-    const observer = new MutationObserver(() => {
-      // Preferir la clase `dark` del DOM como fuente de verdad para la UI
-      const isDark = document.documentElement.classList.contains('dark');
-      setIsDarkMode(!!isDark);
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      observer.disconnect();
     };
   }, []);
 
