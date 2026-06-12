@@ -6,9 +6,22 @@ import Principal from './pages/Principal';
 import Tienda from './pages/Tienda';
 import ResetPassword from './pages/ResetPassword';
 
-function App() {
+function getHomeRedirect() {
   const token = localStorage.getItem('access_token');
+  if (!token) return '/login';
 
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user?.id) {
+      const prefs = JSON.parse(localStorage.getItem(`prefs_${user.id}`)) || {};
+      if (prefs.manualLogin) return '/login';
+    }
+  } catch { /* ignore */ }
+
+  return '/principal';
+}
+
+function App() {
   return (
     <ThemeProvider>
       <Router>
@@ -19,7 +32,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route 
             path="/" 
-            element={token ? <Navigate to="/principal" replace /> : <Navigate to="/login" replace />} 
+            element={<Navigate to={getHomeRedirect()} replace />} 
           />
           {/* Fallback redirection */}
           <Route 
