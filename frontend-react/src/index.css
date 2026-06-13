@@ -291,6 +291,11 @@ html.dark .material-symbols-outlined { color: inherit !important; }
     animation: toastProgress var(--toast-duration, 4s) linear forwards;
 }
 
+@keyframes bannerSlideIn {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes toastSlideIn {
     from { transform: translateX(120%); opacity: 0; }
     to   { transform: translateX(0); opacity: 1; }

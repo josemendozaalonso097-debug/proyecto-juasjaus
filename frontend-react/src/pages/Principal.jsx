@@ -275,6 +275,19 @@ export default function Principal() {
     }
   };
 
+  // Greeting helpers
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h >= 6 && h < 12) return { text: 'Buenos días', emoji: '🌅' };
+    if (h >= 12 && h < 19) return { text: 'Buenas tardes', emoji: '☀️' };
+    return { text: 'Buenas noches', emoji: '🌙' };
+  };
+  const getFormattedDate = () => new Date().toLocaleDateString('es-MX', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+  const greeting = getGreeting();
+  const formattedDate = getFormattedDate();
+
   const handleProfileUpdate = () => {
     loadProfileData();
   };
@@ -469,13 +482,60 @@ export default function Principal() {
 
         {/* MAIN BODY */}
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
-          <div className="mb-12">
-            <h2 className="text-5xl font-black leading-tight tracking-[-0.033em] mb-3 bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent inline-block transform transition-transform hover:scale-[1.02] cursor-default">
-              Bienvenid@, <span>{userProfile ? userProfile.nombre : '—'}</span>
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-lg font-medium leading-normal ml-1">
-              Revisa tu estado de cuenta y realiza pagos escolares.
-            </p>
+
+          {/* ── Desktop Welcome Banner ── */}
+          <div className="mb-10 rounded-3xl overflow-hidden shadow-xl" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
+            <div className="relative bg-gradient-to-br from-[#af101a] via-[#8b0d15] to-[#3d0408] p-8 flex items-center justify-between gap-6 overflow-hidden">
+              {/* Background decoration */}
+              <div className="absolute -top-10 -right-10 w-56 h-56 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute bottom-0 left-1/3 w-72 h-32 bg-white/3 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute top-4 right-48 w-2 h-2 rounded-full bg-white/20" />
+              <div className="absolute top-12 right-64 w-1 h-1 rounded-full bg-white/30" />
+              <div className="absolute bottom-6 right-32 w-1.5 h-1.5 rounded-full bg-white/20" />
+
+              {/* Left: text */}
+              <div className="relative z-10 flex flex-col gap-2 min-w-0">
+                <p className="text-white/70 text-sm font-semibold uppercase tracking-[0.18em]">
+                  {greeting.emoji}&nbsp;&nbsp;{greeting.text}
+                </p>
+                <h2 className="text-4xl font-black text-white leading-tight tracking-tight truncate">
+                  {userProfile ? userProfile.nombre.split(' ')[0] : '—'}
+                  <span className="text-white/50 font-light">
+                    {userProfile && userProfile.nombre.includes(' ')
+                      ? ' ' + userProfile.nombre.split(' ').slice(1).join(' ')
+                      : ''}
+                  </span>
+                </h2>
+                <p className="text-white/60 text-sm font-medium capitalize mt-0.5">{formattedDate}</p>
+
+                <div className="flex items-center gap-3 mt-3">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
+                    pendingCount === 0
+                      ? 'bg-green-500/20 text-green-200 border border-green-400/30'
+                      : 'bg-red-400/20 text-red-200 border border-red-300/30'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${pendingCount === 0 ? 'bg-green-400' : 'bg-red-300'}`} />
+                    {pendingCount === 0 ? 'Al corriente' : `${pendingCount} pago(s) pendiente(s)`}
+                  </span>
+                  {userProfile && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white/80 border border-white/20">
+                      <span className="material-symbols-outlined text-[13px]">school</span>
+                      {userProfile.semestre}° Semestre
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Right: avatar */}
+              <div className="relative z-10 shrink-0">
+                <div className="w-24 h-24 rounded-2xl border-4 border-white/20 shadow-2xl overflow-hidden bg-white/10"
+                  style={{ backgroundImage: `url("${profileAvatar}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-green-400 border-2 border-white flex items-center justify-center shadow-md">
+                  <span className="material-symbols-outlined text-white text-[12px]">check</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -756,20 +816,59 @@ export default function Principal() {
 
         {/* Mobile Main Content */}
         <div className="mobile-main-content px-5 pt-[80px]">
-          {/* Greeting */}
-          <section className="mb-8 mt-4">
-            <p className="mob-sub text-xs font-semibold text-slate-500 dark:text-[#9b7a78] uppercase tracking-wider mb-1">Bienvenid@</p>
-            <h2 className="mob-title text-[1.75rem] font-extrabold tracking-tight text-[#1a1c1d] dark:text-[#f1f1f3]">
-              {userProfile ? userProfile.nombre : '—'}
-            </h2>
-            <div className="mob-badge inline-flex items-center gap-2 bg-white dark:bg-slate-850 rounded-full px-[14px] py-1 border border-slate-200 dark:border-[#3c1e1e]/40 shadow-sm mt-2">
-              <span 
-                className="w-[7px] h-[7px] rounded-full inline-block"
-                style={{ backgroundColor: pendingCount === 0 ? '#27ae60' : '#e74c3c' }}
-              />
-              <span className="mob-value text-[11px] font-bold text-slate-800 dark:text-[#f1f1f3]">
-                {userProfile ? `${userProfile.semestre}° Semestre` : '—'}
-              </span>
+          {/* ── Mobile Welcome Banner ── */}
+          <section className="mb-5 mt-4" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
+            <div className="relative bg-gradient-to-br from-[#af101a] via-[#8b0d15] to-[#3d0408] rounded-2xl p-5 overflow-hidden shadow-lg">
+              {/* BG decoration */}
+              <div className="absolute -top-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute bottom-0 left-1/2 w-40 h-16 bg-white/3 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Top row: greeting + avatar */}
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <p className="text-white/65 text-[11px] font-bold uppercase tracking-[0.18em] mb-1">
+                    {greeting.emoji}&nbsp; {greeting.text}
+                  </p>
+                  <h2 className="text-[1.6rem] font-black text-white leading-tight tracking-tight">
+                    {userProfile ? userProfile.nombre.split(' ')[0] : '—'}
+                  </h2>
+                  {userProfile && userProfile.nombre.includes(' ') && (
+                    <p className="text-white/50 text-sm font-medium -mt-0.5">
+                      {userProfile.nombre.split(' ').slice(1).join(' ')}
+                    </p>
+                  )}
+                </div>
+                <div className="relative shrink-0">
+                  <div
+                    className="w-[52px] h-[52px] rounded-xl border-2 border-white/25 shadow-lg overflow-hidden bg-white/10"
+                    style={{ backgroundImage: `url("${profileAvatar}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                  />
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-400 border-2 border-white flex items-center justify-center">
+                    <span className="material-symbols-outlined text-white text-[11px]">check</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom row: date + badges */}
+              <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/10">
+                <p className="text-white/55 text-[11px] font-medium capitalize">{formattedDate}</p>
+                <div className="flex gap-2">
+                  {userProfile && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/10 text-white/80 border border-white/15">
+                      <span className="material-symbols-outlined text-[11px]">school</span>
+                      {userProfile.semestre}° Sem
+                    </span>
+                  )}
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                    pendingCount === 0
+                      ? 'bg-green-500/20 text-green-200 border-green-400/30'
+                      : 'bg-red-300/20 text-red-200 border-red-300/30'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${pendingCount === 0 ? 'bg-green-400' : 'bg-red-300'}`} />
+                    {pendingCount === 0 ? 'Al corriente' : `${pendingCount} pendiente(s)`}
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
 
