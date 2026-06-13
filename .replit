@@ -57,4 +57,14 @@ externalPort = 8000
 [userenv]
 
 [userenv.shared]
-SECRET_KEY = "cd1c3c5a5ff282a3e415361a043788e3ec9a916b8c04d1f52ba0bdca26c1cd01"
+SECRET_KEY = "cbtis258-fastapi-super-secret-key-change-in-production"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = "10080"
+FRONTEND_URL = "http://localhost:5000"
+MAIL_USERNAME = "financieros258@gmail.com"
+MAIL_FROM = "financieros258@gmail.com"
+MAIL_SERVER = "smtp.gmail.com"
+MAIL_PORT = "587"
+GOOGLE_CLIENT_ID = "518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com"
+ADMIN_EMAILS = "josemendozaalonso097@gmail.com"
+MAIL_PASSWORD = "hlgu fvlv ryqx abdb"
