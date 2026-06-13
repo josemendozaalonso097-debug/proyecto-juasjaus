@@ -108,3 +108,21 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2026-06-13 19:37:43,217 - app.main - INFO - 🌐 Frontend: http://localhost:5000
 2026-06-13 19:37:43,217 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-06-13 19:37:43,217 - app.main - INFO - ============================================================
+2026-06-13 19:42:51,440 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-06-13 19:42:52,224 - app.main - INFO - ============================================================
+2026-06-13 19:42:52,224 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-13 19:42:52,224 - app.main - INFO - ============================================================
+2026-06-13 19:42:52,229 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-13 19:42:52,229 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-13 19:42:52,229 - app.main - INFO - 🌐 Frontend: http://localhost:5000
+2026-06-13 19:42:52,229 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-13 19:42:52,229 - app.main - INFO - ============================================================
+2026-06-13 19:43:00,467 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-06-13 19:43:01,285 - app.main - INFO - ============================================================
+2026-06-13 19:43:01,285 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-13 19:43:01,285 - app.main - INFO - ============================================================
+2026-06-13 19:43:01,289 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-13 19:43:01,290 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-13 19:43:01,290 - app.main - INFO - 🌐 Frontend: http://localhost:5000
+2026-06-13 19:43:01,290 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-13 19:43:01,290 - app.main - INFO - ============================================================

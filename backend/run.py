@@ -11,10 +11,12 @@ load_dotenv(dotenv_path=".env", override=True)
 import uvicorn
 
 if __name__ == "__main__":
+    import os
+    is_dev = os.environ.get("ENVIRONMENT", "development") == "development"
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=True,  # Auto-reload en desarrollo
+        reload=is_dev,
         log_level="info"
     )

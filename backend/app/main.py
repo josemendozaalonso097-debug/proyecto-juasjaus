@@ -126,3 +126,25 @@ async def health_check():
         "status": "healthy",
         "message": "Server is running"
     }
+
+# ============================================
+# SERVIR FRONTEND EN PRODUCCIÓN
+# ============================================
+import os as _os
+from fastapi.responses import FileResponse as _FileResponse
+
+_dist_dir = _os.path.join(
+    _os.path.dirname(_os.path.abspath(__file__)),
+    '..', '..', 'frontend-react', 'dist'
+)
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_frontend(full_path: str):
+    """Sirve el frontend React para todas las rutas no-API"""
+    file_path = _os.path.join(_dist_dir, full_path)
+    if _os.path.isfile(file_path):
+        return _FileResponse(file_path)
+    index_path = _os.path.join(_dist_dir, 'index.html')
+    if _os.path.isfile(index_path):
+        return _FileResponse(index_path)
+    return JSONResponse({"detail": "Not Found"}, status_code=404)

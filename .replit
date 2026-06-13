@@ -68,3 +68,8 @@ MAIL_PORT = "587"
 GOOGLE_CLIENT_ID = "518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com"
 ADMIN_EMAILS = "josemendozaalonso097@gmail.com"
 MAIL_PASSWORD = "hlgu fvlv ryqx abdb"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "-c", "cd backend && ENVIRONMENT=production python run.py"]
+build = ["bash", "-c", "cd frontend-react && npm install && npm run build"]
