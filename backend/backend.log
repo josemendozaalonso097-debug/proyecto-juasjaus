@@ -22,3 +22,24 @@
 2026-06-13 04:38:24,073 - app.main - INFO - 🌐 Frontend: http://localhost:5000
 2026-06-13 04:38:24,073 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-06-13 04:38:24,073 - app.main - INFO - ============================================================
+2026-06-13 04:49:22,987 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2026-06-13 04:49:28,119 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2026-06-13 04:50:11,898 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-06-13 04:50:15,065 - app.main - INFO - ============================================================
+2026-06-13 04:50:15,065 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-13 04:50:15,065 - app.main - INFO - ============================================================
+2026-06-13 04:50:15,072 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-13 04:50:15,072 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-13 04:50:15,072 - app.main - INFO - 🌐 Frontend: http://localhost:5000
+2026-06-13 04:50:15,072 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-13 04:50:15,072 - app.main - INFO - ============================================================
