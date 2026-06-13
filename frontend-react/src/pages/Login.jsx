@@ -298,7 +298,7 @@ export default function Login() {
                 localStorage.setItem('access_token', data.access_token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 showToast(`¡Bienvenido ${data.user.nombre}! 🎉`, 'success');
-                setTimeout(() => navigate('/principal'), 1000);
+                setTimeout(() => navigate('/principal'), 300);
             } else {
                 showToast('Error con Google: ' + (data.detail || 'Intenta de nuevo'), 'error');
             }
