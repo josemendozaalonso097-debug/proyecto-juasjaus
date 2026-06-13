@@ -61,4 +61,65 @@ def init_db():
         except Exception as e:
             print(f"Info tabla eventos: {e}")
 
+    # Migración: crear tabla productos si no existe + seed inicial
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS productos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nombre VARCHAR(200) NOT NULL,
+                    marca VARCHAR(100),
+                    precio REAL NOT NULL,
+                    categoria VARCHAR(50) NOT NULL,
+                    imagen TEXT,
+                    tallas BOOLEAN DEFAULT 0,
+                    semestre BOOLEAN DEFAULT 0,
+                    activo BOOLEAN DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """))
+            conn.commit()
+            print("✅ Tabla 'productos' verificada/creada")
+        except Exception as e:
+            print(f"Info tabla productos: {e}")
+
+    # Seed productos si la tabla está vacía
+    with engine.connect() as conn:
+        count = conn.execute(text("SELECT COUNT(*) FROM productos")).scalar()
+        if count == 0:
+            seed = [
+                ("Playera Blanca", "CBTis 258", 350, "uniformes", "/imagenesTienda/BackgroundEraser_20251206_214733074.png", 1, 0),
+                ("Playera Gris", "CBTis 258", 350, "uniformes", "/imagenesTienda/BackgroundEraser_20251216_161735342.png", 1, 0),
+                ("Playera Deportiva", "CBTis 258", 280, "uniformes", "/imagenesTienda/BackgroundEraser_20251216_161748179.png", 1, 0),
+                ("Paquete completo", "CBTis 258", 600, "uniformes", "/imagenesTienda/cvtis.png", 1, 0),
+                ("Credencial", "Credencial", 100, "uniformes", "/imagenesTienda/IMG-20251216-WA0024.jpg", 0, 0),
+                ("Pensamiento matematico", "Libro", 90, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Lengua y comunicacion", "Libro", 200, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Humanidades", "Libro", 100, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Socio emocional", "Libro", 90, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Ingles", "Libro", 90, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Sociales", "Libro", 100, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Conservacion de la energia", "Libro 2do", 140, "Libros", "/imagenesTienda/6475884.png", 0, 0),
+                ("La materia y sus interacciones", "Libro 1ro", 150, "Libros", "/imagenesTienda/6475884.png", 0, 0),
+                ("Ecosistemas", "Libro 3ro", 150, "Libros", "/imagenesTienda/6475884.png", 0, 0),
+                ("Conciencia historica", "Libros 4to y 5to", 200, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("Reacciones quimicas", "Libro 4to", 200, "Libros", "/imagenesTienda/6475884.png", 0, 0),
+                ("Temas selectos de matematicas", "Libro 4to y 5to", 200, "Libros", "/imagenesTienda/6475884.png", 0, 1),
+                ("La energia en los procesos de la vida diaria", "Libro 5to", 170, "Libros", "/imagenesTienda/6475884.png", 0, 0),
+                ("Temas de filosofia", "Libro 6to", 160, "Libros", "/imagenesTienda/6475884.png", 0, 0),
+                ("Certificado", "Documento", 150, "tramites", "/imagenesTienda/f71decb4816cd27d4460d37b314d2fbf-documento-de-grafico-plano.png", 0, 0),
+                ("Constancia", "Documento", 50, "tramites", "/imagenesTienda/f71decb4816cd27d4460d37b314d2fbf-documento-de-grafico-plano.png", 0, 0),
+                ("Cardex", "Documento", 30, "tramites", "/imagenesTienda/f71decb4816cd27d4460d37b314d2fbf-documento-de-grafico-plano.png", 0, 0),
+                ("Colegiatura", "Documento", 3000, "tramites", "/imagenesTienda/f71decb4816cd27d4460d37b314d2fbf-documento-de-grafico-plano.png", 0, 0),
+            ]
+            for nombre, marca, precio, categoria, imagen, tallas, semestre in seed:
+                conn.execute(text("""
+                    INSERT INTO productos (nombre, marca, precio, categoria, imagen, tallas, semestre, activo)
+                    VALUES (:nombre, :marca, :precio, :categoria, :imagen, :tallas, :semestre, 1)
+                """), {"nombre": nombre, "marca": marca, "precio": precio,
+                       "categoria": categoria, "imagen": imagen,
+                       "tallas": tallas, "semestre": semestre})
+            conn.commit()
+            print(f"✅ Seed: {len(seed)} productos insertados")
+
     print("✅ Base de datos inicializada")

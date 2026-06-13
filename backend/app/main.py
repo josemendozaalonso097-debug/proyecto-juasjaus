@@ -55,6 +55,7 @@ app.add_middleware(
 # ============================================
 from .models import user
 from .models import evento as evento_model
+from .models import producto as producto_model
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(index.router, prefix="/api")

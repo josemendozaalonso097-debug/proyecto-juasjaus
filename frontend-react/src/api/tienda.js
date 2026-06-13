@@ -1,6 +1,45 @@
+const BASE = '/api/tienda/productos';
+
+function authHeaders() {
+    const token = localStorage.getItem('access_token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+}
+
+export async function getProductos(categoria) {
+    const url = categoria ? `${BASE}?categoria=${encodeURIComponent(categoria)}` : BASE;
+    return fetch(url);
+}
+
+export async function createProducto(data) {
+    return fetch(BASE, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(data)
+    });
+}
+
+export async function updateProducto(id, data) {
+    return fetch(`${BASE}/${id}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(data)
+    });
+}
+
+export async function deleteProducto(id) {
+    return fetch(`${BASE}/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+    });
+}
+
+// Legacy static data — kept as seed fallback for offline use
 export const productosData = {
     uniformes: [
-        { id: 1, nombre: "Playera Blanca ", marca: "CBTis 258", precio: 350, imagen: "/imagenesTienda/BackgroundEraser_20251206_214733074.png", tallas: true },
+        { id: 1, nombre: "Playera Blanca", marca: "CBTis 258", precio: 350, imagen: "/imagenesTienda/BackgroundEraser_20251206_214733074.png", tallas: true },
         { id: 2, nombre: "Playera Gris", marca: "CBTis 258", precio: 350, imagen: "/imagenesTienda/BackgroundEraser_20251216_161735342.png", tallas: true },
         { id: 3, nombre: "Playera Deportiva", marca: "CBTis 258", precio: 280, imagen: "/imagenesTienda/BackgroundEraser_20251216_161748179.png", tallas: true },
         { id: 4, nombre: "Paquete completo", marca: "CBTis 258", precio: 600, imagen: "/imagenesTienda/cvtis.png", tallas: true },
