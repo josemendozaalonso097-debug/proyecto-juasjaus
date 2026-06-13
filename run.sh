@@ -16,7 +16,13 @@ sleep 2
 cd ..
 
 echo "🌐 Iniciando frontend React..."
-cd "frontend (1)"
+# Cargar nvm (si está instalado) y asegurarse de usar Node 20
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+if command -v nvm >/dev/null 2>&1; then
+  nvm use 20 >/dev/null 2>&1 || nvm install 20 >/dev/null 2>&1
+fi
+cd "frontend-react"
 npm run dev -- --port 5501 &
 FRONTEND_PID=$!
 

@@ -1,5 +1,5 @@
 # Refactorización de Arquitectura Frontend — CBTis 258
-
+> Nota: esta documentación describe la arquitectura legacy del frontend que estaba ubicada en `frontend/`. Esa carpeta ha sido eliminada, y el proyecto actual usa el frontend React en `frontend-react/`.
 ## Contexto del proyecto
 
 Este proyecto es un sistema financiero escolar para el CBTis 258 desarrollado con HTML, CSS, JavaScript vanilla en el frontend y FastAPI con SQLite en el backend. El proyecto se encuentra funcional en su totalidad, por lo que el objetivo de esta refactorización es exclusivamente reorganizar el código sin modificar ninguna funcionalidad existente ni el comportamiento visual de la aplicación.

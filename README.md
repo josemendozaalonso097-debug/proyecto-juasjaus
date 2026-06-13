@@ -1,176 +1,196 @@
-# CBTis 258 - Servicios Financieros
+# CBTis 258 — Servicios Financieros
 
-## 🐧 Ejecutar en Linux / ChromeOS (RECOMENDADO)
+[![CI](https://github.com/josemendozaalonso097-debug/proyecto-juasjaus/actions/workflows/ci.yml/badge.svg)](https://github.com/josemendozaalonso097-debug/proyecto-juasjaus/actions)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Node](https://img.shields.io/badge/node-20.x-brightgreen)
 
-**Opción automática: `run.sh`**
+Breve descripción: proyecto de laboratorio para CBTis 258 con backend en FastAPI y frontend en React + Vite. Este README ofrece pasos claros para instalar, ejecutar y depurar la aplicación en entornos locales.
 
-Este método levanta el backend y el frontend con un solo comando.
+---
 
-**Requisitos previos:**
-1. Python 3 instalado.
-2. Entorno virtual creado: `python3 -m venv .venv`
-3. Entorno activado: `source .venv/bin/activate`
-4. Dependencias instaladas: `pip install -r backend/requirements.txt`
+## Tabla de contenidos
 
-**Pasos para ejecutar:**
-1. Abre una terminal en la raíz del proyecto.
-2. Da permisos (solo la primera vez): `chmod +x run.sh`
-# CBTis 258 - Servicios Financieros
+- [Resumen](#resumen)
+- [Requisitos](#requisitos)
+- [Instalación rápida](#instalaci%C3%B3n-r%C3%A1pida)
+- [Ejecución (desarrollo)](#ejecuci%C3%B3n-desarrollo)
+- [Ejecución manual](#ejecuci%C3%B3n-manual)
+- [Detener la aplicación](#detener-la-aplicaci%C3%B3n)
+- [Solución de problemas](#soluci%C3%B3n-de-problemas)
+- [Contribuir](#contribuir)
+- [Contacto](#contacto)
 
-Este README explica cómo arrancar el proyecto en desarrollo (frontend React con Vite y backend FastAPI) en Linux.
+---
 
-Resumen rápido
-- Frontend (Vite) -> puerto por defecto usado en esta máquina: 5502 (ej. http://localhost:5502/)
-- Backend (Uvicorn/FastAPI) -> puerto por defecto: 8000 (http://localhost:8000/)
+## Resumen
 
-Requisitos
-- Python 3.8+ (recomendado Python 3.10+)
-- Node.js y npm (o pnpm/yarn) para el frontend
+Este repositorio contiene:
 
-Importante: en este repositorio se creó un entorno virtual de prueba `.venv-backend` y el archivo `backend/requirements.txt` fue actualizado con versiones pinneadas (backup: `backend/requirements.txt.bak`). Si prefieres crear tu propio venv, sigue las instrucciones abajo.
+- `backend/`: API en Python con FastAPI.
+- `frontend-react/`: frontend con React + Vite.
+- Scripts de utilidad: `run.sh`, `start-dev.sh`, `start-dev.bat`.
 
-## 1) Arrancar en modo desarrollo (recomendado, ver logs en la terminal)
+La carpeta legacy `frontend/` fue eliminada. Use `frontend-react/` para desarrollo y despliegue.
 
-Frontend (terminal A)
+### Vista previa
+
+![Demo preview](docs/assets/screenshot.svg)
+
+---
+
+## Requisitos
+
+- Python 3.10 o superior
+- Node.js 20.x (recomendado usar `nvm`)
+- npm (o `yarn`)
+- Git
+
+---
+
+## Instalación rápida
+
+1. Clonar el repositorio:
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus/frontend-react
-# Instalar solo la primera vez o si cambian dependencias
-npm ci
-# Levantar Vite (visible en la red local)
-npm run dev -- --host
+git clone https://github.com/josemendozaalonso097-debug/proyecto-juasjaus.git
+cd proyecto-juasjaus
 ```
 
-Backend (terminal B)
+> **Nota importante**: el repositorio está limpio — NO incluye `node_modules/`, `.venv/`, bases de datos ni logs. Debes instalar las dependencias en tu máquina. Esto es normal, seguro y evita problemas de compatibilidad entre sistemas.
+
+2. Backend: crear `venv` e instalar dependencias:
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus
-# (opcional) crear venv si no existe
-python3 -m venv .venv-backend
-source .venv-backend/bin/activate
-# instalar dependencias (solo la primera vez o si cambian)
+python3 -m venv .venv
+source .venv/bin/activate
 pip install --upgrade pip
 pip install -r backend/requirements.txt
-# arrancar con autoreload (útil en desarrollo)
-python3 backend/run.py
 ```
 
-Después de arrancar, puedes abrir en tu navegador:
-- Frontend: http://localhost:5502/
-- Backend (docs): http://localhost:8000/docs
+3. Crear el archivo `backend/.env` con al menos:
 
-## 2) Ejecutarlos en background (como se hizo en esta sesión)
+```env
+SECRET_KEY=una_clave_secreta_larga
+```
 
-Frontend (background)
+4. Frontend: instalar dependencias (usar Node 20):
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus/frontend-react
-# inicia en background y guarda logs y pid
-nohup npm run dev -- --host > dev.log 2>&1 & echo $! > vite.pid
+nvm install 20 # si usas nvm
+nvm use 20
+cd frontend-react
+npm install
 ```
 
-Backend (background)
+---
+
+### Google OAuth — URIs para registrar (development)
+
+Registra en Google Cloud Console los valores exactos siguientes para evitar `redirect_uri_mismatch`:
+
+- **Authorized JavaScript origins**: `http://localhost:5501`
+- **Authorized redirect URIs**: `http://localhost:5501/oauth2-callback`
+
+Usamos una ruta fija `/oauth2-callback` en el frontend para que el `redirect_uri` sea predecible.
+
+---
+
+## Ejecución (desarrollo)
+
+- Arranque rápido (Linux/macOS/WSL):
 
 ```bash
-cd /home/josemendozaalonso097/proyecto-juasjaus
-# activar venv y arrancar sin autoreload
-. .venv-backend/bin/activate
-nohup python3 backend/run_no_reload.py > backend/uvicorn.log 2>&1 & echo $! > backend/uvicorn.pid
+chmod +x run.sh
+./run.sh
 ```
 
-## Logs y control de procesos
-- Logs frontend: `frontend-react/dev.log`
-- Logs backend: `backend/uvicorn.log`
-- PID frontend: `frontend-react/vite.pid`
-- PID backend: `backend/uvicorn.pid`
+- Arranque completo (Linux/macOS) — procesos en background con logs:
 
-Ver logs en tiempo real:
-
-```bash
-tail -f frontend-react/dev.log
-tail -f backend/uvicorn.log
-```
-
-Parar procesos (si los iniciaste en background):
-
-```bash
-kill $(cat frontend-react/vite.pid) || true && rm -f frontend-react/vite.pid
-kill $(cat backend/uvicorn.pid) || true && rm -f backend/uvicorn.pid
-```
-
-Comandos útiles de reinicio
-
-```bash
-# Reiniciar backend (background)
-kill $(cat backend/uvicorn.pid) || true
-. .venv-backend/bin/activate
-nohup python3 backend/run_no_reload.py > backend/uvicorn.log 2>&1 & echo $! > backend/uvicorn.pid
-```
-
-Notas y recomendaciones
-- Si prefieres trabajar con dos terminales en foreground (ver logs en la terminal) usa la sección "Arrancar en modo desarrollo".
-- Si vas a compartir la app con dispositivos en la misma red, asegúrate de exponer host (`--host`) y/o usar la URL de red que muestre Vite (ej. http://100.115.92.205:5502/).
-- Si quieres automatizar, puedo añadir `start-dev.sh` y `stop-dev.sh` para arrancar/parar ambos con un solo comando.
-
-## Pasos realizados localmente (Windows)
-
-A continuación se documentan los pasos exactos que realicé durante la sesión para levantar el backend y frontend en un equipo con Windows. Útil como guía rápida para reproducir el entorno local.
-
-### Backend (Windows — Python 3.11)
-
-- Instalé Python 3.11 y creé un virtualenv llamado `.venv311`:
-	- `py -3.11 -m venv .venv311`
-	- `.\.venv311\Scripts\python.exe -m pip install --upgrade pip`
-- Instalé dependencias evitando `uvloop` (no compatible con Windows):
-	- `.\.venv311\Scripts\python.exe -m pip install -r backend/requirements_no_uvloop.txt`
-	- Si no existe `requirements_no_uvloop.txt`, instala `backend/requirements.txt` pero omite `uvloop`.
-- Creé un `.env` mínimo en `backend/.env` con al menos:
-	- `SECRET_KEY=dev_secret_for_local_dev`
-	- (No subir este archivo al repositorio ni compartir claves reales.)
-- Arrancar backend:
-	- `cd backend`
-	- `.\.venv311\Scripts\python.exe run.py`
-- Backend disponible en: `http://localhost:8000` (docs: `http://localhost:8000/docs`)
-
-### Frontend estático (opcional)
-
-- Para pruebas rápidas de HTML/CSS estático en `frontend/`:
-	- `cd frontend`
-	- `python -m http.server 5173`
-	- Abrir `http://localhost:5173`
-
-### Frontend React (Vite)
-
-- Entrar en `frontend-react`, instalar y arrancar el dev server:
-	- `cd frontend-react`
-	- `npm install`
-	- `npm run dev`
-- En esta sesión Vite se sirvió en `http://localhost:5502/` (puerto puede variar).
-
-### Notas y buenas prácticas
-
-## Scripts de arranque rápido (añadidos)
-
-He añadido dos scripts en la raíz del repositorio para facilitar el arranque en desarrollo sin tocar nada existente:
-
-- `start-dev.sh` — script para Linux/macOS. Crea/activa `.venv-backend`, instala dependencias (usa `backend/requirements_no_uvloop.txt` si está presente), arranca el backend con `backend/run.py` y levanta el `frontend-react` (`npm run dev`) en background. Guarda logs en `backend/uvicorn.log` y `frontend-react/dev.log`, y PIDs en `backend/uvicorn.pid` y `frontend-react/vite.pid`.
-- `start-dev.bat` — script para Windows (cmd). Crea `.venv-backend`, instala dependencias e abre dos ventanas `cmd` separadas que ejecutan el backend y el frontend.
-
-Uso recomendado:
-
-Linux/macOS:
 ```bash
 chmod +x start-dev.sh
 ./start-dev.sh
+# Logs: backend/uvicorn.log  frontend-react/dev.log
 ```
 
-Windows (cmd/PowerShell):
-```powershell
+- Windows (CMD):
+
+```cmd
 start-dev.bat
 ```
 
-Notas:
-- Los scripts no modifican archivos existentes del backend o frontend.
-- En Windows se usa `requirements_no_uvloop.txt` si existe para evitar instalar `uvloop` incompatibles.
-- Si prefieres una versión PowerShell o scripts para parar los procesos, puedo añadirlos.
+URLs:
+
+- Frontend: http://localhost:5501/
+- Backend: http://localhost:8000/
+- OpenAPI: http://localhost:8000/docs
+
+---
+
+## Ejecución manual
+
+Si prefieres ejecutar cada servicio en su propia terminal:
+
+Backend:
+
+```bash
+cd backend
+source ../.venv/bin/activate
+uvicorn app.main:app --reload
+```
+
+Frontend:
+
+```bash
+cd frontend-react
+npm run dev -- --port 5501
+```
+
+---
+
+## Detener la aplicación
+
+Si usaste `start-dev.sh`, los procesos escriben sus PIDs en `frontend-react/vite.pid` y `backend/uvicorn.pid`. Para detenerlos:
+
+```bash
+kill "$(cat frontend-react/vite.pid)" || true && rm -f frontend-react/vite.pid
+kill "$(cat backend/uvicorn.pid)" || true && rm -f backend/uvicorn.pid
+```
+
+---
+
+## Solución de problemas comunes
+
+- Problema: `SECRET_KEY` faltante -> crea `backend/.env` con `SECRET_KEY=...`.
+- Problema: errores de `npm` o bindings nativos -> elimina `node_modules` y `package-lock.json`, reinstala:
+
+```bash
+cd frontend-react
+rm -rf node_modules package-lock.json
+npm install
+```
+
+- Problema: versión de Node incompatible -> usa `nvm install 20 && nvm use 20`.
+
+---
+
+## Contribuir
+
+1. Crea un fork y una rama descriptiva.
+2. Abre un Pull Request con una explicación clara.
+3. Añade tests o instrucciones de verificación si aplican.
+
+---
+
+## Contacto
+
+Mantén issues en el repositorio para problemas, o contáctame por PRs/commits.
+
+---
+
+Si quieres, puedo:
+
+- agregar una tabla de contenidos con anclas más detalladas,
+- incrustar capturas de pantalla o GIFs, o
+- añadir CI para lint/tests.
+
 
