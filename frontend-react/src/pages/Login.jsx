@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     registerSendOTP, registerVerifyOTP, loginUser,
@@ -285,33 +285,12 @@ export default function Login() {
         return {};
     };
 
-    // Google OAuth
-    const googleOAuthPopup = () => {
-        const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
-        const scope = encodeURIComponent('openid email profile');
-        const nonce = Math.random().toString(36).substring(2);
-        const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=id_token&scope=${scope}&nonce=${nonce}&prompt=select_account`;
-        const width = 500, height = 600;
-        const left = (screen.width - width) / 2;
-        const top = (screen.height - height) / 2;
-        const popup = window.open(url, 'google-login', `width=${width},height=${height},top=${top},left=${left}`);
-        const interval = setInterval(() => {
-            try {
-                if (!popup || popup.closed) { clearInterval(interval); return; }
-                const popupUrl = popup.location.href;
-                if (popupUrl.includes('#')) {
-                    const hash = new URLSearchParams(popup.location.hash.substring(1));
-                    const id_token = hash.get('id_token');
-                    if (id_token) {
-                        popup.close(); clearInterval(interval);
-                        sendGoogleToken(id_token);
-                    }
-                }
-            } catch { /* cross-origin */ }
-        }, 200);
-    };
+    // ── Google Identity Services (GIS) ──
+    const loginGoogleRef = useRef(null);
+    const signupGoogleRef = useRef(null);
+    const gsiReady = useRef(false);
 
-    const sendGoogleToken = async (id_token) => {
+    const sendGoogleToken = useCallback(async (id_token) => {
         try {
             const res = await loginWithGoogleToken(id_token);
             const data = await res.json();
@@ -326,7 +305,56 @@ export default function Login() {
         } catch {
             showToast('Error de conexión con el servidor', 'error');
         }
-    };
+    }, [navigate]);
+
+    // Render GIS buttons into the two ref containers
+    const renderGSIButtons = useCallback(() => {
+        if (!window.google?.accounts?.id) return;
+        [loginGoogleRef, signupGoogleRef].forEach(ref => {
+            if (!ref.current) return;
+            ref.current.innerHTML = '';
+            window.google.accounts.id.renderButton(ref.current, {
+                type: 'standard',
+                theme: 'outline',
+                size: 'large',
+                text: 'continue_with',
+                width: Math.max(ref.current.offsetWidth || 340, 200),
+            });
+        });
+    }, []);
+
+    // Load GIS script once and initialise
+    useEffect(() => {
+        const init = () => {
+            if (gsiReady.current) return;
+            gsiReady.current = true;
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: ({ credential }) => sendGoogleToken(credential),
+                ux_mode: 'popup',
+                cancel_on_tap_outside: true,
+            });
+            renderGSIButtons();
+        };
+
+        if (window.google) { init(); return; }
+
+        const script = document.createElement('script');
+        script.id = 'gsi-client-script';
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        script.onload = init;
+        if (!document.getElementById('gsi-client-script')) {
+            document.head.appendChild(script);
+        }
+    }, [sendGoogleToken, renderGSIButtons]);
+
+    // Re-render buttons when login/signup panel switches
+    useEffect(() => {
+        const timer = setTimeout(renderGSIButtons, 80);
+        return () => clearTimeout(timer);
+    }, [isActive, renderGSIButtons]);
 
     // Login submit
     const handleLogin = async (e) => {
@@ -419,10 +447,7 @@ export default function Login() {
                                 <h2 className="text-slate-900 dark:text-slate-100 text-3xl font-bold mb-2">Registro</h2>
                                 <p className="text-slate-500 dark:text-slate-400">Únete a nuestra comunidad educativa.</p>
                             </div>
-                            <button type="button" onClick={googleOAuthPopup}
-                                className="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-700 font-medium py-3 px-4 rounded-lg hover:bg-slate-50 transition-colors mt-4 shadow-sm cursor-pointer">
-                                <GoogleSVG /> Continuar con Google
-                            </button>
+                            <div ref={signupGoogleRef} className="w-full mt-4 flex justify-center" style={{ minHeight: 44, colorScheme: 'light' }} />
                             <div className="relative flex py-4 items-center">
                                 <div className="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
                                 <span className="flex-shrink-0 mx-4 text-slate-400 text-sm">O usa tu email</span>
@@ -543,10 +568,7 @@ export default function Login() {
                         <div className="max-w-md w-full mx-auto">
                             <h1 className="text-slate-900 dark:text-slate-100 text-4xl font-bold mb-2 text-center md:text-left">Iniciar sesión</h1>
                             <p className="text-slate-500 dark:text-slate-400 mb-8 text-center md:text-left">Accede a tu cuenta institucional</p>
-                            <button type="button" onClick={googleOAuthPopup}
-                                className="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 text-slate-700 font-medium py-3 px-4 rounded-lg hover:bg-slate-50 transition-colors mb-6 shadow-sm cursor-pointer">
-                                <GoogleSVG /> Continuar con Google
-                            </button>
+                            <div ref={loginGoogleRef} className="w-full mb-6 flex justify-center" style={{ minHeight: 44, colorScheme: 'light' }} />
                             <div className="relative flex py-4 items-center mb-6">
                                 <div className="flex-grow border-t border-slate-300 dark:border-slate-700"></div>
                                 <span className="flex-shrink-0 mx-4 text-slate-400 text-sm">O usa tu contraseña de Email</span>
