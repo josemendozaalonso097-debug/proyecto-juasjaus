@@ -393,8 +393,12 @@ export default function Login() {
             )
             .catch(() => {});
 
-        // Fix PC bug: si Google abre una pestaña nueva en vez de popup,
-        // escuchar cuando el token se guarde desde esa otra pestaña y redirigir aquí
+    }, [navigate]);
+
+    // Fix PC bug (useEffect separado para que SIEMPRE se registre):
+    // Si Google abre pestaña nueva en vez de popup, escucha cuando el token
+    // se guarde desde esa otra pestaña y redirige la pestaña original aquí.
+    useEffect(() => {
         const handleCrossTabAuth = (e) => {
             if (e.key === "access_token" && e.newValue) {
                 navigate("/principal");
