@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "1VQb_fGptwwMh3OFzrNQK"
+uri = "file://presentacion/CBTis258_Servicios_Financieros_Final.pptx"
+type = "slides"
+title = "CBTis 258 Servicios Financieros — Presentación Final"
