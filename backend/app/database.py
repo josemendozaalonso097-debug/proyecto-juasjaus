@@ -3,11 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
 
-# Crear engine de SQLAlchemy
-_is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+# Always use SQLite for this application
+_db_url = settings.SQLITE_DATABASE_URL
 engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False} if _is_sqlite else {}
+    _db_url,
+    connect_args={"check_same_thread": False}
 )
 
 # Crear SessionLocal

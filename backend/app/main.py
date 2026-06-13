@@ -31,14 +31,19 @@ app = FastAPI(
 )
 
 # Configuraremos los orígenes permitidos
+import os
+_replit_domain = os.environ.get("REPLIT_DEV_DOMAIN", "")
 origins = [
     settings.FRONTEND_URL,
     "http://127.0.0.1:5501",
     "http://localhost:5501",
-    "http://localhost:5173",  # Puerto por defecto de Vite
+    "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "http://localhost:5502",  # React Frontend
-    "http://127.0.0.1:5502"
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "http://localhost:5502",
+    "http://127.0.0.1:5502",
+    *([f"https://{_replit_domain}"] if _replit_domain else []),
 ]
 
 app.add_middleware(
