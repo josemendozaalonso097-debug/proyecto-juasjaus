@@ -68,3 +68,19 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2026-06-13 05:25:25,322 - app.main - INFO - 🌐 Frontend: http://localhost:5000
 2026-06-13 05:25:25,322 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-06-13 05:25:25,322 - app.main - INFO - ============================================================
+2026-06-13 17:21:21,662 - app.main - INFO - ============================================================
+2026-06-13 17:21:21,664 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-13 17:21:21,664 - app.main - INFO - ============================================================
+2026-06-13 17:21:21,817 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-13 17:21:21,818 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-13 17:21:21,818 - app.main - INFO - 🌐 Frontend: http://localhost:5000
+2026-06-13 17:21:21,818 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-13 17:21:21,818 - app.main - INFO - ============================================================
+2026-06-13 17:36:24,512 - app.main - INFO - ============================================================
+2026-06-13 17:36:24,514 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-13 17:36:24,514 - app.main - INFO - ============================================================
+2026-06-13 17:36:24,711 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-13 17:36:24,711 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-13 17:36:24,712 - app.main - INFO - 🌐 Frontend: http://localhost:5000
+2026-06-13 17:36:24,712 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-13 17:36:24,712 - app.main - INFO - ============================================================
