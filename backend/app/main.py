@@ -97,17 +97,16 @@ async def shutdown_event():
 # ============================================
 @app.get("/")
 async def root():
-    """Ruta raíz de la API"""
+    """Sirve el frontend en producción, JSON en desarrollo"""
+    import os as _os2
+    index_path = _os.path.join(_dist_dir, 'index.html')
+    if _os2.path.isfile(index_path):
+        return _FileResponse(index_path)
     return {
         "message": "CBTis 258 - API FastAPI",
         "version": "1.0.0",
         "status": "online",
-        "docs": "/docs",
-        "endpoints": {
-            "auth": "/api/auth/ping",
-            "dashboard": "/api/dashboard/ping",
-            "tienda": "/api/tienda/ping"
-        }
+        "docs": "/docs"
     }
 
 @app.get("/api/test")
