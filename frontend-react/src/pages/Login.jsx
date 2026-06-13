@@ -392,6 +392,16 @@ export default function Login() {
                     r.ok && r.json().then((d) => console.log("✅ Backend:", d)),
             )
             .catch(() => {});
+
+        // Fix PC bug: si Google abre una pestaña nueva en vez de popup,
+        // escuchar cuando el token se guarde desde esa otra pestaña y redirigir aquí
+        const handleCrossTabAuth = (e) => {
+            if (e.key === "access_token" && e.newValue) {
+                navigate("/principal");
+            }
+        };
+        window.addEventListener("storage", handleCrossTabAuth);
+        return () => window.removeEventListener("storage", handleCrossTabAuth);
     }, [navigate]);
 
     // Validación visual de inputs
@@ -432,7 +442,14 @@ export default function Login() {
                     localStorage.setItem("access_token", data.access_token);
                     localStorage.setItem("user", JSON.stringify(data.user));
                     showToast(`¡Bienvenido ${data.user.nombre}! 🎉`, "success");
-                    setTimeout(() => navigate("/principal"), 300);
+                    setTimeout(() => {
+                        // Si esta pestaña fue abierta por el popup de Google (PC),
+                        // intentar cerrarla — la pestaña original ya redirigió via storage event
+                        if (window.opener || window.history.length <= 1) {
+                            try { window.close(); } catch {}
+                        }
+                        navigate("/principal");
+                    }, 300);
                 } else {
                     showToast(
                         "Error con Google: " +
