@@ -18,8 +18,8 @@ export function ThemeProvider({ children }) {
         console.error('Error cargando preferencias:', e);
       }
     }
-    // Fallback: usar preferencia del sistema
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Fallback: modo claro por defecto
+    return false;
   });
 
   useEffect(() => {
