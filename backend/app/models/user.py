@@ -9,17 +9,19 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(100), nullable=False)
     email = Column(String(120), unique=True, index=True, nullable=False)
-    password_hash = Column(String(200), nullable=True)  # Nullable para usuarios de Google
+    password_hash = Column(String(200), nullable=True)
     google_id = Column(String(100), unique=True, nullable=True)
     profile_picture = Column(String(300), nullable=True)
     is_verified = Column(Boolean, default=False)
     rol = Column(String(20), default="alumno", nullable=False, server_default="alumno")
+    activo = Column(Boolean, default=True, server_default="1")
+    semestre = Column(String(10), nullable=True, default="1")
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)
     
-    # Relaciones
     compras = relationship("Compra", back_populates="user", cascade="all, delete-orphan")
     password_resets = relationship("PasswordReset", back_populates="user", cascade="all, delete-orphan")
+    deudas = relationship("Deuda", back_populates="user", cascade="all, delete-orphan")
 
 
 class PasswordReset(Base):
@@ -32,7 +34,6 @@ class PasswordReset(Base):
     expires_at = Column(DateTime, nullable=False)
     used = Column(Boolean, default=False)
     
-    # Relación
     user = relationship("User", back_populates="password_resets")
 
 
@@ -42,13 +43,12 @@ class Compra(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     total = Column(Float, nullable=False)
-    estado = Column(String(50), default="Pendiente")  # Pendiente, Completado, Cancelado
-    metodo_pago = Column(String(50), nullable=True)  # Tarjeta, Efectivo, Transferencia
-    comprobante_url = Column(String(300), nullable=True)  # URL del comprobante subido
-    factura_url = Column(String(300), nullable=True)  # URL de la factura PDF
+    estado = Column(String(50), default="Pendiente")
+    metodo_pago = Column(String(50), nullable=True)
+    comprobante_url = Column(String(300), nullable=True)
+    factura_url = Column(String(300), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Relaciones
     user = relationship("User", back_populates="compras")
     productos = relationship("ProductoCompra", back_populates="compra", cascade="all, delete-orphan")
 
@@ -64,5 +64,19 @@ class ProductoCompra(Base):
     precio_unitario = Column(Float, nullable=False)
     precio_total = Column(Float, nullable=False)
     
-    # Relación
     compra = relationship("Compra", back_populates="productos")
+
+
+class Deuda(Base):
+    __tablename__ = "deudas"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    concepto = Column(String(200), nullable=False)
+    monto = Column(Float, nullable=False)
+    estado = Column(String(20), default="Pendiente")
+    fecha_vencimiento = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    user = relationship("User", back_populates="deudas")

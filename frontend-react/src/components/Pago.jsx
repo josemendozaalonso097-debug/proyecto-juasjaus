@@ -669,9 +669,9 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
 
       {/* 3. Modal: Bank transfer */}
       {stage === 'transfer' && (
-        <div style={{ display: 'block', position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifycontent: 'center', justifyContent: 'center' }}>
-          <div className="modal-transferencia-content bg-white dark:bg-slate-900" style={{ borderRadius: '20px', width: '90%', maxWidth: '850px', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
-            <div style={{ background: 'linear-gradient(135deg, #f20d0d, #6e0404)', padding: '22px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'white' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="modal-transferencia-content bg-white dark:bg-slate-900" style={{ borderRadius: '20px', width: '90%', maxWidth: '850px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f20d0d, #6e0404)', padding: '22px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'white', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>account_balance</span>
                 <h2 style={{ fontSize: '1.35em', fontWeight: '700', margin: 0 }}>Transferencia Bancaria</h2>
@@ -679,7 +679,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
               <button type="button" onClick={() => setStage('method')} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontSize: '20px', display: 'flex', alignItems: 'center', justifycontent: 'center', justifyContent: 'center' }}>&times;</button>
             </div>
 
-            <div className="transferencia-container grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
+            <div className="transferencia-container grid grid-cols-1 md:grid-cols-3 gap-6 p-8" style={{ overflowY: 'auto', flex: 1 }}>
               {/* Bancarios */}
               <div className="info-bancaria md:col-span-1 border-r border-slate-200 dark:border-slate-800 pr-6">
                 <h3 className="font-bold mb-4 dark:text-white">📋 Datos para transferencia</h3>
@@ -810,9 +810,9 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
 
       {/* 4. Modal: Oxxo Deposit */}
       {stage === 'oxxo' && (
-        <div style={{ display: 'block', position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifycontent: 'center', justifyContent: 'center' }}>
-          <div className="modal-deposito-content bg-white dark:bg-slate-900" style={{ borderRadius: '20px', width: '90%', maxWidth: '800px', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
-            <div style={{ background: 'linear-gradient(135deg, #f20d0d, #6e0404)', padding: '22px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'white' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="modal-deposito-content bg-white dark:bg-slate-900" style={{ borderRadius: '20px', width: '90%', maxWidth: '800px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #f20d0d, #6e0404)', padding: '22px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'white', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>store</span>
                 <h2 style={{ fontSize: '1.35em', fontWeight: '700', margin: 0 }}>Pago por Depósito</h2>
@@ -820,7 +820,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
               <button type="button" onClick={() => setStage('method')} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontSize: '20px', display: 'flex', alignItems: 'center', justifycontent: 'center', justifyContent: 'center' }}>&times;</button>
             </div>
 
-            <div className="deposito-container grid grid-cols-1 md:grid-cols-3 gap-6 p-8">
+            <div className="deposito-container grid grid-cols-1 md:grid-cols-3 gap-6 p-8" style={{ overflowY: 'auto', flex: 1 }}>
               {/* Bancarios */}
               <div className="info-bancaria md:col-span-1 border-r border-slate-200 dark:border-slate-800 pr-6">
                 <h3 className="font-bold mb-4 dark:text-white">📋 Datos para depósito</h3>

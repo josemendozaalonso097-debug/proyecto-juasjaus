@@ -122,4 +122,45 @@ def init_db():
             conn.commit()
             print(f"✅ Seed: {len(seed)} productos insertados")
 
+    # Migración: agregar columnas a users si no existen
+    for col_sql in [
+        "ALTER TABLE users ADD COLUMN activo BOOLEAN NOT NULL DEFAULT 1",
+        "ALTER TABLE users ADD COLUMN semestre VARCHAR(10) DEFAULT '1'",
+    ]:
+        with engine.connect() as conn:
+            try:
+                conn.execute(text(col_sql))
+                conn.commit()
+            except Exception:
+                pass
+
+    # Migración: agregar columna stock a productos
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE productos ADD COLUMN stock INTEGER NOT NULL DEFAULT 0"))
+            conn.commit()
+            print("✅ Migración: columna 'stock' agregada a productos")
+        except Exception:
+            pass
+
+    # Migración: crear tabla deudas
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS deudas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    concepto VARCHAR(200) NOT NULL,
+                    monto REAL NOT NULL,
+                    estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente',
+                    fecha_vencimiento DATETIME,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """))
+            conn.commit()
+            print("✅ Tabla 'deudas' verificada/creada")
+        except Exception as e:
+            print(f"Info tabla deudas: {e}")
+
     print("✅ Base de datos inicializada")

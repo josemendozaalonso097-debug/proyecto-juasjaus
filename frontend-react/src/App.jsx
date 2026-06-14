@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Principal from './pages/Principal';
 import Tienda from './pages/Tienda';
 import ResetPassword from './pages/ResetPassword';
+import Admin from './pages/Admin';
 
 function getHomeRedirect() {
   const token = localStorage.getItem('access_token');
@@ -30,6 +31,7 @@ function App() {
           <Route path="/principal" element={<Principal />} />
           <Route path="/tienda" element={<Tienda />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/admin" element={<Admin />} />
           <Route 
             path="/" 
             element={<Navigate to={getHomeRedirect()} replace />} 

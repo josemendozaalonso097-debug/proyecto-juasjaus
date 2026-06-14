@@ -14,4 +14,5 @@ class Producto(Base):
     tallas = Column(Boolean, default=False)
     semestre = Column(Boolean, default=False)
     activo = Column(Boolean, default=True)
+    stock = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)

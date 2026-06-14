@@ -167,6 +167,19 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientac
               </div>
               <span class="font-bold text-slate-700 dark:text-slate-200">Cobra Asistente</span>
             </button>
+
+            {user?.rol === 'admin' && (
+              <button
+                onClick={() => { onClose(); navigate('/admin'); }}
+                className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group text-left cursor-pointer"
+              >
+                <div className="p-2.5 bg-[#f20d0d]/10 rounded-xl group-hover:bg-[#f20d0d]/20 transition-colors">
+                  <span className="material-symbols-outlined text-[#f20d0d] text-[22px] group-hover:scale-110 transition-transform">admin_panel_settings</span>
+                </div>
+                <span className="font-bold text-slate-700 dark:text-slate-200">Panel Admin</span>
+                <span className="ml-auto px-1.5 py-0.5 bg-[#f20d0d] text-white text-[10px] font-black rounded-md">ADMIN</span>
+              </button>
+            )}
           </div>
         </div>
         
