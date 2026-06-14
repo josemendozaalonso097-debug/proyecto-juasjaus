@@ -206,3 +206,11 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2026-06-14 21:45:21,476 - app.main - INFO - 🌐 Frontend: http://localhost:5000
 2026-06-14 21:45:21,476 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-06-14 21:45:21,476 - app.main - INFO - ============================================================
+2026-06-14 22:19:54,688 - app.main - INFO - ============================================================
+2026-06-14 22:19:54,690 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-06-14 22:19:54,690 - app.main - INFO - ============================================================
+2026-06-14 22:19:54,697 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-06-14 22:19:54,697 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-06-14 22:19:54,697 - app.main - INFO - 🌐 Frontend: http://localhost:5000
+2026-06-14 22:19:54,697 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-06-14 22:19:54,697 - app.main - INFO - ============================================================
