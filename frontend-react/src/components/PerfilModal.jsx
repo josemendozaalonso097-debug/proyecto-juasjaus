@@ -135,7 +135,7 @@ export default function PerfilModal({ isOpen, onClose, onProfileUpdate }) {
       ...profile,
       nombre: inputName,
       rol: inputRol,
-      semestre: inputRol === 'estudiante' ? inputSemestre : ''
+      semestre: inputSemestre
     };
 
     let newCambiosRol = cambiosRol;
@@ -159,7 +159,7 @@ export default function PerfilModal({ isOpen, onClose, onProfileUpdate }) {
       ...user,
       nombre: inputName,
       rol: inputRol,
-      semestre: inputRol === 'estudiante' ? inputSemestre : ''
+      semestre: inputSemestre
     };
     localStorage.setItem('user', JSON.stringify(updatedUser));
 
@@ -271,19 +271,17 @@ export default function PerfilModal({ isOpen, onClose, onProfileUpdate }) {
                 </div>
               </div>
 
-              {profile.rol === 'estudiante' && (
-                <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-transparent">
-                  <div className="size-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[18px] text-white">calendar_today</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Semestre</span>
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {profile.semestre ? `${profile.semestre}° Semestre` : '—'}
-                    </span>
-                  </div>
+              <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-xl border border-transparent">
+                <div className="size-9 rounded-lg bg-primary text-white flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px] text-white">school</span>
                 </div>
-              )}
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">Semestre</span>
+                  <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                    {profile.semestre ? `${profile.semestre}° Semestre` : '—'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Editable Fields */}
@@ -320,30 +318,28 @@ export default function PerfilModal({ isOpen, onClose, onProfileUpdate }) {
                 </select>
               </div>
 
-              {inputRol === 'estudiante' && (
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Semestre</label>
-                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${restSem === 0 ? 'bg-red-100 text-red-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-                      {restSem} cambios restantes
-                    </span>
-                  </div>
-                  <select 
-                    value={inputSemestre}
-                    onChange={(e) => setInputSemestre(e.target.value)}
-                    disabled={restSem === 0}
-                    className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <option value="">Seleccionar...</option>
-                    <option value="1">1er Semestre</option>
-                    <option value="2">2do Semestre</option>
-                    <option value="3">3er Semestre</option>
-                    <option value="4">4to Semestre</option>
-                    <option value="5">5to Semestre</option>
-                    <option value="6">6to Semestre</option>
-                  </select>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400">Semestre</label>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${restSem === 0 ? 'bg-red-100 text-red-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                    {restSem} cambios restantes
+                  </span>
                 </div>
-              )}
+                <select 
+                  value={inputSemestre}
+                  onChange={(e) => setInputSemestre(e.target.value)}
+                  disabled={restSem === 0}
+                  className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="1">1er Semestre</option>
+                  <option value="2">2do Semestre</option>
+                  <option value="3">3er Semestre</option>
+                  <option value="4">4to Semestre</option>
+                  <option value="5">5to Semestre</option>
+                  <option value="6">6to Semestre</option>
+                </select>
+              </div>
 
               {showSavedMsg && (
                 <p id="perfil-guardado-msg" className="text-green-600 text-xs font-semibold text-center">✅ Perfil actualizado correctamente.</p>
