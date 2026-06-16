@@ -9,7 +9,7 @@ function authHeaders() {
 }
 
 export async function getEventos() {
-    return fetch(BASE);
+    return fetch(BASE, { cache: 'no-store' });
 }
 
 export async function createEvento(data) {
