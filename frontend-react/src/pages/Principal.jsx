@@ -215,12 +215,17 @@ export default function Principal() {
     }
   }, [showSplash]);
 
-  // Load eventos on mount
+  // Load eventos on mount + poll every 30s para siempre tener datos frescos
   useEffect(() => {
-    getEventos()
-      .then(r => r.json())
-      .then(data => setEventos(Array.isArray(data) ? data : []))
-      .catch(() => setEventos([]));
+    const fetchEventos = () => {
+      getEventos()
+        .then(r => r.json())
+        .then(data => setEventos(Array.isArray(data) ? data : []))
+        .catch(() => {});
+    };
+    fetchEventos();
+    const interval = setInterval(fetchEventos, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   // Carousel helpers

@@ -81,10 +81,15 @@ function TabEstadisticas() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    adminApi.getStats()
-      .then(setStats)
-      .catch(() => showToast('Error al cargar estadísticas', 'error'))
-      .finally(() => setLoading(false));
+    const fetchStats = () => {
+      adminApi.getStats()
+        .then(setStats)
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    };
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return <Loader />;
