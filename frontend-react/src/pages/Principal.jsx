@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkSessionToken } from '../api/auth';
 import { showToast } from '../utils/toast';
-import { obtenerHistorial } from '../utils/storage';
-import { getEventos, createEvento, updateEvento, deleteEvento } from '../api/eventos';
+import { useAuth } from '../hooks/useAuth';
+import { useEventos } from '../hooks/useEventos';
+import { useFinancial } from '../hooks/useFinancial';
 
-// Modals and components
 import Sidebar from '../components/Sidebar';
 import Chatbot from '../components/Chatbot';
 import PerfilModal from '../components/PerfilModal';
@@ -16,113 +16,67 @@ import DeudaModal from '../components/DeudaModal';
 import HistorialModal from '../components/HistorialModal';
 import InformacionModal from '../components/InformacionModal';
 
+import SplashScreen from '../components/principal/SplashScreen';
+import { DesktopWelcomeBanner, MobileWelcomeBanner } from '../components/principal/WelcomeBanner';
+import EstadoPago from '../components/principal/EstadoPago';
+import CuentaActiva from '../components/principal/CuentaActiva';
+import FinancierosPanel from '../components/principal/FinancierosPanel';
+import EventosList from '../components/principal/EventosList';
+import EventoModal from '../components/principal/EventoModal';
+import MobileCarousel from '../components/principal/MobileCarousel';
+import MobileNextPayment from '../components/principal/MobileNextPayment';
+import MobileCuentaActiva from '../components/principal/MobileCuentaActiva';
+import MobileQuickActions from '../components/principal/MobileQuickActions';
+import MobileBottomNav from '../components/principal/MobileBottomNav';
+
+const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
+
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h >= 6 && h < 12) return { text: 'Buenos días', emoji: '🌅' };
+  if (h >= 12 && h < 19) return { text: 'Buenas tardes', emoji: '☀️' };
+  return { text: 'Buenas noches', emoji: '🌙' };
+};
+
+const getFormattedDate = () => new Date().toLocaleDateString('es-MX', {
+  weekday: 'long', day: 'numeric', month: 'long',
+});
+
 export default function Principal() {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
-  // Authentication & session state
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
+  const [profileAvatar, setProfileAvatar] = useState(DEFAULT_AVATAR);
 
-  // Modal display states
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [chatbotOpen, setChatbotOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [pagoOpen, setPagoOpen] = useState(false);
-  const [papeleriaOpen, setPapeleriaOpen] = useState(false);
+  const [sidebarOpen,     setSidebarOpen]     = useState(false);
+  const [chatbotOpen,     setChatbotOpen]     = useState(false);
+  const [profileOpen,     setProfileOpen]     = useState(false);
+  const [pagoOpen,        setPagoOpen]        = useState(false);
+  const [papeleriaOpen,   setPapeleriaOpen]   = useState(false);
   const [orientacionOpen, setOrientacionOpen] = useState(false);
-  const [deudaOpen, setDeudaOpen] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [infoOpen, setInfoOpen] = useState(false);
+  const [deudaOpen,       setDeudaOpen]       = useState(false);
+  const [historyOpen,     setHistoryOpen]     = useState(false);
+  const [infoOpen,        setInfoOpen]        = useState(false);
 
-  // Financial calculations state
-  const [pendingCount, setPendingCount] = useState(0);
-  const [nextPaymentDateText, setNextPaymentDateText] = useState('—');
-  const [nextPaymentDateColor, setNextPaymentDateColor] = useState('');
-  const [profileAvatar, setProfileAvatar] = useState("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E");
-
-  // Carousel & eventos state
-  const [carouselSlide, setCarouselSlide] = useState(0);
-  const [eventos, setEventos] = useState([]);
-  const [eventoModal, setEventoModal] = useState(false);
-  const [editingEvento, setEditingEvento] = useState(null);
-  const [eventoForm, setEventoForm] = useState({ titulo: '', fecha: '', descripcion: '' });
-  const [savingEvento, setSavingEvento] = useState(false);
-  const touchStartX = useRef(null);
-  const isAdmin = (() => { try { return JSON.parse(localStorage.getItem('user'))?.rol === 'admin'; } catch { return false; } })();
-
-  // Splash logic
-  const [showSplash, setShowSplash] = useState(() => {
+  const [showSplash] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('splash') === '1';
+    if (params.get('splash') === '1') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('splash');
+      window.history.replaceState(null, '', url.pathname);
+      return true;
+    }
+    return false;
   });
 
-  // Calculate debt and next payment details
-  const updateFinancialStatus = useCallback((profileData) => {
-    if (!profileData) return;
+  const { pendingCount, nextPaymentDateText, nextPaymentDateColor, updateFinancialStatus } = useFinancial();
+  const eventoHandlers = useEventos();
 
-    const hoy = new Date();
-    const mesActual = hoy.getMonth(); // 0-11
-    const anioActual = hoy.getFullYear();
+  const greeting = getGreeting();
+  const formattedDate = getFormattedDate();
 
-    let mesVencimientoText = 'Enero';
-    let anioVencimientoText = anioActual;
-
-    // Window for January (Nov, Dec, Jan)
-    if (mesActual === 10 || mesActual === 11 || mesActual === 0) {
-      mesVencimientoText = 'Enero';
-      anioVencimientoText = (mesActual === 0) ? anioActual : anioActual + 1;
-    }
-    // Window for July (May, Jun, Jul)
-    else if (mesActual >= 4 && mesActual <= 6) {
-      mesVencimientoText = 'Julio';
-      anioVencimientoText = anioActual;
-    } else {
-      // Out of standard windows, show next upcoming standard vencimiento
-      if (mesActual > 0 && mesActual < 4) {
-        mesVencimientoText = 'Julio';
-        anioVencimientoText = anioActual;
-      } else {
-        mesVencimientoText = 'Enero';
-        anioVencimientoText = anioActual + 1;
-      }
-    }
-
-    const textoFecha = `1 de ${mesVencimientoText} del ${anioVencimientoText}`;
-
-    const rol = (profileData.rol || 'estudiante').toLowerCase();
-    const semestreDelUsuario = parseInt(profileData.semestre || '1', 10);
-
-    const historial = obtenerHistorial() || [];
-    let pagosRealizados = 0;
-    historial.forEach(compra => {
-      if (compra.productos && compra.productos.some(p => p.nombre.toLowerCase().includes('colegiatura'))) {
-        pagosRealizados++;
-      }
-    });
-
-    let pagosPendientes = 0;
-    if (rol === 'estudiante') {
-      let pagosEsperados = semestreDelUsuario;
-      pagosPendientes = Math.max(0, pagosEsperados - pagosRealizados);
-    }
-
-    setPendingCount(pagosPendientes);
-
-    if (pagosPendientes === 0) {
-      setNextPaymentDateText('No hay pagos pendientes');
-      setNextPaymentDateColor('#27ae60'); // Green
-    } else {
-      setNextPaymentDateText(textoFecha);
-      setNextPaymentDateColor('#e74c3c'); // Red
-    }
-
-    // Trigger DeudaModal automatically on mount/refresh if there is debt
-    if (pagosPendientes > 0) {
-      setDeudaOpen(true);
-    }
-  }, []);
-
-  // Sync avatar and profile details from localStorage
   const loadProfileData = useCallback(() => {
     const token = localStorage.getItem('access_token');
     const userRaw = localStorage.getItem('user');
@@ -132,7 +86,6 @@ export default function Principal() {
       navigate('/login');
       return;
     }
-
     try {
       const u = JSON.parse(userRaw);
       const perfilKey = `perfil_${u.id}`;
@@ -141,24 +94,22 @@ export default function Principal() {
 
       setUserProfile({
         ...u,
-        nombre: profile.nombre || u.nombre || 'Usuario',
-        rol: profile.rol || u.rol || 'estudiante',
-        semestre: profile.semestre || u.semestre || '1',
+        nombre:   profile.nombre   || u.nombre   || 'Usuario',
+        rol:      profile.rol      || u.rol       || 'estudiante',
+        semestre: profile.semestre || u.semestre  || '1',
       });
 
       const foto = localStorage.getItem(`foto_perfil_${u.id}`);
-      if (foto) {
-        setProfileAvatar(foto);
-      }
+      if (foto) setProfileAvatar(foto);
 
-      updateFinancialStatus(profile);
+      const count = updateFinancialStatus(profile);
+      if (count > 0) setDeudaOpen(true);
     } catch (e) {
       console.error('Error parseando datos de sesión:', e);
       navigate('/login');
     }
   }, [navigate, updateFinancialStatus]);
 
-  // Authenticate user session
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -176,152 +127,39 @@ export default function Principal() {
           setTimeout(() => navigate('/login'), 1500);
           return;
         }
-
         const userData = await res.json();
-        const userPrevRaw = localStorage.getItem('user');
-        const userPrev = userPrevRaw ? JSON.parse(userPrevRaw) : {};
-        const userActualizado = { ...userPrev, ...userData };
-        localStorage.setItem('user', JSON.stringify(userActualizado));
+        const userPrev = JSON.parse(localStorage.getItem('user') || '{}');
+        const merged = { ...userPrev, ...userData };
+        localStorage.setItem('user', JSON.stringify(merged));
 
         const perfilKey = `perfil_${userData.id}`;
-        const perfilPrevRaw = localStorage.getItem(perfilKey);
-        const perfilPrev = perfilPrevRaw ? JSON.parse(perfilPrevRaw) : {};
-        const perfilActualizado = { ...perfilPrev, ...userData };
-        localStorage.setItem(perfilKey, JSON.stringify(perfilActualizado));
+        const perfilPrev = JSON.parse(localStorage.getItem(perfilKey) || '{}');
+        localStorage.setItem(perfilKey, JSON.stringify({ ...perfilPrev, ...userData }));
 
         loadProfileData();
         setLoading(false);
       })
-      .catch((err) => {
-        console.error('Session verification error:', err);
+      .catch(() => {
         showToast('Error de conexión al verificar sesión', 'error');
-        // fall back to offline verification
         loadProfileData();
         setLoading(false);
       });
   }, [navigate, loadProfileData]);
-
-  // Handle splash timeout
-  useEffect(() => {
-    if (showSplash) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('splash');
-      window.history.replaceState(null, '', url.pathname);
-
-      const timer = setTimeout(() => {
-        setShowSplash(false);
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [showSplash]);
-
-  // Load eventos on mount + poll every 30s para siempre tener datos frescos
-  useEffect(() => {
-    const fetchEventos = () => {
-      getEventos()
-        .then(r => r.json())
-        .then(data => setEventos(Array.isArray(data) ? data : []))
-        .catch(() => {});
-    };
-    fetchEventos();
-    const interval = setInterval(fetchEventos, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Carousel helpers
-  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) setCarouselSlide(diff > 0 ? 1 : 0);
-    touchStartX.current = null;
-  };
-
-  // Evento CRUD helpers
-  const openCreateEvento = () => {
-    setEditingEvento(null);
-    setEventoForm({ titulo: '', fecha: '', descripcion: '' });
-    setEventoModal(true);
-  };
-  const openEditEvento = (ev) => {
-    setEditingEvento(ev);
-    setEventoForm({ titulo: ev.titulo, fecha: ev.fecha, descripcion: ev.descripcion || '' });
-    setEventoModal(true);
-  };
-  const handleSaveEvento = async () => {
-    if (!eventoForm.titulo.trim() || !eventoForm.fecha.trim()) {
-      showToast('El título y la fecha son obligatorios', 'error');
-      return;
-    }
-    setSavingEvento(true);
-    try {
-      const fn = editingEvento ? updateEvento(editingEvento.id, eventoForm) : createEvento(eventoForm);
-      const res = await fn;
-      if (!res.ok) throw new Error();
-      const refreshed = await getEventos();
-      const data = await refreshed.json();
-      setEventos(Array.isArray(data) ? data : []);
-      setEventoModal(false);
-      showToast(editingEvento ? 'Evento actualizado' : 'Evento creado', 'success');
-    } catch {
-      showToast('Error al guardar el evento', 'error');
-    } finally {
-      setSavingEvento(false);
-    }
-  };
-  const handleDeleteEvento = async (id) => {
-    if (!window.confirm('¿Eliminar este evento?')) return;
-    try {
-      await deleteEvento(id);
-      setEventos(prev => prev.filter(e => e.id !== id));
-      showToast('Evento eliminado', 'success');
-    } catch {
-      showToast('Error al eliminar', 'error');
-    }
-  };
-
-  // Greeting helpers
-  const getGreeting = () => {
-    const h = new Date().getHours();
-    if (h >= 6 && h < 12) return { text: 'Buenos días', emoji: '🌅' };
-    if (h >= 12 && h < 19) return { text: 'Buenas tardes', emoji: '☀️' };
-    return { text: 'Buenas noches', emoji: '🌙' };
-  };
-  const getFormattedDate = () => new Date().toLocaleDateString('es-MX', {
-    weekday: 'long', day: 'numeric', month: 'long'
-  });
-  const greeting = getGreeting();
-  const formattedDate = getFormattedDate();
-
-  const handleProfileUpdate = () => {
-    loadProfileData();
-  };
-
-  const handlePaymentSuccess = () => {
-    // Reload local financial stats
-    loadProfileData();
-    setPagoOpen(false);
-  };
 
   const handleLogout = () => {
     if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
       showToast('Sesión cerrada correctamente', 'success');
-      setTimeout(() => {
-        navigate('/login');
-      }, 1000);
+      setTimeout(() => navigate('/login'), 1000);
     }
   };
 
   if (loading) {
     return (
       <div className="fixed inset-0 bg-[#f20d0d] flex items-center justify-center z-[99998]">
-        <style>{`@keyframes ptSpin{to{transform:rotate(360deg)}}`}</style>
         <div className="text-center text-white">
-          <div className="w-[66px] h-[66px] rounded-full border-[2.5px] border-white/30 border-top-color-white margin-[0_auto_12px] relative animate-[ptSpin_1s_linear_infinite] mx-auto mb-4">
-            <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[46px] h-[46px] rounded-full bg-white/15"></div>
-          </div>
+          <div className="w-16 h-16 rounded-full border-2 border-white/30 border-t-white animate-spin mx-auto mb-4" />
           <div className="text-lg font-bold">CBTis 258</div>
           <div className="text-[10px] opacity-65 tracking-[3px] uppercase mt-1">Cargando...</div>
         </div>
@@ -331,136 +169,14 @@ export default function Principal() {
 
   return (
     <>
-      {/* CSS Splash animations injected */}
-      <style>{`
-        #_splash {
-          position: fixed;
-          inset: 0;
-          z-index: 999999;
-          background: #94272C;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          transition: opacity .5s ease;
-          pointer-events: none;
-        }
-        #_splash-inner {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 18px;
-          position: relative;
-          z-index: 2;
-          animation: _sPopIn .65s cubic-bezier(.34,1.56,.64,1) forwards;
-        }
-        #_splash-ring {
-          position: relative;
-          width: 120px;
-          height: 120px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        #_splash-ring-border {
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          border: 2.5px solid rgba(255,255,255,.35);
-          border-top-color: white;
-          animation: _sSpin 1.4s linear infinite;
-        }
-        #_splash-logo-bg {
-          width: 100px;
-          height: 100px;
-          border-radius: 50%;
-          background: rgba(255,255,255,.15);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        #_splash-logo-bg img {
-          width: 64px;
-          height: 64px;
-          object-fit: contain;
-        }
-        #_splash-title {
-          color: white;
-          font-size: 1.9rem;
-          font-weight: 900;
-          letter-spacing: -.5px;
-          font-family: Lexend, Montserrat, sans-serif;
-          margin: 0;
-          animation: _sFadeUp .5s ease .35s both;
-        }
-        #_splash-sub {
-          color: rgba(255,255,255,.65);
-          font-size: .72rem;
-          font-weight: 600;
-          letter-spacing: 3.5px;
-          text-transform: uppercase;
-          font-family: Lexend, Montserrat, sans-serif;
-          margin: -10px 0 0;
-          animation: _sFadeUp .5s ease .55s both;
-        }
-        #_splash-dots {
-          display: flex;
-          gap: 8px;
-          margin-top: 6px;
-          animation: _sFadeUp .5s ease .7s both;
-        }
-        .splash-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: rgba(255,255,255,.4);
-        }
-        .splash-dot:nth-child(1) { animation: _sBounce 1.1s ease infinite 0s; }
-        .splash-dot:nth-child(2) { animation: _sBounce 1.1s ease infinite .18s; }
-        .splash-dot:nth-child(3) { animation: _sBounce 1.1s ease infinite .36s; }
-        ._sc { position: absolute; border-radius: 50%; background: rgba(255,100,100,.18); }
-        ._sc-tr { width: 360px; height: 360px; top: -130px; right: -130px; }
-        ._sc-bl { width: 300px; height: 300px; bottom: -110px; left: -110px; }
+      <SplashScreen show={showSplash} />
 
-        @keyframes _sPopIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
-        @keyframes _sFadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes _sSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-        @keyframes _sBounce { 0%,80%,100%{transform:translateY(0);opacity:.4} 40%{transform:translateY(-8px);opacity:1;background:white} }
-      `}</style>
-
-      {/* SPLASH SCREEN */}
-      {showSplash && (
-        <div id="_splash">
-          <div className="_sc _sc-tr"></div>
-          <div className="_sc _sc-bl"></div>
-          <div id="_splash-inner">
-            <div id="_splash-ring">
-              <div id="_splash-ring-border"></div>
-              <div id="_splash-logo-bg">
-                <img src="/imgs/yameharte.png" alt="CBTis 258" />
-              </div>
-            </div>
-            <p id="_splash-title">CBTis 258</p>
-            <p id="_splash-sub">Un motivo de orgullo</p>
-            <div id="_splash-dots">
-              <div className="splash-dot"></div>
-              <div className="splash-dot"></div>
-              <div className="splash-dot"></div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* DESKTOP LAYOUT */}
+      {/* ── DESKTOP LAYOUT ── */}
       <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative">
-        <div className="mesh-bg" aria-hidden="true"></div>
+        <div className="mesh-bg" aria-hidden="true" />
 
-        {/* HEADER */}
         <header className="bg-gradient-to-r from-primary to-red-800/90 backdrop-blur-md bg-opacity-90 text-white flex items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
-          <div 
-            onClick={() => setSidebarOpen(true)}
-            className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity"
-          >
+          <div onClick={() => setSidebarOpen(true)} className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
               <img src="/imgs/yameharte.png" alt="Logo" className="h-8 w-auto object-contain" />
             </div>
@@ -470,14 +186,12 @@ export default function Principal() {
             </div>
           </div>
           <div className="flex flex-1 justify-end gap-8 items-center">
-            <div 
+            <div
               onClick={() => setProfileOpen(true)}
               className="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors"
             >
-              <span className="text-sm font-bold text-white">
-                {userProfile ? userProfile.nombre : '—'}
-              </span>
-              <div 
+              <span className="text-sm font-bold text-white">{userProfile?.nombre ?? '—'}</span>
+              <div
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50 bg-slate-300"
                 style={{ backgroundImage: `url("${profileAvatar}")` }}
               />
@@ -485,293 +199,45 @@ export default function Principal() {
           </div>
         </header>
 
-        {/* MAIN BODY */}
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
-
-          {/* ── Desktop Welcome Banner ── */}
-          <div className="mb-10 rounded-3xl overflow-hidden shadow-xl" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
-            <div className="relative bg-gradient-to-br from-[#af101a] via-[#8b0d15] to-[#3d0408] p-8 flex items-center justify-between gap-6 overflow-hidden">
-              {/* Background decoration */}
-              <div className="absolute -top-10 -right-10 w-56 h-56 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute bottom-0 left-1/3 w-72 h-32 bg-white/3 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute top-4 right-48 w-2 h-2 rounded-full bg-white/20" />
-              <div className="absolute top-12 right-64 w-1 h-1 rounded-full bg-white/30" />
-              <div className="absolute bottom-6 right-32 w-1.5 h-1.5 rounded-full bg-white/20" />
-
-              {/* Left: text */}
-              <div className="relative z-10 flex flex-col gap-2 min-w-0">
-                <p className="text-white/70 text-sm font-semibold uppercase tracking-[0.18em]">
-                  {greeting.emoji}&nbsp;&nbsp;{greeting.text}
-                </p>
-                <h2 className="text-4xl font-black text-white leading-tight tracking-tight truncate">
-                  {userProfile ? userProfile.nombre.split(' ')[0] : '—'}
-                  <span className="text-white/50 font-light">
-                    {userProfile && userProfile.nombre.includes(' ')
-                      ? ' ' + userProfile.nombre.split(' ').slice(1).join(' ')
-                      : ''}
-                  </span>
-                </h2>
-                <p className="text-white/60 text-sm font-medium capitalize mt-0.5">{formattedDate}</p>
-
-                <div className="flex items-center gap-3 mt-3">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
-                    pendingCount === 0
-                      ? 'bg-green-500/20 text-green-200 border border-green-400/30'
-                      : 'bg-red-400/20 text-red-200 border border-red-300/30'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${pendingCount === 0 ? 'bg-green-400' : 'bg-red-300'}`} />
-                    {pendingCount === 0 ? 'Al corriente' : `${pendingCount} pago(s) pendiente(s)`}
-                  </span>
-                  {userProfile && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-white/10 text-white/80 border border-white/20">
-                      <span className="material-symbols-outlined text-[13px]">school</span>
-                      {userProfile.semestre}° Semestre
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Right: avatar */}
-              <div className="relative z-10 shrink-0">
-                <div className="w-24 h-24 rounded-2xl border-4 border-white/20 shadow-2xl overflow-hidden bg-white/10"
-                  style={{ backgroundImage: `url("${profileAvatar}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-green-400 border-2 border-white flex items-center justify-center shadow-md">
-                  <span className="material-symbols-outlined text-white text-[12px]">check</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <DesktopWelcomeBanner
+            userProfile={userProfile}
+            profileAvatar={profileAvatar}
+            pendingCount={pendingCount}
+            greeting={greeting}
+            formattedDate={formattedDate}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 flex flex-col gap-8">
-              <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 flex flex-col h-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                <h3 className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-8 flex items-center gap-3 relative z-10 text-slate-800 dark:text-white">
-                  <div className="p-2 bg-primary/10 rounded-xl">
-                    <span className="material-symbols-outlined text-primary text-2xl">account_balance_wallet</span>
-                  </div>
-                  Estados de pago
-                </h3>
-
-                <div className="flex-grow flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 relative overflow-hidden glass-card z-10 mb-8" id="estado-container-global">
-                  {pendingCount > 0 ? (
-                    <>
-                      <div className="relative inline-flex items-center justify-center w-36 h-36 rounded-full mb-6">
-                        <svg className="w-full h-full text-red-200 dark:text-red-900/40" viewBox="0 0 36 36">
-                          <path className="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeLinecap="round" strokeWidth="2.5"></path>
-                        </svg>
-                        <svg className="w-full h-full text-red-500 absolute top-0 left-0" viewBox="0 0 36 36">
-                          <path className="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeDasharray="100, 100" strokeLinecap="round" strokeWidth="2.5"></path>
-                        </svg>
-                        <div className="absolute bg-red-500/10 w-24 h-24 rounded-full flex items-center justify-center">
-                          <span className="material-symbols-outlined text-5xl text-red-500">close</span>
-                        </div>
-                      </div>
-                      <h4 className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-3 text-slate-800 dark:text-slate-100">
-                        Tienes <strong className="text-red-500">{pendingCount}</strong> pago(s) pendiente(s)
-                      </h4>
-                      <p className="text-slate-500 dark:text-slate-400 text-base max-w-md text-center">
-                        Hemos detectado un atraso en tu cuenta. Por favor regulariza tu situación.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="relative inline-flex items-center justify-center w-36 h-36 rounded-full mb-6">
-                        <svg className="w-full h-full text-slate-200 dark:text-slate-700" viewBox="0 0 36 36">
-                          <path className="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeLinecap="round" strokeWidth="2.5"></path>
-                        </svg>
-                        <svg className="w-full h-full text-green-500 absolute top-0 left-0" viewBox="0 0 36 36">
-                          <path className="stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeDasharray="100, 100" strokeLinecap="round" strokeWidth="2.5"></path>
-                        </svg>
-                        <div className="absolute bg-green-500/10 w-24 h-24 rounded-full flex items-center justify-center">
-                          <span className="material-symbols-outlined text-5xl text-green-500">check</span>
-                        </div>
-                      </div>
-                      <h4 className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-3 text-slate-800 dark:text-slate-100">
-                        Tienes <strong className="text-primary">0</strong> pagos pendientes
-                      </h4>
-                      <p className="text-slate-500 dark:text-slate-400 text-base max-w-md text-center">
-                        Tu cuenta está al corriente. ¡Gracias por tu puntualidad y compromiso con tu educación!
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-5 mt-auto relative z-10">
-                  <button 
-                    onClick={() => setInfoOpen(true)}
-                    className="flex-1 flex cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-gradient-to-r from-primary to-red-600 text-white text-base font-bold shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all focus:ring-4 focus:ring-primary/20"
-                  >
-                    <span className="material-symbols-outlined mr-3 text-[22px]">info</span>
-                    Información
-                  </button>
-                  <button 
-                    onClick={() => setHistoryOpen(true)}
-                    className="flex-1 flex cursor-pointer items-center justify-center rounded-xl h-14 px-8 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-base font-bold shadow-sm border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 hover:-translate-y-0.5 transition-all"
-                  >
-                    <span className="material-symbols-outlined mr-3 text-[22px]">history</span>
-                    Historial de Pagos
-                  </button>
-                </div>
-              </section>
+              <EstadoPago
+                pendingCount={pendingCount}
+                onOpenInfo={() => setInfoOpen(true)}
+                onOpenHistory={() => setHistoryOpen(true)}
+              />
             </div>
-
             <div className="flex flex-col gap-8">
-              <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
-                <h3 className="text-xl font-bold leading-tight tracking-[-0.015em] mb-6 flex items-center gap-3 text-slate-800 dark:text-white">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                    <span className="material-symbols-outlined text-blue-500 text-xl">credit_card</span>
-                  </div>
-                  Cuenta Activa
-                </h3>
-                <div className="space-y-5">
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700/50">
-                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Semestre Actual</span>
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                      {userProfile ? `${userProfile.semestre}° Semestre` : '—'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-700/50">
-                    <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Colegiatura Mes</span>
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">$3,000.00 MXN</span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-primary/5 rounded-xl border border-primary/10">
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Próximo Vencimiento</span>
-                    <span 
-                      className="text-sm font-black" 
-                      style={{ color: nextPaymentDateColor }}
-                    >
-                      {nextPaymentDateText}
-                    </span>
-                  </div>
-                </div>
-              </section>
-
-              <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
-                <h3 className="text-xl font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-3 text-slate-800 dark:text-white">
-                  <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-                    <span className="material-symbols-outlined text-purple-500 text-xl">storefront</span>
-                  </div>
-                  Financieros
-                </h3>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">Adquiere productos escolares o realiza tus trámites.</p>
-                <ul className="space-y-4 mb-6">
-                  <li>
-                    <a 
-                      onClick={() => setPapeleriaOpen(true)}
-                      className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-orange-200 dark:hover:border-orange-500/30 hover:shadow-md transition-all group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
-                          <span className="material-symbols-outlined text-xl">draw</span>
-                        </div>
-                        <span className="text-base font-bold text-slate-700 dark:text-slate-200">Subir Papelería</span>
-                      </div>
-                      <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-orange-500 transition-colors">arrow_forward</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a 
-                      onClick={() => setOrientacionOpen(true)}
-                      className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/30 hover:shadow-md transition-all group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="p-2.5 bg-teal-100 dark:bg-teal-900/30 rounded-lg text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform">
-                          <span className="material-symbols-outlined text-xl">psychology</span>
-                        </div>
-                        <span className="text-base font-bold text-slate-700 dark:text-slate-200">Orientación</span>
-                      </div>
-                      <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-teal-500 transition-colors">arrow_forward</span>
-                    </a>
-                  </li>
-                </ul>
-                <button 
-                  onClick={() => navigate('/tienda')}
-                  className="w-full flex cursor-pointer items-center justify-center h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm"
-                >
-                  Ingresar a Tienda
-                </button>
-              </section>
-
-              {/* ── Eventos y Avisos (desktop) ── */}
-              <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-bold leading-tight tracking-[-0.015em] flex items-center gap-3 text-slate-800 dark:text-white">
-                    <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-xl">
-                      <span className="material-symbols-outlined text-primary text-xl">event_note</span>
-                    </div>
-                    Eventos y Avisos
-                  </h3>
-                  {isAdmin && (
-                    <button
-                      onClick={openCreateEvento}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-xl text-xs font-bold border-none cursor-pointer hover:bg-red-700 transition-colors"
-                      title="Nuevo evento"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">add</span>
-                      Nuevo
-                    </button>
-                  )}
-                </div>
-
-                {eventos.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-                    <span className="material-symbols-outlined text-slate-200 dark:text-slate-700 text-5xl">event_busy</span>
-                    <p className="text-sm text-slate-400 dark:text-slate-500">No hay eventos publicados</p>
-                    {isAdmin && (
-                      <button
-                        onClick={openCreateEvento}
-                        className="mt-1 text-xs font-bold text-primary hover:underline cursor-pointer border-none bg-transparent"
-                      >
-                        Publicar el primero
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <ul className="flex flex-col divide-y divide-slate-100 dark:divide-slate-700/50 max-h-72 overflow-y-auto">
-                    {eventos.map(ev => (
-                      <li key={ev.id} className="py-4 first:pt-0 last:pb-0">
-                        <div className="flex justify-between items-start gap-3">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-bold text-sm text-slate-800 dark:text-slate-200 leading-snug truncate">{ev.titulo}</p>
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary mt-0.5">
-                              <span className="material-symbols-outlined text-[13px]">calendar_month</span>
-                              {ev.fecha}
-                            </span>
-                            {ev.descripcion && (
-                              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1 line-clamp-2">{ev.descripcion}</p>
-                            )}
-                          </div>
-                          {isAdmin && (
-                            <div className="flex gap-1 shrink-0 mt-0.5">
-                              <button
-                                onClick={() => openEditEvento(ev)}
-                                className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center border-none cursor-pointer transition-colors"
-                                title="Editar"
-                              >
-                                <span className="material-symbols-outlined text-[14px] text-slate-600 dark:text-slate-300">edit</span>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteEvento(ev.id)}
-                                className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50 flex items-center justify-center border-none cursor-pointer transition-colors"
-                                title="Eliminar"
-                              >
-                                <span className="material-symbols-outlined text-[14px] text-primary dark:text-red-400">delete</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
+              <CuentaActiva
+                userProfile={userProfile}
+                nextPaymentDateText={nextPaymentDateText}
+                nextPaymentDateColor={nextPaymentDateColor}
+              />
+              <FinancierosPanel
+                onOpenPapeleria={() => setPapeleriaOpen(true)}
+                onOpenOrientacion={() => setOrientacionOpen(true)}
+                onNavigateTienda={() => navigate('/tienda')}
+              />
+              <EventosList
+                eventos={eventoHandlers.eventos}
+                isAdmin={isAdmin}
+                onCreate={eventoHandlers.openCreateEvento}
+                onEdit={eventoHandlers.openEditEvento}
+                onDelete={eventoHandlers.handleDeleteEvento}
+              />
             </div>
           </div>
         </main>
 
-        {/* FOOTER */}
         <footer className="bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 mt-auto py-10 z-10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[1280px] flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 md:gap-10 text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -779,7 +245,7 @@ export default function Principal() {
               <a className="hover:text-primary transition-colors" href="#">Términos y condiciones</a>
               <a className="hover:text-primary transition-colors" href="#">Política de privacidad</a>
             </div>
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-slate-400 hover:text-primary transition-colors text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/10 cursor-pointer"
             >
@@ -790,16 +256,11 @@ export default function Principal() {
         </footer>
       </div>
 
-      {/* MOBILE LAYOUT */}
+      {/* ── MOBILE LAYOUT ── */}
       <div className="mobile-only block lg:hidden min-h-screen bg-[#f9f9fb] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display">
-        {/* Mobile Header */}
         <header className="mob-header fixed top-0 left-0 right-0 z-50 bg-white/92 dark:bg-[#1a1c20]/92 backdrop-blur-md border-b border-slate-100 dark:border-[#3c1e1e]/30 h-[64px] flex items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setSidebarOpen(true)}
-              style={{ background: 'transparent' }} 
-              className="w-10 h-10 rounded-full border-none cursor-pointer flex items-center justify-center text-[#1a1c1d] dark:text-[#f1f1f3]"
-            >
+            <button onClick={() => setSidebarOpen(true)} style={{ background: 'transparent' }} className="w-10 h-10 rounded-full border-none cursor-pointer flex items-center justify-center text-[#1a1c1d] dark:text-[#f1f1f3]">
               <span className="material-symbols-outlined">menu</span>
             </button>
             <div className="flex items-center gap-2">
@@ -807,433 +268,59 @@ export default function Principal() {
               <span className="mob-title font-bold text-[1.1rem] text-[#af101a] dark:text-white">CBTis 258</span>
             </div>
           </div>
-          <button 
-            onClick={() => setProfileOpen(true)}
-            style={{ background: 'transparent' }} 
-            className="border-none cursor-pointer p-0"
-          >
-            <div 
-              className="w-9 h-9 rounded-full bg-center bg-no-repeat bg-cover border-2 border-primary/20 bg-slate-300"
-              style={{ backgroundImage: `url("${profileAvatar}")` }}
-            />
+          <button onClick={() => setProfileOpen(true)} style={{ background: 'transparent' }} className="border-none cursor-pointer p-0">
+            <div className="w-9 h-9 rounded-full bg-center bg-no-repeat bg-cover border-2 border-primary/20 bg-slate-300" style={{ backgroundImage: `url("${profileAvatar}")` }} />
           </button>
         </header>
 
-        {/* Mobile Main Content */}
         <div className="mobile-main-content px-5 pt-[80px]">
-          {/* ── Mobile Welcome Banner ── */}
-          <section className="mb-5 mt-4" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
-            <div className="relative bg-gradient-to-br from-[#af101a] via-[#8b0d15] to-[#3d0408] rounded-2xl p-5 overflow-hidden shadow-lg">
-              {/* BG decoration */}
-              <div className="absolute -top-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-              <div className="absolute bottom-0 left-1/2 w-40 h-16 bg-white/3 rounded-full blur-2xl pointer-events-none" />
-
-              {/* Top row: greeting + avatar */}
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="text-white/65 text-[11px] font-bold uppercase tracking-[0.18em] mb-1">
-                    {greeting.emoji}&nbsp; {greeting.text}
-                  </p>
-                  <h2 className="text-[1.6rem] font-black text-white leading-tight tracking-tight">
-                    {userProfile ? userProfile.nombre.split(' ')[0] : '—'}
-                  </h2>
-                  {userProfile && userProfile.nombre.includes(' ') && (
-                    <p className="text-white/50 text-sm font-medium -mt-0.5">
-                      {userProfile.nombre.split(' ').slice(1).join(' ')}
-                    </p>
-                  )}
-                </div>
-                <div className="relative shrink-0">
-                  <div
-                    className="w-[52px] h-[52px] rounded-xl border-2 border-white/25 shadow-lg overflow-hidden bg-white/10"
-                    style={{ backgroundImage: `url("${profileAvatar}")`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-400 border-2 border-white flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white text-[11px]">check</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom row: date + badges */}
-              <div className="flex items-center justify-between mt-2 pt-3 border-t border-white/10">
-                <p className="text-white/55 text-[11px] font-medium capitalize">{formattedDate}</p>
-                <div className="flex gap-2">
-                  {userProfile && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-white/10 text-white/80 border border-white/15">
-                      <span className="material-symbols-outlined text-[11px]">school</span>
-                      {userProfile.semestre}° Sem
-                    </span>
-                  )}
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                    pendingCount === 0
-                      ? 'bg-green-500/20 text-green-200 border-green-400/30'
-                      : 'bg-red-300/20 text-red-200 border-red-300/30'
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${pendingCount === 0 ? 'bg-green-400' : 'bg-red-300'}`} />
-                    {pendingCount === 0 ? 'Al corriente' : `${pendingCount} pendiente(s)`}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Swipeable Carousel: Pagos + Eventos */}
-          <section className="mb-5" id="estado-container-global-mobile">
-            {/* Dot indicators */}
-            <div className="flex justify-center gap-1.5 mb-2">
-              <button
-                onClick={() => setCarouselSlide(0)}
-                className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${carouselSlide === 0 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`}
-              />
-              <button
-                onClick={() => setCarouselSlide(1)}
-                className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${carouselSlide === 1 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`}
-              />
-            </div>
-
-            {/* Slides wrapper */}
-            <div
-              className="overflow-hidden rounded-2xl"
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-            >
-              <div
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${carouselSlide * 100}%)` }}
-              >
-                {/* ── Slide 1: Estados de pago ── */}
-                <div className="min-w-full">
-                  <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm">
-                    <div className="flex justify-between items-start mb-[14px]">
-                      <div>
-                        <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-1.5">Estados de pago</h3>
-                        {pendingCount > 0 ? (
-                          <div className="inline-flex items-center gap-1.5 bg-[#ffdad6] dark:bg-red-950/40 rounded-full px-2.5 py-1 text-[11px] font-bold text-[#93000a] dark:text-red-300">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a] inline-block"></span>
-                            {pendingCount} pago(s) pendiente(s)
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 bg-[#e8f5e9] dark:bg-green-950/40 rounded-full px-2.5 py-1 text-[11px] font-bold text-[#1b5e20] dark:text-green-300">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#27ae60] inline-block"></span>
-                            Al corriente
-                          </div>
-                        )}
-                      </div>
-                      {pendingCount > 0 ? (
-                        <div className="w-[52px] h-[52px] rounded-full bg-[#ffdad6] dark:bg-red-950/40 flex items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-[#ba1a1a] dark:text-red-400 text-[22px]">warning</span>
-                        </div>
-                      ) : (
-                        <div className="w-[52px] h-[52px] rounded-full bg-[#e8f5e9] dark:bg-green-950/40 flex items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-[#27ae60] dark:text-green-400 text-[22px]">check_circle</span>
-                        </div>
-                      )}
-                    </div>
-                    <p className="mob-sub text-xs text-[#5b403d] dark:text-[#9b7a78] leading-relaxed mb-4">
-                      {pendingCount > 0
-                        ? 'Tienes pagos atrasados. Regulariza tu situación a tiempo.'
-                        : 'Tu cuenta está al corriente. ¡Gracias por tu puntualidad!'}
-                    </p>
-                    <button
-                      onClick={() => setInfoOpen(true)}
-                      className="w-full bg-[#af101a] text-white py-3 rounded-xl font-bold text-sm border-none cursor-pointer"
-                    >
-                      Ver detalles
-                    </button>
-                  </div>
-                </div>
-
-                {/* ── Slide 2: Eventos / Anuncios ── */}
-                <div className="min-w-full">
-                  <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm min-h-[190px]">
-                    <div className="flex justify-between items-center mb-3">
-                      <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3]">Eventos y Avisos</h3>
-                      {isAdmin && (
-                        <button
-                          onClick={openCreateEvento}
-                          className="w-8 h-8 rounded-full bg-[#af101a] text-white flex items-center justify-center border-none cursor-pointer shrink-0"
-                          title="Nuevo evento"
-                        >
-                          <span className="material-symbols-outlined text-[18px]">add</span>
-                        </button>
-                      )}
-                    </div>
-
-                    {eventos.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-6 gap-2 text-center">
-                        <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 text-[40px]">event_note</span>
-                        <p className="text-xs text-[#8f6f6c] dark:text-[#9b7a78]">Sin eventos por ahora</p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-3 max-h-[280px] overflow-y-auto pr-1">
-                        {eventos.map(ev => (
-                          <div key={ev.id} className="flex flex-col gap-0.5 pb-2.5 border-b border-slate-100 dark:border-[#3c1e1e]/20 last:border-0 last:pb-0">
-                            <div className="flex justify-between items-start gap-2">
-                              <p className="font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] leading-snug">{ev.titulo}</p>
-                              {isAdmin && (
-                                <div className="flex gap-1 shrink-0">
-                                  <button
-                                    onClick={() => openEditEvento(ev)}
-                                    className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center border-none cursor-pointer"
-                                  >
-                                    <span className="material-symbols-outlined text-[14px] text-slate-600 dark:text-slate-300">edit</span>
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteEvento(ev.id)}
-                                    className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center border-none cursor-pointer"
-                                  >
-                                    <span className="material-symbols-outlined text-[14px] text-[#ba1a1a] dark:text-red-400">delete</span>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#af101a] dark:text-red-400">
-                              <span className="material-symbols-outlined text-[12px]">calendar_month</span>
-                              {ev.fecha}
-                            </span>
-                            {ev.descripcion && (
-                              <p className="text-xs text-[#5b403d] dark:text-[#9b7a78] leading-relaxed mt-0.5">{ev.descripcion}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Next Payment Date Card */}
-          <section className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 mb-5 border border-slate-100 dark:border-[#3c1e1e]/20 flex items-center justify-between shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="mob-action-icon w-10 h-10 rounded-xl bg-[#af101a]/5 dark:bg-[#af101a]/15 flex items-center justify-center text-[#af101a] dark:text-white shrink-0">
-                <span className="material-symbols-outlined text-[20px]">calendar_month</span>
-              </div>
-              <div>
-                <p className="mob-label text-[10px] font-bold text-[#8f6f6c] dark:text-[#9b7a78] uppercase tracking-wider mb-0.5">Próximo Vencimiento</p>
-                <p className="font-bold text-[0.9rem]" style={{ color: nextPaymentDateColor }}>
-                  {pendingCount === 0 ? 'Sin deuda' : nextPaymentDateText}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="mob-label text-[10px] font-bold text-[#8f6f6c] dark:text-[#9b7a78] mb-0.5">Colegiatura</p>
-              <p className="mob-value font-bold text-[0.9rem] text-[#1a1c1d] dark:text-[#f1f1f3]">$3,000 MXN</p>
-            </div>
-          </section>
-
-          {/* Account Info Card */}
-          <section className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 mb-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm">
-            <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-4">Cuenta Activa</h3>
-            <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-[#3c1e1e]/20">
-                <span className="mob-label text-sm text-[#5b403d] dark:text-[#9b7a78]">Semestre Actual</span>
-                <span className="mob-value font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3]">
-                  {userProfile ? `${userProfile.semestre}° Semestre` : '—'}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="mob-label text-sm text-[#5b403d] dark:text-[#9b7a78]">Correo</span>
-                <span className="mob-value font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap">
-                  {userProfile ? userProfile.email : '—'}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* Quick Actions */}
-          <section className="mb-5">
-            <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-3.5">Acciones rápidas</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <button 
-                onClick={() => setInfoOpen(true)}
-                className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform"
-              >
-                <div className="mob-action-icon w-10 h-10 rounded-xl bg-[#af101a]/5 dark:bg-[#af101a]/15 flex items-center justify-center mb-2.5">
-                  <span className="material-symbols-outlined text-[#af101a] dark:text-white text-[20px]">info</span>
-                </div>
-                <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Información</p>
-                <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Ver estado de cuenta</p>
-              </button>
-
-              <button 
-                onClick={() => setHistoryOpen(true)}
-                className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#005faf]/5 dark:bg-[#005faf]/15 flex items-center justify-center mb-2.5">
-                  <span className="material-symbols-outlined text-[#005faf] dark:text-blue-400 text-[20px]">history</span>
-                </div>
-                <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Historial</p>
-                <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Pagos realizados</p>
-              </button>
-
-              <button 
-                onClick={() => setOrientacionOpen(true)}
-                className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform"
-              >
-                <div className="w-10 h-10 rounded-xl bg-[#005f3a]/5 dark:bg-[#005f3a]/15 flex items-center justify-center mb-2.5">
-                  <span className="material-symbols-outlined text-[#005f3a] dark:text-emerald-400 text-[20px]">school</span>
-                </div>
-                <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Orientación</p>
-                <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Reportes y citas</p>
-              </button>
-
-              <button 
-                onClick={() => setPapeleriaOpen(true)}
-                className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform"
-              >
-                <div className="mob-action-icon w-10 h-10 rounded-xl bg-[#af101a]/5 dark:bg-[#af101a]/15 flex items-center justify-center mb-2.5">
-                  <span className="material-symbols-outlined text-[#af101a] dark:text-white text-[20px]">edit_note</span>
-                </div>
-                <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Papelería</p>
-                <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Subir documentos</p>
-              </button>
-            </div>
-          </section>
+          <MobileWelcomeBanner
+            userProfile={userProfile}
+            profileAvatar={profileAvatar}
+            pendingCount={pendingCount}
+            greeting={greeting}
+            formattedDate={formattedDate}
+          />
+          <MobileCarousel
+            pendingCount={pendingCount}
+            eventos={eventoHandlers.eventos}
+            isAdmin={isAdmin}
+            onOpenInfo={() => setInfoOpen(true)}
+            onCreate={eventoHandlers.openCreateEvento}
+            onEdit={eventoHandlers.openEditEvento}
+            onDelete={eventoHandlers.handleDeleteEvento}
+          />
+          <MobileNextPayment
+            pendingCount={pendingCount}
+            nextPaymentDateText={nextPaymentDateText}
+            nextPaymentDateColor={nextPaymentDateColor}
+          />
+          <MobileCuentaActiva userProfile={userProfile} />
+          <MobileQuickActions
+            onOpenInfo={() => setInfoOpen(true)}
+            onOpenHistory={() => setHistoryOpen(true)}
+            onOpenOrientacion={() => setOrientacionOpen(true)}
+            onOpenPapeleria={() => setPapeleriaOpen(true)}
+          />
         </div>
 
-        {/* Bottom Nav Bar (Mobile) */}
-        <nav className="mob-nav fixed bottom-0 left-0 right-0 z-45 flex justify-around items-center px-4 h-20 bg-white/92 dark:bg-[#1a1c20]/92 backdrop-blur-md border-t border-slate-100 dark:border-[#3c1e1e]/20 shadow-lg rounded-t-3xl">
-          <a href="#" className="flex flex-col items-center justify-center w-full h-full text-[#af101a] relative">
-            <span className="absolute w-16 h-10 bg-[#af101a]/8 rounded-full z-[-1]"></span>
-            <span className="material-symbols-outlined mb-1 text-[FILL] font-variation-settings-['FILL'_1]">dashboard</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider">Panel</span>
-          </a>
-          <a 
-            onClick={() => navigate('/tienda?splash=1')}
-            className="flex flex-col items-center justify-center w-full h-full text-slate-500 dark:text-[#9b7a78] cursor-pointer"
-          >
-            <span className="material-symbols-outlined mb-1">shopping_bag</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider">Tienda</span>
-          </a>
-          <a 
-            onClick={() => setSidebarOpen(true)}
-            className="flex flex-col items-center justify-center w-full h-full text-slate-500 dark:text-[#9b7a78] cursor-pointer"
-          >
-            <span className="material-symbols-outlined mb-1">settings</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider">Ajustes</span>
-          </a>
-        </nav>
+        <MobileBottomNav
+          onOpenSidebar={() => setSidebarOpen(true)}
+          onNavigateTienda={() => navigate('/tienda?splash=1')}
+        />
       </div>
 
-      {/* ALL MODALS RENDERED HERE */}
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-        onOpenChatbot={() => setChatbotOpen(true)} 
-      />
-      
-      <Chatbot 
-        isOpen={chatbotOpen} 
-        onClose={() => setChatbotOpen(false)} 
-      />
-
-      <PerfilModal 
-        isOpen={profileOpen} 
-        onClose={() => setProfileOpen(false)} 
-        onProfileUpdate={handleProfileUpdate} 
-      />
-
-      <Pago 
-        isOpen={pagoOpen} 
-        onClose={() => setPagoOpen(false)} 
-        cart={[]} 
-        clearCart={() => {}} 
-        mode="principal" 
-        onPaymentSuccess={handlePaymentSuccess} 
-      />
-
-      <Papeleria 
-        isOpen={papeleriaOpen} 
-        onClose={() => setPapeleriaOpen(false)} 
-      />
-
-      <OrientacionModal 
-        isOpen={orientacionOpen} 
-        onClose={() => setOrientacionOpen(false)} 
-      />
-
-      <DeudaModal 
-        isOpen={deudaOpen} 
-        onClose={() => setDeudaOpen(false)} 
-        pendingCount={pendingCount} 
-      />
-
-      <HistorialModal 
-        isOpen={historyOpen} 
-        onClose={() => setHistoryOpen(false)} 
-      />
-
-      <InformacionModal 
-        isOpen={infoOpen} 
-        onClose={() => setInfoOpen(false)} 
-      />
-
-      {/* ── Admin Evento Modal ── */}
-      {eventoModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm" onClick={() => setEventoModal(false)}>
-          <div
-            className="bg-white dark:bg-[#1e2025] rounded-t-3xl w-full max-w-lg p-6 pb-10 shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-5">
-              <h2 className="font-bold text-lg text-[#1a1c1d] dark:text-[#f1f1f3]">
-                {editingEvento ? 'Editar Evento' : 'Nuevo Evento'}
-              </h2>
-              <button
-                onClick={() => setEventoModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center border-none cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[18px] text-slate-600 dark:text-slate-300">close</span>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div>
-                <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Título *</label>
-                <input
-                  type="text"
-                  placeholder="Ej. Junta de padres de familia"
-                  value={eventoForm.titulo}
-                  onChange={e => setEventoForm(f => ({ ...f, titulo: e.target.value }))}
-                  className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Fecha *</label>
-                <input
-                  type="text"
-                  placeholder="Ej. 15 de junio de 2026"
-                  value={eventoForm.fecha}
-                  onChange={e => setEventoForm(f => ({ ...f, fecha: e.target.value }))}
-                  className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Descripción</label>
-                <textarea
-                  rows={3}
-                  placeholder="Detalles adicionales del evento..."
-                  value={eventoForm.descripcion}
-                  onChange={e => setEventoForm(f => ({ ...f, descripcion: e.target.value }))}
-                  className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a] resize-none"
-                />
-              </div>
-
-              <button
-                onClick={handleSaveEvento}
-                disabled={savingEvento}
-                className="w-full bg-[#af101a] text-white py-3.5 rounded-xl font-bold text-sm border-none cursor-pointer disabled:opacity-60 mt-1"
-              >
-                {savingEvento ? 'Guardando...' : (editingEvento ? 'Guardar cambios' : 'Crear evento')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── MODALS ── */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onOpenChatbot={() => setChatbotOpen(true)} />
+      <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
+      <PerfilModal isOpen={profileOpen} onClose={() => setProfileOpen(false)} onProfileUpdate={loadProfileData} />
+      <Pago isOpen={pagoOpen} onClose={() => setPagoOpen(false)} cart={[]} clearCart={() => {}} mode="principal" onPaymentSuccess={() => { loadProfileData(); setPagoOpen(false); }} />
+      <Papeleria isOpen={papeleriaOpen} onClose={() => setPapeleriaOpen(false)} />
+      <OrientacionModal isOpen={orientacionOpen} onClose={() => setOrientacionOpen(false)} />
+      <DeudaModal isOpen={deudaOpen} onClose={() => setDeudaOpen(false)} pendingCount={pendingCount} />
+      <HistorialModal isOpen={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <InformacionModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />
+      <EventoModal {...eventoHandlers} />
     </>
   );
 }

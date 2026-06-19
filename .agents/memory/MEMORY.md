@@ -1,0 +1,1 @@
+- [Architecture restructuring](arch-restructuring.md) — context/hooks/components split completed; godfiles eliminated; key constraints documented.
