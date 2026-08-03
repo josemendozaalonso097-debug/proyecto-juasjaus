@@ -59,7 +59,12 @@ export function useEventos() {
   const handleDeleteEvento = useCallback(async (id) => {
     if (!window.confirm('¿Eliminar este evento?')) return;
     try {
-      await deleteEvento(id);
+      const res = await deleteEvento(id);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        showToast(body.detail || 'No se pudo eliminar el evento', 'error');
+        return;
+      }
       setEventos(prev => prev.filter(e => e.id !== id));
       showToast('Evento eliminado', 'success');
     } catch {
