@@ -55,6 +55,10 @@ externalPort = 80
 localPort = 8000
 externalPort = 8000
 
+[[ports]]
+localPort = 8010
+externalPort = 3000
+
 [userenv]
 
 [userenv.shared]
@@ -73,4 +77,4 @@ MAIL_PASSWORD = "hlgu fvlv ryqx abdb"
 [deployment]
 deploymentTarget = "autoscale"
 run = ["bash", "-c", "cd backend && ENVIRONMENT=production PORT=5000 .venv/bin/python run.py"]
-build = ["bash", "-c", "python -m venv backend/.venv && backend/.venv/bin/python -m pip install --no-cache-dir -r backend/requirements.txt && cd frontend-react && npm install && npm run build"]
+build = ["bash", "-c", "python -m venv backend/.venv && PIP_CONFIG_FILE=/dev/null backend/.venv/bin/python -m pip install --no-cache-dir -r backend/requirements.txt && cd frontend-react && npm install && npm run build"]

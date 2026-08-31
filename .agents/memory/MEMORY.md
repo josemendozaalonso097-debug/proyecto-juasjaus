@@ -1,1 +1,2 @@
 - [Architecture restructuring](arch-restructuring.md) — context/hooks/components split completed; godfiles eliminated; key constraints documented.
+- [Deployment Python environment](deployment-python-environment.md) — use a project virtualenv and bypass the global user-install pip config during publishing.
