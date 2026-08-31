@@ -17930,3 +17930,538 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2026-08-31 00:56:53,668 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
 2026-08-31 00:56:53,669 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-08-31 00:56:53,669 - app.main - INFO - ============================================================
+2026-08-31 01:25:22,160 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:25:32,778 - app.main - INFO - ============================================================
+2026-08-31 01:25:32,778 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:25:32,778 - app.main - INFO - ============================================================
+2026-08-31 01:25:32,788 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:25:32,789 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:25:32,789 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:25:32,789 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:25:32,789 - app.main - INFO - ============================================================
+2026-08-31 01:26:16,935 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:26:17,967 - app.main - INFO - ============================================================
+2026-08-31 01:26:17,967 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:26:17,967 - app.main - INFO - ============================================================
+2026-08-31 01:26:17,972 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:26:17,972 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:26:17,972 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:26:17,972 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:26:17,972 - app.main - INFO - ============================================================
+2026-08-31 01:26:17,972 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:26:19,204 - app.main - INFO - ============================================================
+2026-08-31 01:26:19,204 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:26:19,204 - app.main - INFO - ============================================================
+2026-08-31 01:26:19,263 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:26:19,263 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:26:19,264 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:26:19,264 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:26:19,264 - app.main - INFO - ============================================================
+2026-08-31 01:26:19,264 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:26:20,334 - app.main - INFO - ============================================================
+2026-08-31 01:26:20,334 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:26:20,334 - app.main - INFO - ============================================================
+2026-08-31 01:26:20,339 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:26:20,339 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:26:20,339 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:26:20,339 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:26:20,339 - app.main - INFO - ============================================================
+2026-08-31 01:26:20,339 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:26:33,079 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:26:34,123 - app.main - INFO - ============================================================
+2026-08-31 01:26:34,124 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:26:34,124 - app.main - INFO - ============================================================
+2026-08-31 01:26:34,128 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:26:34,129 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:26:34,129 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:26:34,129 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:26:34,129 - app.main - INFO - ============================================================
+2026-08-31 01:26:34,129 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:26:35,162 - app.main - INFO - ============================================================
+2026-08-31 01:26:35,162 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:26:35,162 - app.main - INFO - ============================================================
+2026-08-31 01:26:35,167 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:26:35,167 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:26:35,167 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:26:35,167 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:26:35,168 - app.main - INFO - ============================================================
+2026-08-31 01:26:35,168 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:26:38,985 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:26:40,049 - app.main - INFO - ============================================================
+2026-08-31 01:26:40,049 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:26:40,049 - app.main - INFO - ============================================================
+2026-08-31 01:26:40,055 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:26:40,055 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:26:40,055 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:26:40,055 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:26:40,055 - app.main - INFO - ============================================================
+2026-08-31 01:26:40,056 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:27:11,153 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:27:12,363 - app.main - INFO - ============================================================
+2026-08-31 01:27:12,364 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:27:12,364 - app.main - INFO - ============================================================
+2026-08-31 01:27:12,391 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:27:12,391 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:27:12,391 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:27:12,391 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:27:12,391 - app.main - INFO - ============================================================
+2026-08-31 01:27:12,392 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:27:13,504 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:27:14,585 - app.main - INFO - ============================================================
+2026-08-31 01:27:14,585 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:27:14,585 - app.main - INFO - ============================================================
+2026-08-31 01:27:14,591 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:27:14,591 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:27:14,591 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:27:14,591 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:27:14,591 - app.main - INFO - ============================================================
+2026-08-31 01:27:14,591 - app.main - ERROR - No se pudieron limpiar códigos OXXO expirados
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2423, in _determine_joins
+    self.primaryjoin = join_condition(
+                       ^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/util.py", line 123, in join_condition
+    return Join._join_condition(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1368, in _join_condition
+    cls._joincond_trim_constraints(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/selectable.py", line 1513, in _joincond_trim_constraints
+    raise exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Can't determine join between 'users' and 'compras'; tables have more than one foreign key constraint relationship between them. Please specify the 'onclause' of this join explicitly.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/backend/app/main.py", line 33, in cleanup_oxxo_loop
+    db.query(OxxoPayment).filter(
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2952, in query
+    return self._query_cls(entities, self, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 275, in __init__
+    self._set_entities(entities)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 288, in _set_entities
+    coercions.expect(
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/sql/coercions.py", line 388, in expect
+    insp._post_inspect
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 1253, in __get__
+    obj.__dict__[self.__name__] = result = self.fget(obj)
+                                           ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2722, in _post_inspect
+    self._check_configure()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2399, in _check_configure
+    _configure_registries({self.registry}, cascade=True)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4215, in _configure_registries
+    _do_configure_registries(registries, cascade)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 4256, in _do_configure_registries
+    mapper._post_configure_properties()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/mapper.py", line 2416, in _post_configure_properties
+    prop.init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/interfaces.py", line 589, in init
+    self.do_init()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1644, in do_init
+    self._setup_join_conditions()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 1884, in _setup_join_conditions
+    self._join_condition = jc = JoinCondition(
+                                ^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2310, in __init__
+    self._determine_joins()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/sqlalchemy/orm/relationships.py", line 2467, in _determine_joins
+    raise sa_exc.AmbiguousForeignKeysError(
+sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition between parent/child tables on relationship User.compras - there are multiple foreign key paths linking the tables.  Specify the 'foreign_keys' argument, providing a list of those columns which should be counted as containing a foreign key reference to the parent table.
+2026-08-31 01:27:47,472 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:27:48,552 - app.main - INFO - ============================================================
+2026-08-31 01:27:48,552 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:27:48,552 - app.main - INFO - ============================================================
+2026-08-31 01:27:48,558 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:27:48,558 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:27:48,558 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:27:48,558 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:27:48,558 - app.main - INFO - ============================================================
+2026-08-31 01:27:53,801 - httpx - INFO - HTTP Request: POST http://testserver/api/compras "HTTP/1.1 201 Created"
+2026-08-31 01:27:53,812 - httpx - INFO - HTTP Request: POST http://testserver/api/compras/admin/verify "HTTP/1.1 200 OK"
+2026-08-31 01:28:07,068 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 01:28:08,335 - app.main - INFO - ============================================================
+2026-08-31 01:28:08,335 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 01:28:08,335 - app.main - INFO - ============================================================
+2026-08-31 01:28:08,340 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 01:28:08,340 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 01:28:08,341 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 01:28:08,341 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 01:28:08,341 - app.main - INFO - ============================================================
+2026-08-31 01:28:17,913 - httpx - INFO - HTTP Request: POST http://testserver/api/compras "HTTP/1.1 201 Created"
+2026-08-31 01:28:17,924 - httpx - INFO - HTTP Request: POST http://testserver/api/compras/admin/verify "HTTP/1.1 200 OK"
+2026-08-31 01:28:17,929 - httpx - INFO - HTTP Request: POST http://testserver/api/compras/admin/verify "HTTP/1.1 409 Conflict"
+2026-08-31 01:28:35,285 - httpx - INFO - HTTP Request: POST http://testserver/api/oxxo/payments "HTTP/1.1 201 Created"
+2026-08-31 01:28:35,295 - httpx - INFO - HTTP Request: POST http://testserver/api/oxxo/admin/scan "HTTP/1.1 200 OK"

@@ -11,6 +11,7 @@ class OxxoPayment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    compra_id = Column(Integer, ForeignKey("compras.id"), nullable=True, index=True)
     code = Column(String(32), unique=True, nullable=False, index=True)
     total = Column(Float, nullable=False)
     mode = Column(String(30), nullable=False, default="tienda")
@@ -21,3 +22,4 @@ class OxxoPayment(Base):
     paid_at = Column(DateTime, nullable=True)
 
     user = relationship("User", back_populates="oxxo_payments")
+    compra = relationship("Compra", back_populates="oxxo_payment")

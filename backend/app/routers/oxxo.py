@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..dependencies import get_current_user
 from ..models.oxxo import OxxoPayment
-from ..models.user import User
+from ..models.user import Compra, ProductoCompra, User
+from .compras import generate_verification_id, serialize_compra
 
 router = APIRouter(prefix="/oxxo", tags=["OXXO Pay"])
 
@@ -43,13 +44,15 @@ def serialize_payment(payment: OxxoPayment, include_user=False):
     result = {
         "id": payment.id,
         "code": payment.code,
+        "purchase_id": payment.compra_id,
+        "verification_id": payment.compra.verification_id if payment.compra else None,
         "total": payment.total,
         "mode": payment.mode,
         "productos": json.loads(payment.items_json),
         "estado": payment.estado,
-        "expires_at": payment.expires_at,
-        "created_at": payment.created_at,
-        "paid_at": payment.paid_at,
+        "expires_at": payment.expires_at.isoformat() if payment.expires_at else None,
+        "created_at": payment.created_at.isoformat() if payment.created_at else None,
+        "paid_at": payment.paid_at.isoformat() if payment.paid_at else None,
     }
     if include_user and payment.user:
         result["user"] = {
@@ -80,8 +83,28 @@ async def create_payment(
     if abs(calculated_total - data.total) > 0.01:
         raise HTTPException(status_code=400, detail="El total del pago no coincide con sus productos")
 
+    compra = Compra(
+        user_id=user.id,
+        total=round(data.total, 2),
+        estado="Pendiente",
+        metodo_pago="Oxxo Pay",
+        verification_id=generate_verification_id(db),
+    )
+    db.add(compra)
+    db.flush()
+    for item in data.productos:
+        db.add(ProductoCompra(
+            compra_id=compra.id,
+            nombre=item.nombre,
+            descripcion=item.tallaSeleccionada,
+            cantidad=item.cantidad,
+            precio_unitario=item.precio,
+            precio_total=round(item.precio * item.cantidad, 2),
+        ))
+
     payment = OxxoPayment(
         user_id=user.id,
+        compra_id=compra.id,
         code=generate_unique_code(db),
         total=round(data.total, 2),
         mode=data.mode,
@@ -138,6 +161,8 @@ async def scan_payment(
 
     payment.estado = "Completado"
     payment.paid_at = datetime.utcnow()
+    if payment.compra:
+        payment.compra.estado = "Completado"
     db.commit()
     db.refresh(payment)
     return {

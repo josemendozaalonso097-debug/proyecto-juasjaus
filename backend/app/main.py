@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .database import init_db, SessionLocal
 from .database_otp import init_otp_db
-from .routers import auth, index, tienda, eventos, admin, oxxo
+from .routers import auth, index, tienda, eventos, admin, oxxo, compras
 import logging
 import asyncio
 from datetime import datetime
@@ -83,6 +83,7 @@ from .models import user
 from .models import evento as evento_model
 from .models import producto as producto_model
 from .models import oxxo as oxxo_model
+from .models import user as user_model
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(index.router, prefix="/api")
@@ -90,6 +91,7 @@ app.include_router(tienda.router, prefix="/api")
 app.include_router(eventos.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 app.include_router(oxxo.router, prefix="/api")
+app.include_router(compras.router, prefix="/api")
 
 # ============================================
 # EVENTOS DE INICIO Y CIERRE

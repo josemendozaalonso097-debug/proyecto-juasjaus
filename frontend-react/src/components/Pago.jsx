@@ -5,6 +5,7 @@ import confetti from 'canvas-confetti';
 import { showToast } from '../utils/toast';
 import { guardarEnHistorial, obtenerHistorial } from '../utils/storage';
 import { crearPagoOxxo } from '../api/oxxo';
+import { crearCompra } from '../api/compras';
 
 export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda', onPaymentSuccess }) {
   // Modal stage: 'method', 'card', 'transfer', 'oxxo', 'oxxopay'
@@ -230,7 +231,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
     showToast('Código descargado', 'success');
   };
 
-  const handleCheckoutSuccess = (metodoPago) => {
+  const handleCheckoutSuccess = async (metodoPago) => {
     const fecha = new Date();
     const meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
     const fechaFormato = `${fecha.getDate().toString().padStart(2, '0')}/${meses[fecha.getMonth()]}/${fecha.getFullYear()}`;
@@ -247,7 +248,20 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
       itemsAdquiridos = [{ nombre: "Colegiatura Mensual", precio: 3000, cantidad: 1 }];
     }
 
+    let compraServidor;
+    try {
+      compraServidor = await crearCompra({
+        metodo_pago: metodoPago,
+        productos: itemsAdquiridos,
+      });
+    } catch (error) {
+      showToast(error.message || 'No se pudo registrar la compra', 'error');
+      return;
+    }
+
     const compra = {
+      id: compraServidor.id,
+      verificationId: compraServidor.verification_id,
       fecha: fechaFormato,
       metodoPago: metodoPago,
       productos: itemsAdquiridos,
@@ -258,7 +272,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
     guardarEnHistorial(compra);
     
     // Generate PDF receipt
-    generarPDFComprobante(metodoPago, fechaFormato, total, itemsAdquiridos);
+    generarPDFComprobante(metodoPago, fechaFormato, total, itemsAdquiridos, compraServidor.verification_id);
     
     // Play confetti
     lanzarConfeti();
@@ -338,7 +352,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
   };
 
   // PDF generation implementation (using standard jsPDF in npm)
-  const generarPDFComprobante = (metodo, fechaFormato, totalMonto, items) => {
+  const generarPDFComprobante = (metodo, fechaFormato, totalMonto, items, verificationId) => {
     const doc = new jsPDF();
     const userRaw = localStorage.getItem('user');
     let nombreUsuario = 'Usuario';
@@ -382,17 +396,19 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
     doc.text(fechaFormato, 60, 82);
     doc.text(`Método:`, 20, 89);
     doc.text(metodo, 60, 89);
+    doc.text(`ID de compra:`, 20, 96);
+    doc.text(verificationId || '—', 60, 96);
     
     doc.setDrawColor(...primaryRGB);
     doc.setLineWidth(0.5);
-    doc.line(20, 95, 190, 95);
+    doc.line(20, 102, 190, 102);
     
     doc.setFont(undefined, 'bold');
-    doc.text('PRODUCTO', 25, 105);
-    doc.text('CANTIDAD', 120, 105);
-    doc.text('SUBTOTAL', 165, 105);
+    doc.text('PRODUCTO', 25, 112);
+    doc.text('CANTIDAD', 120, 112);
+    doc.text('SUBTOTAL', 165, 112);
     
-    let y = 115;
+    let y = 122;
     doc.setFont(undefined, 'normal');
     items.forEach(item => {
       const itemTotal = item.precio * item.cantidad;

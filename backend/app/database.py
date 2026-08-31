@@ -163,4 +163,36 @@ def init_db():
         except Exception as e:
             print(f"Info tabla deudas: {e}")
 
+    # Migración: campos para identificar y consumir una compra una sola vez
+    for col_sql in [
+        "ALTER TABLE compras ADD COLUMN verification_id VARCHAR(24)",
+        "ALTER TABLE compras ADD COLUMN verification_used BOOLEAN NOT NULL DEFAULT 0",
+        "ALTER TABLE compras ADD COLUMN verified_at DATETIME",
+        "ALTER TABLE compras ADD COLUMN verified_by INTEGER",
+    ]:
+        with engine.connect() as conn:
+            try:
+                conn.execute(text(col_sql))
+                conn.commit()
+            except Exception:
+                pass
+
+    # Migración: relacionar una compra con su referencia OXXO cuando aplique
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE oxxo_payments ADD COLUMN compra_id INTEGER"))
+            conn.commit()
+        except Exception:
+            pass
+
+    with engine.connect() as conn:
+        try:
+            conn.execute(text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS ix_compras_verification_id "
+                "ON compras (verification_id)"
+            ))
+            conn.commit()
+        except Exception as e:
+            print(f"Info índice de IDs de compra: {e}")
+
     print("✅ Base de datos inicializada")

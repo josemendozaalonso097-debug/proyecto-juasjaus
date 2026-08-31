@@ -3,6 +3,7 @@ import JsBarcode from 'jsbarcode';
 import { obtenerHistorial } from '../utils/storage';
 import { generarPDFHistorial } from '../utils/pdf';
 import { obtenerPagosOxxo } from '../api/oxxo';
+import { obtenerMisCompras } from '../api/compras';
 
 export default function HistorialModal({ isOpen, onClose }) {
   const [historial, setHistorial] = useState([]);
@@ -17,8 +18,20 @@ export default function HistorialModal({ isOpen, onClose }) {
       const localHistory = obtenerHistorial();
       if (!cancelled) setHistorial(localHistory);
       try {
-        const oxxoPayments = await obtenerPagosOxxo();
+        const [serverPurchases, oxxoPayments] = await Promise.all([
+          obtenerMisCompras(),
+          obtenerPagosOxxo(),
+        ]);
         if (cancelled) return;
+        const purchaseHistory = serverPurchases.map(purchase => ({
+          id: `purchase-${purchase.id}`,
+          fecha: new Date(purchase.created_at).toLocaleDateString('es-MX'),
+          metodoPago: purchase.metodo_pago,
+          productos: purchase.productos,
+          total: purchase.total,
+          estado: purchase.estado,
+          verificationId: purchase.verification_id,
+        }));
         const oxxoHistory = oxxoPayments.map(payment => ({
           id: `oxxo-${payment.id}`,
           fecha: new Date(payment.created_at).toLocaleDateString('es-MX'),
@@ -26,11 +39,15 @@ export default function HistorialModal({ isOpen, onClose }) {
           productos: payment.productos,
           total: payment.total,
           estado: payment.estado,
+          verificationId: payment.verification_id,
           oxxoPayment: payment,
         }));
         setHistorial([
-          ...localHistory.filter(item => !item.oxxoPaymentId),
-          ...oxxoHistory,
+          ...localHistory.filter(item => !item.verificationId && !item.oxxoPaymentId),
+          ...purchaseHistory,
+          ...oxxoHistory.filter(payment => !purchaseHistory.some(
+            purchase => purchase.verificationId === payment.verificationId
+          )),
         ].sort((a, b) => new Date(b.oxxoPayment?.created_at || 0) - new Date(a.oxxoPayment?.created_at || 0)));
         setServerError('');
       } catch {
@@ -108,6 +125,22 @@ export default function HistorialModal({ isOpen, onClose }) {
                             {compra.metodoPago}
                           </span>
                         </div>
+                        {compra.verificationId && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">ID de compra:</span>
+                            <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300 tracking-wider">
+                              {compra.verificationId}
+                            </span>
+                            <button
+                              type="button"
+                              title="Copiar ID"
+                              onClick={() => navigator.clipboard.writeText(compra.verificationId)}
+                              className="text-slate-400 hover:text-[#f20d0d] cursor-pointer"
+                            >
+                              <span className="material-symbols-outlined text-sm">content_copy</span>
+                            </button>
+                          </div>
+                        )}
                         {compra.oxxoPayment?.estado === 'Pendiente' && (
                           <button
                             type="button"

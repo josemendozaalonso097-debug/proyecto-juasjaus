@@ -19,7 +19,12 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)
     
-    compras = relationship("Compra", back_populates="user", cascade="all, delete-orphan")
+    compras = relationship(
+        "Compra",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        foreign_keys="Compra.user_id",
+    )
     password_resets = relationship("PasswordReset", back_populates="user", cascade="all, delete-orphan")
     deudas = relationship("Deuda", back_populates="user", cascade="all, delete-orphan")
     oxxo_payments = relationship("OxxoPayment", back_populates="user", cascade="all, delete-orphan")
@@ -48,10 +53,15 @@ class Compra(Base):
     metodo_pago = Column(String(50), nullable=True)
     comprobante_url = Column(String(300), nullable=True)
     factura_url = Column(String(300), nullable=True)
+    verification_id = Column(String(24), unique=True, nullable=True, index=True)
+    verification_used = Column(Boolean, nullable=False, default=False, server_default="0")
+    verified_at = Column(DateTime, nullable=True)
+    verified_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    user = relationship("User", back_populates="compras")
+    user = relationship("User", back_populates="compras", foreign_keys=[user_id])
     productos = relationship("ProductoCompra", back_populates="compra", cascade="all, delete-orphan")
+    oxxo_payment = relationship("OxxoPayment", back_populates="compra", uselist=False)
 
 
 class ProductoCompra(Base):
