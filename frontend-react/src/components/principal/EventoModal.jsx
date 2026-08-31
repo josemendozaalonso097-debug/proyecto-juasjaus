@@ -43,15 +43,25 @@ export default function EventoModal({
               className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
             />
           </div>
-          <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
             <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Fecha *</label>
             <input
-              type="text"
-              placeholder="Ej. 15 de junio de 2026"
+              type="date"
               value={eventoForm.fecha}
               onChange={e => setEventoForm(f => ({ ...f, fecha: e.target.value }))}
               className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
             />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Hora</label>
+              <input
+                type="time"
+                value={eventoForm.hora || ''}
+                onChange={e => setEventoForm(f => ({ ...f, hora: e.target.value }))}
+                className="w-full bg-slate-50 dark:bg-[#2a2d35] border border-slate-200 dark:border-[#3c1e1e]/30 rounded-xl px-4 py-3 text-sm text-[#1a1c1d] dark:text-[#f1f1f3] outline-none focus:border-[#af101a]"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-bold text-[#5b403d] dark:text-[#9b7a78] mb-1.5 uppercase tracking-wide">Descripción</label>

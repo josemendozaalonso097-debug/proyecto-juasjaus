@@ -50,6 +50,7 @@ def init_db():
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     titulo VARCHAR(200) NOT NULL,
                     fecha VARCHAR(50) NOT NULL,
+                    hora VARCHAR(10),
                     descripcion TEXT,
                     created_by INTEGER NOT NULL REFERENCES users(id),
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -60,6 +61,14 @@ def init_db():
             print("✅ Tabla 'eventos' verificada/creada")
         except Exception as e:
             print(f"Info tabla eventos: {e}")
+
+    # Migración: agregar hora a eventos existentes
+    with engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE eventos ADD COLUMN hora VARCHAR(10)"))
+            conn.commit()
+        except Exception:
+            pass  # La columna ya existe
 
     # Migración: crear tabla productos si no existe + seed inicial
     with engine.connect() as conn:

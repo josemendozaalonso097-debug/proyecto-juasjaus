@@ -15,6 +15,7 @@ import OrientacionModal from '../components/OrientacionModal';
 import DeudaModal from '../components/DeudaModal';
 import HistorialModal from '../components/HistorialModal';
 import InformacionModal from '../components/InformacionModal';
+import AppHeader from '../components/AppHeader';
 
 import SplashScreen from '../components/principal/SplashScreen';
 import { DesktopWelcomeBanner, MobileWelcomeBanner } from '../components/principal/WelcomeBanner';
@@ -22,6 +23,7 @@ import EstadoPago from '../components/principal/EstadoPago';
 import CuentaActiva from '../components/principal/CuentaActiva';
 import FinancierosPanel from '../components/principal/FinancierosPanel';
 import EventosList from '../components/principal/EventosList';
+import CalendarioEventos from '../components/principal/CalendarioEventos';
 import EventoModal from '../components/principal/EventoModal';
 import MobileCarousel from '../components/principal/MobileCarousel';
 import MobileNextPayment from '../components/principal/MobileNextPayment';
@@ -175,29 +177,12 @@ export default function Principal() {
       <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative">
         <div className="mesh-bg" aria-hidden="true" />
 
-        <header className="bg-gradient-to-r from-primary to-red-800/90 backdrop-blur-md bg-opacity-90 text-white flex items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
-          <div onClick={() => setSidebarOpen(true)} className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity">
-            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-              <img src="/imgs/yameharte.png" alt="Logo" className="h-8 w-auto object-contain" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black leading-tight tracking-[-0.015em] text-white">CBTis 258</h1>
-              <p className="text-xs font-semibold text-white/90 uppercase tracking-widest">Un motivo de orgullo</p>
-            </div>
-          </div>
-          <div className="flex flex-1 justify-end gap-8 items-center">
-            <div
-              onClick={() => setProfileOpen(true)}
-              className="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors"
-            >
-              <span className="text-sm font-bold text-white">{userProfile?.nombre ?? '—'}</span>
-              <div
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50 bg-slate-300"
-                style={{ backgroundImage: `url("${profileAvatar}")` }}
-              />
-            </div>
-          </div>
-        </header>
+        <AppHeader
+          userProfile={userProfile}
+          profileAvatar={profileAvatar}
+          onOpenMenu={() => setSidebarOpen(true)}
+          onOpenProfile={() => setProfileOpen(true)}
+        />
 
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
           <DesktopWelcomeBanner
@@ -234,6 +219,13 @@ export default function Principal() {
                 onEdit={eventoHandlers.openEditEvento}
                 onDelete={eventoHandlers.handleDeleteEvento}
               />
+              <CalendarioEventos
+                eventos={eventoHandlers.eventos}
+                isAdmin={isAdmin}
+                onCreate={eventoHandlers.openCreateEvento}
+                onEdit={eventoHandlers.openEditEvento}
+                onDelete={eventoHandlers.handleDeleteEvento}
+              />
             </div>
           </div>
         </main>
@@ -258,20 +250,12 @@ export default function Principal() {
 
       {/* ── MOBILE LAYOUT ── */}
       <div className="mobile-only block lg:hidden min-h-screen bg-[#f9f9fb] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display">
-        <header className="mob-header fixed top-0 left-0 right-0 z-50 bg-white/92 dark:bg-[#1a1c20]/92 backdrop-blur-md border-b border-slate-100 dark:border-[#3c1e1e]/30 h-[64px] flex items-center justify-between px-5">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} style={{ background: 'transparent' }} className="w-10 h-10 rounded-full border-none cursor-pointer flex items-center justify-center text-[#1a1c1d] dark:text-[#f1f1f3]">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
-            <div className="flex items-center gap-2">
-              <img src="/imgs/yameharte.png" alt="Logo" className="w-[28px] h-[28px] object-contain" />
-              <span className="mob-title font-bold text-[1.1rem] text-[#af101a] dark:text-white">CBTis 258</span>
-            </div>
-          </div>
-          <button onClick={() => setProfileOpen(true)} style={{ background: 'transparent' }} className="border-none cursor-pointer p-0">
-            <div className="w-9 h-9 rounded-full bg-center bg-no-repeat bg-cover border-2 border-primary/20 bg-slate-300" style={{ backgroundImage: `url("${profileAvatar}")` }} />
-          </button>
-        </header>
+        <AppHeader
+          userProfile={userProfile}
+          profileAvatar={profileAvatar}
+          onOpenMenu={() => setSidebarOpen(true)}
+          onOpenProfile={() => setProfileOpen(true)}
+        />
 
         <div className="mobile-main-content px-5 pt-[80px]">
           <MobileWelcomeBanner

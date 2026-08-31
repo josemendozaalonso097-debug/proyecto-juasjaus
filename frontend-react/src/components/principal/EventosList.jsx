@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatEventDate, formatEventTime } from '../../utils/eventos';
 
 export default function EventosList({ eventos, isAdmin, onCreate, onEdit, onDelete }) {
   return (
@@ -40,7 +41,7 @@ export default function EventosList({ eventos, isAdmin, onCreate, onEdit, onDele
                   <p className="font-bold text-sm text-slate-800 dark:text-slate-200 leading-snug truncate">{ev.titulo}</p>
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary mt-0.5">
                     <span className="material-symbols-outlined text-[13px]">calendar_month</span>
-                    {ev.fecha}
+                    {formatEventDate(ev.fecha)}{ev.hora ? ` · ${formatEventTime(ev.hora)} h` : ''}
                   </span>
                   {ev.descripcion && (
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1 line-clamp-2">{ev.descripcion}</p>

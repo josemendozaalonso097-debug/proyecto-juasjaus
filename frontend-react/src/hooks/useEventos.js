@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getEventos, createEvento, updateEvento, deleteEvento } from '../api/eventos';
 import { showToast } from '../utils/toast';
+import { eventDateKey } from '../utils/eventos';
 
 export function useEventos() {
   const [eventos, setEventos] = useState([]);
   const [eventoModal, setEventoModal] = useState(false);
   const [editingEvento, setEditingEvento] = useState(null);
-  const [eventoForm, setEventoForm] = useState({ titulo: '', fecha: '', descripcion: '' });
+  const [eventoForm, setEventoForm] = useState({ titulo: '', fecha: '', hora: '', descripcion: '' });
   const [savingEvento, setSavingEvento] = useState(false);
 
   const fetchEventos = useCallback(() => {
@@ -22,15 +23,20 @@ export function useEventos() {
     return () => clearInterval(interval);
   }, [fetchEventos]);
 
-  const openCreateEvento = useCallback(() => {
+  const openCreateEvento = useCallback((fecha = '') => {
     setEditingEvento(null);
-    setEventoForm({ titulo: '', fecha: '', descripcion: '' });
+    setEventoForm({ titulo: '', fecha, hora: '', descripcion: '' });
     setEventoModal(true);
   }, []);
 
   const openEditEvento = useCallback((ev) => {
     setEditingEvento(ev);
-    setEventoForm({ titulo: ev.titulo, fecha: ev.fecha, descripcion: ev.descripcion || '' });
+    setEventoForm({
+      titulo: ev.titulo,
+      fecha: eventDateKey(ev.fecha) || '',
+      hora: ev.hora || '',
+      descripcion: ev.descripcion || '',
+    });
     setEventoModal(true);
   }, []);
 

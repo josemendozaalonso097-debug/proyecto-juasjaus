@@ -11,6 +11,7 @@ import PerfilModal from '../components/PerfilModal';
 import Pago from '../components/Pago';
 import Papeleria from '../components/Papeleria';
 import Productos from '../components/Productos';
+import AppHeader from '../components/AppHeader';
 
 export default function Tienda() {
   const navigate = useNavigate();
@@ -167,35 +168,12 @@ export default function Tienda() {
       <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative">
         <div className="mesh-bg" aria-hidden="true"></div>
 
-        {/* HEADER */}
-        <header className="bg-gradient-to-r from-primary to-red-800/90 backdrop-blur-md bg-opacity-90 text-white flex items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
-          <div 
-            onClick={() => setSidebarOpen(true)}
-            className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-              <img src="/imgs/yameharte.png" alt="Logo" className="h-8 w-auto object-contain" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-black leading-tight tracking-[-0.015em] text-white">CBTis 258</h1>
-              <p className="text-xs font-semibold text-white/90 uppercase tracking-widest">Un motivo de orgullo</p>
-            </div>
-          </div>
-          <div className="flex flex-1 justify-end gap-8 items-center">
-            <div 
-              onClick={() => setProfileOpen(true)}
-              className="flex items-center gap-4 bg-black/10 py-2 px-4 rounded-full border border-white/20 shadow-sm cursor-pointer hover:bg-black/20 transition-colors"
-            >
-              <span className="text-sm font-bold text-white">
-                {userProfile ? userProfile.nombre : '—'}
-              </span>
-              <div 
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-white/50 bg-slate-300"
-                style={{ backgroundImage: `url("${profileAvatar}")` }}
-              />
-            </div>
-          </div>
-        </header>
+        <AppHeader
+          userProfile={userProfile}
+          profileAvatar={profileAvatar}
+          onOpenMenu={() => setSidebarOpen(true)}
+          onOpenProfile={() => setProfileOpen(true)}
+        />
 
         {/* MAIN BODY */}
         <main className="flex-grow flex items-center py-12">
@@ -393,28 +371,12 @@ export default function Tienda() {
 
       {/* MOBILE LAYOUT */}
       <div className="mobile-only block lg:hidden min-h-screen bg-[#f9f9fb] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display">
-        {/* Mobile Header */}
-        <header className="mob-header fixed top-0 left-0 right-0 z-50 bg-white/92 dark:bg-[#1a1c20]/92 backdrop-blur-md border-b border-slate-100 dark:border-[#3c1e1e]/30 h-[64px] flex items-center justify-between px-5">
-          <div className="flex items-center gap-3">
-            <a 
-              onClick={() => navigate('/principal')}
-              className="flex items-center gap-2 text-decoration-none cursor-pointer"
-            >
-              <img src="/imgs/yameharte.png" alt="Logo" className="w-[28px] h-[28px] object-contain" />
-              <span className="mob-title font-bold text-[1.1rem] text-[#af101a] dark:text-white">CBTis 258</span>
-            </a>
-          </div>
-          <button 
-            onClick={() => setProfileOpen(true)}
-            style={{ background: 'transparent' }} 
-            className="border-none cursor-pointer p-0"
-          >
-            <div 
-              className="w-9 h-9 rounded-full bg-center bg-no-repeat bg-cover border-2 border-primary/20 bg-slate-300"
-              style={{ backgroundImage: `url("${profileAvatar}")` }}
-            />
-          </button>
-        </header>
+        <AppHeader
+          userProfile={userProfile}
+          profileAvatar={profileAvatar}
+          onOpenMenu={() => setSidebarOpen(true)}
+          onOpenProfile={() => setProfileOpen(true)}
+        />
 
         {/* Mobile Main Content */}
         <div className="mobile-main-content px-5 pt-[80px]">

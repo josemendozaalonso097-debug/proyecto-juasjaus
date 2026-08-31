@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import CalendarioEventos from './CalendarioEventos';
 
 export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenInfo, onCreate, onEdit, onDelete }) {
   const [slide, setSlide] = useState(0);
@@ -8,7 +9,9 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
   const handleTouchEnd = (e) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) setSlide(diff > 0 ? 1 : 0);
+    if (Math.abs(diff) > 40) {
+      setSlide(current => diff > 0 ? Math.min(current + 1, 2) : Math.max(current - 1, 0));
+    }
     touchStartX.current = null;
   };
 
@@ -17,6 +20,7 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
       <div className="flex justify-center gap-1.5 mb-2">
         <button onClick={() => setSlide(0)} className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${slide === 0 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`} />
         <button onClick={() => setSlide(1)} className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${slide === 1 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`} />
+        <button onClick={() => setSlide(2)} className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${slide === 2 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`} />
       </div>
 
       <div className="overflow-hidden rounded-2xl" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
@@ -94,7 +98,7 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
                       </div>
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#af101a] dark:text-red-400">
                         <span className="material-symbols-outlined text-[12px]">calendar_month</span>
-                        {ev.fecha}
+                         {ev.fecha}
                       </span>
                       {ev.descripcion && (
                         <p className="text-xs text-[#5b403d] dark:text-[#9b7a78] leading-relaxed mt-0.5">{ev.descripcion}</p>
@@ -104,6 +108,17 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="min-w-full">
+            <CalendarioEventos
+              eventos={eventos}
+              isAdmin={isAdmin}
+              onCreate={onCreate}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              compact
+            />
           </div>
 
         </div>

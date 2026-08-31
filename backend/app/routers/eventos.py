@@ -17,17 +17,20 @@ router = APIRouter(prefix="/eventos", tags=["Eventos"])
 class EventoCreate(BaseModel):
     titulo: str
     fecha: str
+    hora: Optional[str] = None
     descripcion: Optional[str] = None
 
 class EventoUpdate(BaseModel):
     titulo: Optional[str] = None
     fecha: Optional[str] = None
+    hora: Optional[str] = None
     descripcion: Optional[str] = None
 
 class EventoResponse(BaseModel):
     id: int
     titulo: str
     fecha: str
+    hora: Optional[str]
     descripcion: Optional[str]
     created_by: int
     created_at: datetime
@@ -67,6 +70,7 @@ async def create_evento(
     evento = Evento(
         titulo=data.titulo,
         fecha=data.fecha,
+        hora=data.hora,
         descripcion=data.descripcion,
         created_by=admin.id
     )
@@ -91,6 +95,8 @@ async def update_evento(
         evento.titulo = data.titulo
     if data.fecha is not None:
         evento.fecha = data.fecha
+    if data.hora is not None:
+        evento.hora = data.hora
     if data.descripcion is not None:
         evento.descripcion = data.descripcion
     evento.updated_at = datetime.utcnow()
