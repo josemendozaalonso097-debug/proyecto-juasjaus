@@ -117,15 +117,15 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientac
         id="sidebar-main" 
         className={`fixed top-0 left-0 h-full w-[320px] bg-white dark:bg-slate-900 shadow-[20px_0_50px_rgba(0,0,0,0.1)] dark:shadow-[20px_0_50px_rgba(0,0,0,0.3)] z-[10002] flex flex-col border-r border-slate-100 dark:border-slate-800 transition-transform duration-300 ${activePanel === 'main' ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div className="p-6 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-primary to-red-800 text-white">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-xl">
+            <div className="p-2 bg-white/20 rounded-xl">
               <img src="/imgs/yameharte.png" alt="Logo" className="h-6 w-auto" />
             </div>
-            <h2 className="text-xl font-black dark:text-white tracking-tight">Menú Sistema</h2>
+            <h2 className="text-xl font-black text-white tracking-tight">Menú Sistema</h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-400 cursor-pointer">
-            <span className="material-symbols-outlined">close</span>
+          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-xl transition-colors text-white cursor-pointer">
+            <span className="material-symbols-outlined text-white">close</span>
           </button>
         </div>
         
@@ -199,11 +199,11 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientac
         id="sidebar-prefs" 
         className={`fixed top-0 left-0 h-full w-[320px] bg-white dark:bg-slate-900 shadow-[20px_0_50px_rgba(0,0,0,0.1)] dark:shadow-[20px_0_50px_rgba(0,0,0,0.3)] z-[10003] flex flex-col border-r border-slate-100 dark:border-slate-800 transition-transform duration-300 ${activePanel === 'prefs' ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4">
-          <button onClick={() => setActivePanel('main')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-400 cursor-pointer">
-            <span className="material-symbols-outlined">arrow_back</span>
+        <div className="p-6 border-b border-white/10 flex items-center gap-4 bg-gradient-to-r from-primary to-red-800 text-white">
+          <button onClick={() => setActivePanel('main')} className="p-2 hover:bg-white/20 rounded-xl transition-colors text-white cursor-pointer">
+            <span className="material-symbols-outlined text-white">arrow_back</span>
           </button>
-          <h2 className="text-xl font-black dark:text-white tracking-tight">Preferencias</h2>
+          <h2 className="text-xl font-black text-white tracking-tight">Preferencias</h2>
         </div>
         
         <div className="p-6 space-y-2 overflow-y-auto">

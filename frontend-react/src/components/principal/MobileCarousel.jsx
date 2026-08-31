@@ -1,9 +1,23 @@
-import React, { useState, useRef } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import CalendarioEventos from './CalendarioEventos';
 
 export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenInfo, onCreate, onEdit, onDelete }) {
   const [slide, setSlide] = useState(0);
+  const [carouselHeight, setCarouselHeight] = useState(null);
   const touchStartX = useRef(null);
+  const slidesRef = useRef([]);
+
+  useLayoutEffect(() => {
+    const activeSlide = slidesRef.current[slide];
+    if (!activeSlide) return undefined;
+
+    const updateHeight = () => setCarouselHeight(activeSlide.offsetHeight);
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(activeSlide);
+    return () => observer.disconnect();
+  }, [slide]);
 
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e) => {
@@ -23,12 +37,17 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
         <button onClick={() => setSlide(2)} className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${slide === 2 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`} />
       </div>
 
-      <div className="overflow-hidden rounded-2xl" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${slide * 100}%)` }}>
+      <div
+        className="overflow-hidden rounded-2xl transition-[height] duration-500 ease-in-out"
+        style={carouselHeight ? { height: `${carouselHeight}px` } : undefined}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="flex items-start transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${slide * 100}%)` }}>
 
           {/* Slide 1: Estado de pago */}
-          <div className="min-w-full">
-            <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm">
+          <div className="min-w-full" ref={element => { slidesRef.current[0] = element; }}>
+            <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm min-h-[218px]">
               <div className="flex justify-between items-start mb-[14px]">
                 <div>
                   <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-1.5">Estados de pago</h3>
@@ -64,8 +83,8 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
           </div>
 
           {/* Slide 2: Eventos */}
-          <div className="min-w-full">
-            <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm min-h-[190px]">
+          <div className="min-w-full" ref={element => { slidesRef.current[1] = element; }}>
+            <div className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 border border-slate-100 dark:border-[#3c1e1e]/20 shadow-sm min-h-[218px]">
               <div className="flex justify-between items-center mb-3">
                 <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3]">Eventos y Avisos</h3>
                 {isAdmin && (
@@ -110,7 +129,7 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
             </div>
           </div>
 
-          <div className="min-w-full">
+          <div className="min-w-full" ref={element => { slidesRef.current[2] = element; }}>
             <CalendarioEventos
               eventos={eventos}
               isAdmin={isAdmin}
