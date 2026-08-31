@@ -2,10 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
-from .database import init_db
+from .database import init_db, SessionLocal
 from .database_otp import init_otp_db
-from .routers import auth, index, tienda, eventos, admin
+from .routers import auth, index, tienda, eventos, admin, oxxo
 import logging
+import asyncio
+from datetime import datetime
+from .models.oxxo import OxxoPayment
 from logging.handlers import RotatingFileHandler
 
 # ============================================
@@ -20,6 +23,24 @@ console_handler.setFormatter(log_formatter)
 
 logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
 logger = logging.getLogger(__name__)
+_oxxo_cleanup_task = None
+
+
+async def cleanup_oxxo_loop():
+    while True:
+        db = SessionLocal()
+        try:
+            db.query(OxxoPayment).filter(
+                OxxoPayment.estado == "Pendiente",
+                OxxoPayment.expires_at <= datetime.utcnow(),
+            ).delete(synchronize_session=False)
+            db.commit()
+        except Exception:
+            db.rollback()
+            logger.exception("No se pudieron limpiar códigos OXXO expirados")
+        finally:
+            db.close()
+        await asyncio.sleep(300)
 
 # Crear aplicación FastAPI
 app = FastAPI(
@@ -61,12 +82,14 @@ app.add_middleware(
 from .models import user
 from .models import evento as evento_model
 from .models import producto as producto_model
+from .models import oxxo as oxxo_model
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(index.router, prefix="/api")
 app.include_router(tienda.router, prefix="/api")
 app.include_router(eventos.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
+app.include_router(oxxo.router, prefix="/api")
 
 # ============================================
 # EVENTOS DE INICIO Y CIERRE
@@ -81,6 +104,8 @@ async def startup_event():
     # Inicializar base de datos
     init_db()
     init_otp_db()
+    global _oxxo_cleanup_task
+    _oxxo_cleanup_task = asyncio.create_task(cleanup_oxxo_loop())
     
     logger.info(f"📍 API URL: http://localhost:8000")
     logger.info(f"📚 Docs: http://localhost:8000/docs")
@@ -92,6 +117,8 @@ async def startup_event():
 async def shutdown_event():
     """Se ejecuta al cerrar el servidor"""
     logger.info("👋 Servidor cerrado correctamente")
+    if _oxxo_cleanup_task:
+        _oxxo_cleanup_task.cancel()
 
 # ============================================
 # RUTA RAÍZ

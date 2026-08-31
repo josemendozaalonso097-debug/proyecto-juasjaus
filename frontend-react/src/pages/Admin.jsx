@@ -6,6 +6,7 @@ import TabUsuarios from '../components/admin/TabUsuarios';
 import TabAdeudos from '../components/admin/TabAdeudos';
 import TabInventario from '../components/admin/TabInventario';
 import TabNotificaciones from '../components/admin/TabNotificaciones';
+import TabOxxo from '../components/admin/TabOxxo';
 
 const TABS = [
   { id: 'stats',         label: 'Estadísticas',   icon: 'bar_chart' },
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'adeudos',       label: 'Adeudos',         icon: 'account_balance_wallet' },
   { id: 'inventario',    label: 'Inventario',      icon: 'inventory_2' },
   { id: 'notificaciones',label: 'Notificaciones',  icon: 'notifications' },
+  { id: 'oxxo',         label: 'Escanear OXXO',    icon: 'barcode_reader' },
 ];
 
 export default function Admin() {
@@ -67,6 +69,7 @@ export default function Admin() {
         {activeTab === 'adeudos'        && <TabAdeudos />}
         {activeTab === 'inventario'     && <TabInventario />}
         {activeTab === 'notificaciones' && <TabNotificaciones />}
+        {activeTab === 'oxxo'          && <TabOxxo />}
       </div>
     </div>
   );

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import JsBarcode from 'jsbarcode';
 import { jsPDF } from 'jspdf';
 import confetti from 'canvas-confetti';
-import { BrowserMultiFormatReader } from '@zxing/library';
 import { showToast } from '../utils/toast';
 import { guardarEnHistorial, obtenerHistorial } from '../utils/storage';
+import { crearPagoOxxo } from '../api/oxxo';
 
 export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda', onPaymentSuccess }) {
   // Modal stage: 'method', 'card', 'transfer', 'oxxo', 'oxxopay'
@@ -28,11 +28,9 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
   const [bancoOrigenDeposito, setBancoOrigenDeposito] = useState('');
   const [fechaDeposito, setFechaDeposito] = useState('');
 
-  // Oxxo Pay Camera Scanner
-  const [scanning, setScanning] = useState(false);
-  const videoRef = useRef(null);
+  // OXXO Pay code generated and owned by the server
+  const [oxxoPayment, setOxxoPayment] = useState(null);
   const barcodeRef = useRef(null);
-  const codeReaderRef = useRef(null);
 
   // Tuition payment limit alert state
   const [showLimitAlert, setShowLimitAlert] = useState(false);
@@ -51,56 +49,26 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
     }
   }, [isOpen]);
 
-  // Render Barcode for Oxxo Pay when entering the stage
+  // Render the server-generated barcode
   useEffect(() => {
-    if (stage === 'oxxopay' && barcodeRef.current) {
+    if (stage === 'oxxopay' && barcodeRef.current && oxxoPayment?.code) {
       try {
-        const barcodeVal = `OXXOPAY-${total}`;
-        JsBarcode(barcodeRef.current, barcodeVal, {
+        JsBarcode(barcodeRef.current, oxxoPayment.code, {
           format: "CODE128",
           displayValue: true,
-          width: 1.5,
-          height: 60,
-          fontSize: 14
+          width: 2,
+          height: 88,
+          margin: 14,
+          fontSize: 16,
+          textMargin: 8,
+          lineColor: "#111827",
+          background: "#ffffff"
         });
       } catch (err) {
         console.error("Error generating barcode:", err);
       }
     }
-  }, [stage, total]);
-
-  // Handle camera scanner
-  useEffect(() => {
-    if (scanning && stage === 'oxxopay') {
-      codeReaderRef.current = new BrowserMultiFormatReader();
-      codeReaderRef.current.decodeFromVideoDevice(null, 'scanner-video-react', (result, err) => {
-        if (result) {
-          console.log("Barcode scanned:", result.text);
-          stopScanning();
-          handleCheckoutSuccess('Oxxo Pay');
-        }
-        if (err && !(err.name === 'NotFoundException')) {
-          console.error(err);
-        }
-      }).catch((err) => {
-        console.error("Camera access error:", err);
-        showToast("No se pudo acceder a la cámara o no hay permisos.", "error");
-        stopScanning();
-      });
-    } else {
-      stopScanning();
-    }
-
-    return () => stopScanning();
-  }, [scanning, stage]);
-
-  const stopScanning = () => {
-    if (codeReaderRef.current) {
-      codeReaderRef.current.reset();
-      codeReaderRef.current = null;
-    }
-    setScanning(false);
-  };
+  }, [stage, oxxoPayment]);
 
   const resetStates = () => {
     setCardName('');
@@ -119,7 +87,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
     setBancoOrigenDeposito('');
     setFechaDeposito('');
 
-    stopScanning();
+    setOxxoPayment(null);
   };
 
   const copyToClipboard = (text) => {
@@ -225,6 +193,41 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
     checkTuitionLimit(() => {
       handleCheckoutSuccess(mode === 'tienda' ? 'Tarjeta' : 'Tarjeta Bancaria');
     });
+  };
+
+  const buildPaymentItems = () => mode === 'tienda'
+    ? cart.map(item => ({
+      nombre: item.nombre,
+      precio: item.precio,
+      cantidad: item.cantidad,
+      tallaSeleccionada: item.tallaSeleccionada || null,
+    }))
+    : [{ nombre: 'Colegiatura Mensual', precio: 3000, cantidad: 1 }];
+
+  const handleStartOxxoPayment = () => {
+    checkTuitionLimit(async () => {
+      try {
+        const productos = buildPaymentItems();
+        const payment = await crearPagoOxxo({ total, mode, productos });
+        setOxxoPayment(payment);
+        setStage('oxxopay');
+      } catch (error) {
+        showToast(error.message || 'No se pudo generar el código OXXO', 'error');
+      }
+    });
+  };
+
+  const downloadOxxoBarcode = () => {
+    if (!barcodeRef.current || !oxxoPayment?.code) return;
+    const svg = new XMLSerializer().serializeToString(barcodeRef.current);
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `OXXO-${oxxoPayment.code}.svg`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    showToast('Código descargado', 'success');
   };
 
   const handleCheckoutSuccess = (metodoPago) => {
@@ -529,7 +532,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
 
               {/* Oxxo Pay */}
               <button 
-                onClick={() => setStage('oxxopay')} 
+                onClick={handleStartOxxoPayment}
                 style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '18px 20px', border: '2px solid #e2e8f0', borderRadius: '14px', background: '#f8f9fa', cursor: 'pointer', width: '100%', textAlign: 'left', transition: 'all 0.2s ease' }}
                 className="hover:border-primary hover:bg-[#fff5f5]"
               >
@@ -932,7 +935,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
         </div>
       )}
 
-      {/* 5. Modal: Oxxo Pay barcode scan */}
+      {/* 5. Modal: OXXO Pay barcode */}
       {stage === 'oxxopay' && (
         <div style={{ display: 'flex', position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)', alignItems: 'center', justifycontent: 'center', justifyContent: 'center' }}>
           <div className="bg-white dark:bg-slate-900 rounded-[20px] w-[90%] max-w-[500px] overflow-hidden shadow-2xl">
@@ -954,28 +957,19 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
                 </div>
               </div>
 
-              {scanning && (
-                <div id="scanner-container" style={{ width: '100%', borderRadius: '14px', overflow: 'hidden', border: '2px solid #e2e8f0', position: 'relative', background: 'black' }}>
-                  <video id="scanner-video-react" style={{ width: '100%', height: 'auto', maxHeight: '300px', display: 'block', objectFit: 'cover' }}></video>
-                  <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
-                    <button onClick={() => setScanning(false)} style={{ background: 'rgba(255,0,0,0.8)', color: 'white', padding: '5px 10px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar Cámara</button>
-                  </div>
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={downloadOxxoBarcode}
+                style={{ width: '100%', background: '#f20d0d', color: 'white', fontWeight: '700', padding: '15px', border: 'none', borderRadius: '12px', fontSize: '1.05em', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: 'background 0.2s' }}
+                className="hover:bg-red-700"
+              >
+                <span className="material-symbols-outlined">download</span>
+                Descargar código de barras
+              </button>
 
-              {!scanning && (
-                <button 
-                  id="btn-escanear-oxxopay" 
-                  onClick={() => setScanning(true)} 
-                  style={{ width: '100%', background: '#f20d0d', color: 'white', fontWeight: '700', padding: '15px', border: 'none', borderRadius: '12px', fontSize: '1.1em', cursor: 'pointer', display: 'flex', alignItems: 'center', justifycontent: 'center', justifyContent: 'center', gap: '10px', transition: 'background 0.2s' }} 
-                  className="hover:bg-red-700"
-                >
-                  <span className="material-symbols-outlined">center_focus_strong</span>
-                  Simular Escaneo (WebCam)
-                </button>
-              )}
-              
-              <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.8em', margin: 0 }}>Presiona el botón para abrir la cámara web y escanear el código de barras generado para simular el pago en Oxxo.</p>
+              <p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.82em', margin: 0 }}>
+                Presenta este código en caja OXXO. Es válido durante 1 hora. Si cierras esta ventana, podrás volver a mostrarlo desde tu historial de pagos.
+              </p>
             </div>
           </div>
         </div>
