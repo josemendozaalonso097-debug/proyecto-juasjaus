@@ -18494,3 +18494,20 @@ sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition bet
 2026-08-31 03:11:47,436 - httpx - INFO - HTTP Request: POST http://testserver/api/eventos "HTTP/1.1 201 Created"
 2026-08-31 03:11:47,451 - httpx - INFO - HTTP Request: PUT http://testserver/api/eventos/1 "HTTP/1.1 200 OK"
 2026-08-31 03:11:47,455 - httpx - INFO - HTTP Request: GET http://testserver/api/eventos "HTTP/1.1 200 OK"
+2026-08-31 03:57:14,787 - app.main - INFO - ============================================================
+2026-08-31 03:57:14,789 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 03:57:14,789 - app.main - INFO - ============================================================
+2026-08-31 03:57:14,794 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 03:57:14,794 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 03:57:14,794 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 03:57:14,794 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 03:57:14,794 - app.main - INFO - ============================================================
+2026-08-31 04:01:19,600 - app.main - INFO - 👋 Servidor cerrado correctamente
+2026-08-31 04:01:20,592 - app.main - INFO - ============================================================
+2026-08-31 04:01:20,592 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-08-31 04:01:20,592 - app.main - INFO - ============================================================
+2026-08-31 04:01:20,597 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-08-31 04:01:20,597 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-08-31 04:01:20,597 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-08-31 04:01:20,597 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-08-31 04:01:20,597 - app.main - INFO - ============================================================

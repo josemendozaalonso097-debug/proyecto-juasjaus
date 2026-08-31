@@ -72,5 +72,5 @@ MAIL_PASSWORD = "hlgu fvlv ryqx abdb"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["bash", "-c", "cd backend && ENVIRONMENT=production PORT=5000 python run.py"]
-build = ["bash", "-c", "cd frontend-react && npm install && npm run build"]
+run = ["bash", "-c", "cd backend && ENVIRONMENT=production PORT=5000 .venv/bin/python run.py"]
+build = ["bash", "-c", "python -m venv backend/.venv && backend/.venv/bin/python -m pip install --no-cache-dir -r backend/requirements.txt && cd frontend-react && npm install && npm run build"]
