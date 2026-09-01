@@ -103,7 +103,7 @@ export default function HistorialModal({ isOpen, onClose }) {
           <div className="historial-compras flex-grow overflow-y-auto space-y-4 pr-2 max-h-[50vh] md:max-h-[60vh]">
             {historial.length === 0 ? (
               <div className="text-center py-12 text-slate-400">
-                <p>No hay compras registradas aún</p>
+                <p>Aún no tienes compras. Cuando realices una, podrás consultar aquí tu comprobante y su estado.</p>
               </div>
             ) : (
                 historial.map((compra, index) => {

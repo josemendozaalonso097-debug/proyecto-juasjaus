@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function EstadoPago({ pendingCount, onOpenInfo, onOpenHistory }) {
   return (
-    <section className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 flex flex-col h-full relative overflow-hidden">
+    <section id="estado-pago" className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 flex flex-col h-full relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20" />
       <h3 className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-8 flex items-center gap-3 relative z-10 text-slate-800 dark:text-white">
         <div className="p-2 bg-primary/10 rounded-xl">
@@ -46,7 +46,7 @@ export default function EstadoPago({ pendingCount, onOpenInfo, onOpenHistory }) 
               </div>
             </div>
             <h4 className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-3 text-slate-800 dark:text-slate-100">
-              Tienes <strong className="text-primary">0</strong> pagos pendientes
+              No tienes pagos pendientes
             </h4>
             <p className="text-slate-500 dark:text-slate-400 text-base max-w-md text-center">
               Tu cuenta está al corriente. ¡Gracias por tu puntualidad y compromiso con tu educación!

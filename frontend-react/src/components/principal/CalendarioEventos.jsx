@@ -39,7 +39,7 @@ export default function CalendarioEventos({ eventos = [], isAdmin, onCreate, onE
   };
 
   return (
-    <section className={`bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 ${compact ? 'p-4' : 'p-5 sm:p-6'}`}>
+    <section id="calendario-eventos" className={`bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 ${compact ? 'p-4' : 'p-5 sm:p-6'}`}>
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-xl shrink-0">

@@ -456,7 +456,7 @@ export default function Productos({ isOpen, onClose, categoria, onAgregarAlCarri
                         ) : productos.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
                                 <span className="material-symbols-outlined text-slate-200 dark:text-slate-700 text-5xl">inventory_2</span>
-                                <p className="text-slate-400 dark:text-slate-500 text-sm">No hay productos en esta categoría</p>
+                                <p className="max-w-xs text-center text-slate-400 dark:text-slate-500 text-sm">No hay productos disponibles en esta categoría. Revisa más tarde o consulta en ventanilla.</p>
                                 {isAdmin && (
                                     <button
                                         onClick={() => { setEditingProducto(null); setAdminModal(true); }}

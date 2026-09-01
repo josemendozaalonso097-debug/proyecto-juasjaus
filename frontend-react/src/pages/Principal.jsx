@@ -30,6 +30,8 @@ import MobileNextPayment from '../components/principal/MobileNextPayment';
 import MobileCuentaActiva from '../components/principal/MobileCuentaActiva';
 import MobileQuickActions from '../components/principal/MobileQuickActions';
 import MobileBottomNav from '../components/principal/MobileBottomNav';
+import OnboardingGuide from '../components/principal/OnboardingGuide';
+import AccionesPendientes from '../components/principal/AccionesPendientes';
 
 const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
 
@@ -78,6 +80,10 @@ export default function Principal() {
 
   const greeting = getGreeting();
   const formattedDate = getFormattedDate();
+
+  const scrollToSection = useCallback((id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
 
   const loadProfileData = useCallback(() => {
     const token = localStorage.getItem('access_token');
@@ -192,6 +198,19 @@ export default function Principal() {
             greeting={greeting}
             formattedDate={formattedDate}
           />
+          <OnboardingGuide
+            userId={userProfile?.id}
+            onOpenInfo={() => setInfoOpen(true)}
+            onScrollToPending={() => scrollToSection('acciones-pendientes')}
+            onNavigateTienda={() => navigate('/tienda')}
+          />
+          <AccionesPendientes
+            pendingCount={pendingCount}
+            eventos={eventoHandlers.eventos}
+            onOpenInfo={() => setInfoOpen(true)}
+            onViewEvents={() => scrollToSection('eventos-avisos')}
+            onNavigateTienda={() => navigate('/tienda')}
+          />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 flex flex-col gap-8">
@@ -264,6 +283,19 @@ export default function Principal() {
             pendingCount={pendingCount}
             greeting={greeting}
             formattedDate={formattedDate}
+          />
+          <OnboardingGuide
+            userId={userProfile?.id}
+            onOpenInfo={() => setInfoOpen(true)}
+            onScrollToPending={() => scrollToSection('acciones-pendientes')}
+            onNavigateTienda={() => navigate('/tienda?splash=1')}
+          />
+          <AccionesPendientes
+            pendingCount={pendingCount}
+            eventos={eventoHandlers.eventos}
+            onOpenInfo={() => setInfoOpen(true)}
+            onViewEvents={() => scrollToSection('eventos-avisos')}
+            onNavigateTienda={() => navigate('/tienda?splash=1')}
           />
           <MobileCarousel
             pendingCount={pendingCount}
