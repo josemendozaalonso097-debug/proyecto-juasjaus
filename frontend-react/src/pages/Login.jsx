@@ -9,13 +9,14 @@ import {
     checkBackendHealth,
     sendForgotPasswordLink,
 } from "../api/auth";
+import { useAuth } from "../hooks/useAuth";
 import { showToast } from "../utils/toast";
 
 const GOOGLE_CLIENT_ID =
     "518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com";
 
 // ── Componente OTP Modal ──
-function OtpModal({ isOpen, onClose, email, userParams, navigate }) {
+function OtpModal({ isOpen, onClose, email, userParams, navigate, onAuthenticated }) {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [timeLeft, setTimeLeft] = useState(120);
     const [verifying, setVerifying] = useState(false);
@@ -76,7 +77,6 @@ function OtpModal({ isOpen, onClose, email, userParams, navigate }) {
             const response = await registerVerifyOTP(email, code);
             const data = await response.json();
             if (response.ok) {
-                localStorage.setItem("access_token", data.access_token);
                 const userProfile = {
                     id: data.user.id,
                     email: data.user.email,
@@ -84,7 +84,7 @@ function OtpModal({ isOpen, onClose, email, userParams, navigate }) {
                     rol: userParams.rol,
                     semestre: userParams.semestre,
                 };
-                localStorage.setItem("user", JSON.stringify(userProfile));
+                onAuthenticated(userProfile, data.access_token);
                 localStorage.setItem(
                     `perfil_${data.user.id}`,
                     JSON.stringify(userProfile),
@@ -329,6 +329,7 @@ const GoogleSVG = () => (
 // ── Página Login Principal ──
 export default function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [isActive, setIsActive] = useState(false);
     const [showForgot, setShowForgot] = useState(false);
     const [showOtp, setShowOtp] = useState(false);
@@ -443,8 +444,7 @@ export default function Login() {
                 const res = await loginWithGoogleToken(id_token);
                 const data = await res.json();
                 if (res.ok) {
-                    localStorage.setItem("access_token", data.access_token);
-                    localStorage.setItem("user", JSON.stringify(data.user));
+                    login(data.user, data.access_token);
                     showToast(`¡Bienvenido ${data.user.nombre}! 🎉`, "success");
                     setTimeout(() => {
                         // Si esta pestaña fue abierta por el popup de Google (PC),
@@ -465,7 +465,7 @@ export default function Login() {
                 showToast("Error de conexión con el servidor", "error");
             }
         },
-        [navigate],
+        [login, navigate],
     );
 
     // Render GIS buttons into the two ref containers
@@ -532,8 +532,7 @@ export default function Login() {
             const response = await loginUser(loginEmail, loginPassword);
             const data = await response.json();
             if (response.ok) {
-                localStorage.setItem("access_token", data.access_token);
-                localStorage.setItem("user", JSON.stringify(data.user));
+                login(data.user, data.access_token);
                 if (data.user.id) {
                     const prev = localStorage.getItem(`perfil_${data.user.id}`);
                     if (!prev)
@@ -543,7 +542,8 @@ export default function Login() {
                         );
                 }
                 showToast(`¡Bienvenid@ ${data.user.nombre}! 🎉`, "success");
-                setTimeout(() => navigate("/principal?splash=1"), 1000);
+                setLoginLoading(false);
+                navigate("/principal?splash=1", { replace: true });
             } else {
                 showToast(
                     data.detail || "Email o contraseña incorrectos",
@@ -717,6 +717,7 @@ export default function Login() {
                                         </div>
                                         <input
                                             type="email"
+                                            autoComplete="email"
                                             value={regEmail}
                                             onChange={(e) =>
                                                 setRegEmail(e.target.value)
@@ -745,6 +746,7 @@ export default function Login() {
                                             type={
                                                 showRegPwd ? "text" : "password"
                                             }
+                                            autoComplete="new-password"
                                             value={regPassword}
                                             onChange={(e) =>
                                                 setRegPassword(e.target.value)
@@ -942,6 +944,7 @@ export default function Login() {
                                         </span>
                                         <input
                                             type="email"
+                                            autoComplete="email"
                                             value={loginEmail}
                                             onChange={(e) =>
                                                 setLoginEmail(e.target.value)
@@ -970,6 +973,7 @@ export default function Login() {
                                                     ? "text"
                                                     : "password"
                                             }
+                                            autoComplete="current-password"
                                             value={loginPassword}
                                             onChange={(e) =>
                                                 setLoginPassword(e.target.value)
@@ -1120,6 +1124,7 @@ export default function Login() {
                 email={otpEmail}
                 userParams={otpUserParams}
                 navigate={navigate}
+                onAuthenticated={login}
             />
         </div>
     );

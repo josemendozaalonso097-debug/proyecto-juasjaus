@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function SplashScreen({ show }) {
-  if (!show) return null;
+  const [visible, setVisible] = useState(show);
+
+  useEffect(() => {
+    if (!show) {
+      setVisible(false);
+      return undefined;
+    }
+
+    setVisible(true);
+    const timer = window.setTimeout(() => setVisible(false), 1800);
+    return () => window.clearTimeout(timer);
+  }, [show]);
+
+  if (!visible) return null;
 
   return (
     <>
