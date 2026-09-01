@@ -18538,3 +18538,11 @@ sqlalchemy.exc.AmbiguousForeignKeysError: Could not determine join condition bet
 2026-08-31 04:02:15,683 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
 2026-08-31 04:02:15,683 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-08-31 04:02:15,683 - app.main - INFO - ============================================================
+2026-09-01 06:09:41,217 - app.main - INFO - ============================================================
+2026-09-01 06:09:41,217 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-09-01 06:09:41,217 - app.main - INFO - ============================================================
+2026-09-01 06:09:41,221 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-09-01 06:09:41,222 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-09-01 06:09:41,222 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-09-01 06:09:41,222 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-09-01 06:09:41,222 - app.main - INFO - ============================================================
