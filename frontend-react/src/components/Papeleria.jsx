@@ -21,7 +21,7 @@ export default function Papeleria({ isOpen, onClose }) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [sentStats, setSentStats] = useState({ tipo: '', count: 0 });
+  const [sentStats, setSentStats] = useState({ tipo: '', count: 0, folio: '', estado: '' });
 
   useEffect(() => {
     if (isOpen) {
@@ -147,10 +147,12 @@ export default function Papeleria({ isOpen, onClose }) {
     };
 
     try {
-      await enviarPapeleria(payload);
+      const solicitud = await enviarPapeleria(payload);
       setSentStats({
         tipo: formData.tipoDocumento === 'Otro' ? formData.otroDocumento : formData.tipoDocumento,
-        count: uploadedFiles.length
+        count: uploadedFiles.length,
+        folio: solicitud.folio,
+        estado: solicitud.estado,
       });
       setShowConfirmation(true);
     } catch (err) {
@@ -495,7 +497,8 @@ export default function Papeleria({ isOpen, onClose }) {
               Tu papelería ha sido recibida exitosamente.<br/>
               <strong>Tipo:</strong> {sentStats.tipo}<br/>
               <strong>Archivos:</strong> {sentStats.count}<br/><br/>
-              <strong>Estado: Pendiente de revisión</strong>
+               <strong>Folio:</strong> {sentStats.folio}<br/>
+               <strong>Estado: {sentStats.estado || 'Enviada'}</strong>
             </p>
             <button 
               onClick={() => {

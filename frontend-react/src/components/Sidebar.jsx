@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { showToast } from '../utils/toast';
 import { ThemeContext } from '../context/ThemeContext';
+import { setTooltipEnabled } from '../utils/preferences';
 
 export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientacion }) {
   const navigate = useNavigate();
@@ -12,7 +13,8 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientac
   const [prefs, setPrefs] = useState({
     darkMode: false,
     largeText: false,
-    manualLogin: false
+    manualLogin: false,
+    tooltips: false,
   });
   const [activePanel, setActivePanel] = useState('main'); // 'main' or 'prefs'
 
@@ -74,6 +76,9 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientac
           localStorage.setItem('prefs_global', JSON.stringify(newPrefs));
         }
         aplicarPreferencias(newPrefs);
+        if (key === 'tooltips') {
+          setTooltipEnabled(user?.id, value);
+        }
       }
     } catch (e) {
       console.error('Error persisting prefs:', e);
@@ -238,6 +243,26 @@ export default function Sidebar({ isOpen, onClose, onOpenChatbot, onOpenOrientac
                 className="sr-only peer" 
                 checked={prefs.largeText}
                 onChange={(e) => updatePreference('largeText', e.target.checked)}
+              />
+              <div className="w-10 h-5 bg-slate-400 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          <div class="h-4"></div>
+          <p class="text-[10px] font-black uppercase tracking-[2px] text-slate-400 px-2 mb-4">Ayuda</p>
+
+          {/* Tooltips */}
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+            <div className="pr-3">
+              <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">Tooltips de ayuda</p>
+              <p className="text-[11px] text-slate-500 font-medium">Muestra burbujas para volver al tour por sección</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={Boolean(prefs.tooltips)}
+                onChange={(e) => updatePreference('tooltips', e.target.checked)}
               />
               <div className="w-10 h-5 bg-slate-400 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
             </label>

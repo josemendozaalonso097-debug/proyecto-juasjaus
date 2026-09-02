@@ -30,7 +30,7 @@ export default function MobileCarousel({ pendingCount, eventos, isAdmin, onOpenI
   };
 
   return (
-    <section className="mb-5" id="estado-container-global-mobile">
+      <section className="mb-5" id="estado-container-global-mobile" data-tour="events">
       <div className="flex justify-center gap-1.5 mb-2">
         <button onClick={() => setSlide(0)} className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${slide === 0 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`} />
         <button onClick={() => setSlide(1)} className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${slide === 1 ? 'bg-[#af101a] w-5' : 'bg-slate-300 dark:bg-slate-600'}`} />

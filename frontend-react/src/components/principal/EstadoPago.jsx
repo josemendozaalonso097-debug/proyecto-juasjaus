@@ -1,14 +1,16 @@
 import React from 'react';
+import TooltipBubble from './TooltipBubble';
 
-export default function EstadoPago({ pendingCount, onOpenInfo, onOpenHistory }) {
+export default function EstadoPago({ pendingCount, onOpenInfo, onOpenHistory, userId }) {
   return (
-    <section id="estado-pago" className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 flex flex-col h-full relative overflow-hidden">
+    <section id="estado-pago" data-tour="payments" className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8 flex flex-col h-full relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20" />
       <h3 className="text-2xl font-bold leading-tight tracking-[-0.015em] mb-8 flex items-center gap-3 relative z-10 text-slate-800 dark:text-white">
         <div className="p-2 bg-primary/10 rounded-xl">
           <span className="material-symbols-outlined text-primary text-2xl">account_balance_wallet</span>
         </div>
         Estados de pago
+        <TooltipBubble userId={userId} stepId="payments" />
       </h3>
 
       <div className="flex-grow flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 relative overflow-hidden glass-card z-10 mb-8">

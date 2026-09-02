@@ -20,18 +20,17 @@ import AppHeader from '../components/AppHeader';
 import SplashScreen from '../components/principal/SplashScreen';
 import { DesktopWelcomeBanner, MobileWelcomeBanner } from '../components/principal/WelcomeBanner';
 import EstadoPago from '../components/principal/EstadoPago';
-import CuentaActiva from '../components/principal/CuentaActiva';
 import FinancierosPanel from '../components/principal/FinancierosPanel';
 import EventosList from '../components/principal/EventosList';
 import CalendarioEventos from '../components/principal/CalendarioEventos';
 import EventoModal from '../components/principal/EventoModal';
 import MobileCarousel from '../components/principal/MobileCarousel';
 import MobileNextPayment from '../components/principal/MobileNextPayment';
-import MobileCuentaActiva from '../components/principal/MobileCuentaActiva';
 import MobileQuickActions from '../components/principal/MobileQuickActions';
 import MobileBottomNav from '../components/principal/MobileBottomNav';
-import OnboardingGuide from '../components/principal/OnboardingGuide';
-import AccionesPendientes from '../components/principal/AccionesPendientes';
+import CuentaActivaCarousel from '../components/principal/CuentaActivaCarousel';
+import GuidedTour from '../components/principal/GuidedTour';
+import SeguimientoModal from '../components/SeguimientoModal';
 
 const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
 
@@ -63,6 +62,7 @@ export default function Principal() {
   const [deudaOpen,       setDeudaOpen]       = useState(false);
   const [historyOpen,     setHistoryOpen]     = useState(false);
   const [infoOpen,        setInfoOpen]        = useState(false);
+  const [seguimientoOpen, setSeguimientoOpen] = useState(false);
 
   const [showSplash] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -178,6 +178,7 @@ export default function Principal() {
   return (
     <>
       <SplashScreen show={showSplash} />
+      <GuidedTour userId={userProfile?.id} />
 
       {/* ── DESKTOP LAYOUT ── */}
       <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative">
@@ -198,41 +199,36 @@ export default function Principal() {
             greeting={greeting}
             formattedDate={formattedDate}
           />
-          <OnboardingGuide
-            userId={userProfile?.id}
-            onOpenInfo={() => setInfoOpen(true)}
-            onScrollToPending={() => scrollToSection('acciones-pendientes')}
-            onNavigateTienda={() => navigate('/tienda')}
-          />
-          <AccionesPendientes
-            pendingCount={pendingCount}
-            eventos={eventoHandlers.eventos}
-            onOpenInfo={() => setInfoOpen(true)}
-            onViewEvents={() => scrollToSection('eventos-avisos')}
-            onNavigateTienda={() => navigate('/tienda')}
-          />
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 flex flex-col gap-8">
               <EstadoPago
                 pendingCount={pendingCount}
+                userId={userProfile?.id}
                 onOpenInfo={() => setInfoOpen(true)}
                 onOpenHistory={() => setHistoryOpen(true)}
               />
             </div>
             <div className="flex flex-col gap-8">
-              <CuentaActiva
+              <CuentaActivaCarousel
                 userProfile={userProfile}
                 nextPaymentDateText={nextPaymentDateText}
                 nextPaymentDateColor={nextPaymentDateColor}
+                pendingCount={pendingCount}
+                eventos={eventoHandlers.eventos}
+                onOpenInfo={() => setInfoOpen(true)}
+                onViewEvents={() => scrollToSection('eventos-avisos')}
+                variant="desktop"
               />
               <FinancierosPanel
                 onOpenPapeleria={() => setPapeleriaOpen(true)}
                 onOpenOrientacion={() => setOrientacionOpen(true)}
+                onOpenSeguimiento={() => setSeguimientoOpen(true)}
                 onNavigateTienda={() => navigate('/tienda')}
+                userId={userProfile?.id}
               />
               <EventosList
                 eventos={eventoHandlers.eventos}
+                userId={userProfile?.id}
                 isAdmin={isAdmin}
                 onCreate={eventoHandlers.openCreateEvento}
                 onEdit={eventoHandlers.openEditEvento}
@@ -284,19 +280,6 @@ export default function Principal() {
             greeting={greeting}
             formattedDate={formattedDate}
           />
-          <OnboardingGuide
-            userId={userProfile?.id}
-            onOpenInfo={() => setInfoOpen(true)}
-            onScrollToPending={() => scrollToSection('acciones-pendientes')}
-            onNavigateTienda={() => navigate('/tienda?splash=1')}
-          />
-          <AccionesPendientes
-            pendingCount={pendingCount}
-            eventos={eventoHandlers.eventos}
-            onOpenInfo={() => setInfoOpen(true)}
-            onViewEvents={() => scrollToSection('eventos-avisos')}
-            onNavigateTienda={() => navigate('/tienda?splash=1')}
-          />
           <MobileCarousel
             pendingCount={pendingCount}
             eventos={eventoHandlers.eventos}
@@ -310,13 +293,25 @@ export default function Principal() {
             pendingCount={pendingCount}
             nextPaymentDateText={nextPaymentDateText}
             nextPaymentDateColor={nextPaymentDateColor}
+            userId={userProfile?.id}
           />
-          <MobileCuentaActiva userProfile={userProfile} />
+          <CuentaActivaCarousel
+            userProfile={userProfile}
+            nextPaymentDateText={nextPaymentDateText}
+            nextPaymentDateColor={nextPaymentDateColor}
+            pendingCount={pendingCount}
+            eventos={eventoHandlers.eventos}
+            onOpenInfo={() => setInfoOpen(true)}
+            onViewEvents={() => scrollToSection('eventos-avisos')}
+            variant="mobile"
+          />
           <MobileQuickActions
             onOpenInfo={() => setInfoOpen(true)}
             onOpenHistory={() => setHistoryOpen(true)}
             onOpenOrientacion={() => setOrientacionOpen(true)}
             onOpenPapeleria={() => setPapeleriaOpen(true)}
+            onOpenSeguimiento={() => setSeguimientoOpen(true)}
+            userId={userProfile?.id}
           />
         </div>
 
@@ -335,6 +330,7 @@ export default function Principal() {
       <OrientacionModal isOpen={orientacionOpen} onClose={() => setOrientacionOpen(false)} />
       <DeudaModal isOpen={deudaOpen} onClose={() => setDeudaOpen(false)} pendingCount={pendingCount} />
       <HistorialModal isOpen={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <SeguimientoModal isOpen={seguimientoOpen} onClose={() => setSeguimientoOpen(false)} />
       <InformacionModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />
       <EventoModal {...eventoHandlers} />
     </>

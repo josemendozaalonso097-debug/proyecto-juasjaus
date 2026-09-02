@@ -1,14 +1,18 @@
 import React from 'react';
+import TooltipBubble from './TooltipBubble';
 
-export default function MobileNextPayment({ pendingCount, nextPaymentDateText, nextPaymentDateColor }) {
+export default function MobileNextPayment({ pendingCount, nextPaymentDateText, nextPaymentDateColor, userId }) {
   return (
-    <section className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 mb-5 border border-slate-100 dark:border-[#3c1e1e]/20 flex items-center justify-between shadow-sm">
+    <section data-tour="payments" className="mob-card bg-white dark:bg-[#1e2025] rounded-2xl p-5 mb-5 border border-slate-100 dark:border-[#3c1e1e]/20 flex items-center justify-between shadow-sm">
       <div className="flex items-center gap-3">
         <div className="mob-action-icon w-10 h-10 rounded-xl bg-[#af101a]/5 dark:bg-[#af101a]/15 flex items-center justify-center text-[#af101a] dark:text-white shrink-0">
           <span className="material-symbols-outlined text-[20px]">calendar_month</span>
         </div>
         <div>
-          <p className="mob-label text-[10px] font-bold text-[#8f6f6c] dark:text-[#9b7a78] uppercase tracking-wider mb-0.5">Próximo Vencimiento</p>
+          <div className="flex items-center gap-2">
+            <p className="mob-label text-[10px] font-bold text-[#8f6f6c] dark:text-[#9b7a78] uppercase tracking-wider mb-0.5">Próximo Vencimiento</p>
+            <TooltipBubble userId={userId} stepId="payments" />
+          </div>
           <p className="font-bold text-[0.9rem]" style={{ color: nextPaymentDateColor }}>
             {pendingCount === 0 ? 'Sin deuda' : nextPaymentDateText}
           </p>

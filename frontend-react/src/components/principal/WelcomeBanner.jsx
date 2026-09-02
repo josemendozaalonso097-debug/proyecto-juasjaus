@@ -2,7 +2,7 @@ import React from 'react';
 
 export function DesktopWelcomeBanner({ userProfile, profileAvatar, pendingCount, greeting, formattedDate }) {
   return (
-    <div className="mb-10 rounded-3xl overflow-hidden shadow-xl" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
+    <div data-tour="welcome" className="mb-10 rounded-3xl overflow-hidden shadow-xl" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
       <div className="relative bg-gradient-to-br from-[#af101a] via-[#8b0d15] to-[#3d0408] p-8 flex items-center justify-between gap-6 overflow-hidden">
         <div className="absolute -top-10 -right-10 w-56 h-56 bg-white/5 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-72 h-32 bg-white/3 rounded-full blur-3xl pointer-events-none" />
@@ -51,7 +51,7 @@ export function DesktopWelcomeBanner({ userProfile, profileAvatar, pendingCount,
 
 export function MobileWelcomeBanner({ userProfile, profileAvatar, pendingCount, greeting, formattedDate }) {
   return (
-    <section className="mb-5 mt-4" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
+    <section data-tour="welcome" className="mb-5 mt-4" style={{ animation: 'bannerSlideIn 0.55s cubic-bezier(0.22,1,0.36,1) both' }}>
       <div className="relative bg-gradient-to-br from-[#af101a] via-[#8b0d15] to-[#3d0408] rounded-2xl p-5 overflow-hidden shadow-lg">
         <div className="absolute -top-8 -right-8 w-36 h-36 bg-white/5 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/2 w-40 h-16 bg-white/3 rounded-full blur-2xl pointer-events-none" />

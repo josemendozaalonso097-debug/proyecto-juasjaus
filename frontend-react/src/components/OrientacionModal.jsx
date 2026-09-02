@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { showToast } from '../utils/toast';
+import { crearSolicitud } from '../api/solicitudes';
 
 export default function OrientacionModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('reporte');
@@ -14,6 +15,7 @@ export default function OrientacionModal({ isOpen, onClose }) {
   const [appointmentTime, setAppointmentTime] = useState('Turno Matutino (7:00 AM - 1:00 PM)');
   
   const [suggestionText, setSuggestionText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -25,26 +27,43 @@ export default function OrientacionModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (type) => {
+  const handleSubmit = async (type) => {
     let successMessage = "";
+    let titulo = "";
+    let detalle = "";
 
     if (type === 'reporte') {
       if (!reportText.trim()) { showToast("Por favor describe el incidente.", 'warning'); return; }
-      successMessage = "🚨 Reporte enviado con éxito. Orientación revisará el caso a la brevedad.";
+      titulo = 'Reporte de incidente';
+      detalle = reportText.trim();
+      successMessage = "Reporte enviado con éxito. Orientación revisará el caso a la brevedad.";
     } else if (type === 'queja') {
       if (!complaintType) { showToast("Por favor selecciona un tipo de queja.", 'warning'); return; }
-      successMessage = `📢 Tu queja sobre "${complaintType}" ha sido recibida. Le daremos seguimiento inmediato.`;
+      titulo = `Queja: ${complaintType}`;
+      detalle = complaintText.trim();
+      successMessage = `Tu queja sobre "${complaintType}" ha sido recibida. Le daremos seguimiento.`;
     } else if (type === 'cita') {
       if (!appointmentReason.trim()) { showToast("Por favor escribe el motivo de la cita.", 'warning'); return; }
-      successMessage = `📅 Solicitud de cita enviada (${appointmentTime}). El psicólogo se pondrá en contacto contigo pronto.`;
+      titulo = 'Solicitud de cita';
+      detalle = `Motivo: ${appointmentReason.trim()}\nHorario preferido: ${appointmentTime}`;
+      successMessage = `Solicitud de cita enviada (${appointmentTime}). Orientación dará seguimiento.`;
     } else if (type === 'buzon') {
       if (!suggestionText.trim()) { showToast("Por favor escribe tu sugerencia.", 'warning'); return; }
-      successMessage = "📥 ¡Gracias por tu sugerencia! Tu opinión nos ayuda a mejorar el plantel.";
+      titulo = 'Sugerencia para el plantel';
+      detalle = suggestionText.trim();
+      successMessage = "Tu sugerencia fue recibida. Gracias por ayudar a mejorar el plantel.";
     }
 
-    if (successMessage) {
-      showToast(successMessage, 'success');
+    if (!successMessage) return;
+    setIsSubmitting(true);
+    try {
+      const solicitud = await crearSolicitud({ tipo: type, titulo, detalle });
+      showToast(`${successMessage} Folio: ${solicitud.folio}`, 'success');
       handleClose();
+    } catch (error) {
+      showToast(error.message || 'No se pudo enviar la solicitud.', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,8 +134,9 @@ export default function OrientacionModal({ isOpen, onClose }) {
                   />
                 </div>
                 <button 
+                   disabled={isSubmitting}
                   onClick={() => handleSubmit('reporte')} 
-                  className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                   className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   <span className="material-symbols-outlined text-lg text-white">send</span>
                   Enviar Reporte
@@ -156,8 +176,9 @@ export default function OrientacionModal({ isOpen, onClose }) {
                   />
                 </div>
                 <button 
+                   disabled={isSubmitting}
                   onClick={() => handleSubmit('queja')} 
-                  className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                   className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   <span className="material-symbols-outlined text-lg text-white">flag</span>
                   Enviar Queja
@@ -194,8 +215,9 @@ export default function OrientacionModal({ isOpen, onClose }) {
                   </select>
                 </div>
                 <button 
+                   disabled={isSubmitting}
                   onClick={() => handleSubmit('cita')} 
-                  className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                   className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   <span className="material-symbols-outlined text-lg text-white">event</span>
                   Solicitar Cita
@@ -220,8 +242,9 @@ export default function OrientacionModal({ isOpen, onClose }) {
                   />
                 </div>
                 <button 
+                   disabled={isSubmitting}
                   onClick={() => handleSubmit('buzon')} 
-                  className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                   className="w-full py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   <span className="material-symbols-outlined text-lg text-white">mail</span>
                   Enviar al Buzón

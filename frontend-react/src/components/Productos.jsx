@@ -244,6 +244,12 @@ function ProductoModal({ isOpen, onClose, initialData, onSaved }) {
 }
 
 // ── Product card ─────────────────────────────────────────────────────────────
+const PRODUCT_INFO = {
+    uniformes: { label: 'Uniforme', delivery: 'Entrega en plantel', requirements: 'Talla requerida' },
+    libros: { label: 'Material escolar', delivery: 'Entrega en biblioteca', requirements: 'Semestre requerido' },
+    tramites: { label: 'Trámite escolar', delivery: 'Respuesta por seguimiento', requirements: 'Datos y documentos de respaldo' },
+};
+
 function ProductoCard({ producto, isAdmin, onAgregar, onEdit, onDelete }) {
     const [tallaActiva, setTallaActiva] = useState('S');
     const [semestreActivo, setSemestreActivo] = useState('II');
@@ -254,6 +260,10 @@ function ProductoCard({ producto, isAdmin, onAgregar, onEdit, onDelete }) {
         if (producto.semestre) p.tallaSeleccionada = semestreActivo;
         onAgregar(p);
     };
+    const productInfo = PRODUCT_INFO[String(producto.categoria || '').toLowerCase()] || { label: producto.categoria || 'Producto', delivery: 'Entrega por confirmar', requirements: 'Revisa los requisitos con administración' };
+    const stockLabel = Number(producto.stock) > 0
+        ? `${producto.stock} disponibles`
+        : 'Disponibilidad por confirmar';
 
     return (
         <div className="product-card bg-white dark:bg-slate-800 dark:border-slate-700 rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md transition-all relative">
@@ -298,6 +308,24 @@ function ProductoCard({ producto, isAdmin, onAgregar, onEdit, onDelete }) {
             <div className="p-4">
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wide mb-1">{producto.marca}</p>
                 <h2 className="font-bold text-base text-slate-800 dark:text-slate-100 mb-3">{producto.nombre}</h2>
+                <div className="mb-3 grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="rounded-lg bg-slate-50 px-2.5 py-2 dark:bg-slate-900">
+                        <p className="font-bold uppercase tracking-wide text-slate-400">Tipo</p>
+                        <p className="mt-0.5 font-bold text-slate-600 dark:text-slate-300">{productInfo.label}</p>
+                    </div>
+                    <div className="rounded-lg bg-slate-50 px-2.5 py-2 dark:bg-slate-900">
+                        <p className="font-bold uppercase tracking-wide text-slate-400">Existencia</p>
+                        <p className={`mt-0.5 font-bold ${Number(producto.stock) > 0 ? 'text-green-600' : 'text-amber-600'}`}>{stockLabel}</p>
+                    </div>
+                </div>
+                <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="material-symbols-outlined text-[15px] text-primary">fact_check</span>
+                    Requisito: {productInfo.requirements}
+                </p>
+                <p className="mb-3 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <span className="material-symbols-outlined text-[15px] text-primary">local_shipping</span>
+                    {productInfo.delivery}
+                </p>
 
                 {producto.tallas && (
                     <div className="mb-3">

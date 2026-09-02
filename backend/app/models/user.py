@@ -28,6 +28,7 @@ class User(Base):
     password_resets = relationship("PasswordReset", back_populates="user", cascade="all, delete-orphan")
     deudas = relationship("Deuda", back_populates="user", cascade="all, delete-orphan")
     oxxo_payments = relationship("OxxoPayment", back_populates="user", cascade="all, delete-orphan")
+    solicitudes = relationship("Solicitud", back_populates="user", cascade="all, delete-orphan")
 
 
 class PasswordReset(Base):

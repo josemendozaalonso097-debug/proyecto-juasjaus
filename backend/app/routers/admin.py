@@ -6,8 +6,9 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from ..database import get_db
-from ..models.user import User, Deuda
+from ..models.user import User, Deuda, Compra
 from ..models.producto import Producto
+from ..models.solicitud import Solicitud
 from ..dependencies import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -18,6 +19,64 @@ def require_admin(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Solo los administradores pueden realizar esta acción")
     return current_user
+
+
+# ── Bandeja de pendientes ──────────────────────────────────────────────────────
+
+@router.get("/inbox")
+async def get_inbox(
+    estado: Optional[str] = None,
+    db: Session = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    items = []
+    solicitudes_query = db.query(Solicitud)
+    if estado and estado != "Todos":
+        solicitudes_query = solicitudes_query.filter(Solicitud.estado == estado)
+
+    for solicitud in solicitudes_query.order_by(Solicitud.created_at.desc()).all():
+        items.append({
+            "id": f"solicitud-{solicitud.id}",
+            "source": "solicitud",
+            "source_id": solicitud.id,
+            "tipo": solicitud.tipo,
+            "titulo": solicitud.titulo,
+            "detalle": solicitud.detalle,
+            "estado": solicitud.estado,
+            "folio": f"CBT-{solicitud.created_at.strftime('%Y%m%d')}-{solicitud.id:04d}" if solicitud.created_at else f"CBT-{solicitud.id:04d}",
+            "created_at": solicitud.created_at.isoformat() if solicitud.created_at else None,
+            "usuario": {
+                "id": solicitud.user.id if solicitud.user else None,
+                "nombre": solicitud.user.nombre if solicitud.user else "Usuario no disponible",
+                "email": solicitud.user.email if solicitud.user else "",
+            },
+        })
+
+    purchases_query = db.query(Compra)
+    if estado and estado != "Todos":
+        purchases_query = purchases_query.filter(Compra.estado == estado)
+    for compra in purchases_query.order_by(Compra.created_at.desc()).all():
+        products = ", ".join(
+            f"{item.nombre} ×{item.cantidad}" for item in compra.productos
+        )
+        items.append({
+            "id": f"compra-{compra.id}",
+            "source": "compra",
+            "source_id": compra.id,
+            "tipo": "compra",
+            "titulo": products or "Compra institucional",
+            "detalle": f"Método de pago: {compra.metodo_pago or 'No especificado'}",
+            "estado": compra.estado,
+            "folio": compra.verification_id,
+            "created_at": compra.created_at.isoformat() if compra.created_at else None,
+            "usuario": {
+                "id": compra.user.id if compra.user else None,
+                "nombre": compra.user.nombre if compra.user else "Usuario no disponible",
+                "email": compra.user.email if compra.user else "",
+            },
+        })
+
+    return sorted(items, key=lambda item: item["created_at"] or "", reverse=True)
 
 
 # ── Estadísticas ──────────────────────────────────────────────────────────────

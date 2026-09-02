@@ -33,4 +33,15 @@ export const adminApi = {
   updateStock: (id, stock) => req('PUT', `/inventario/${id}/stock`, { stock }),
 
   sendNotificacion: (data) => req('POST', '/notificaciones', data),
+  getInbox: (estado = '') => req('GET', `/inbox${estado && estado !== 'Todos' ? `?estado=${encodeURIComponent(estado)}` : ''}`),
+  updateSolicitud: async (id, data) => {
+    const response = await fetch(`/api/solicitudes/admin/${id}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(data),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.detail || 'Error al actualizar la solicitud');
+    return result;
+  },
 };

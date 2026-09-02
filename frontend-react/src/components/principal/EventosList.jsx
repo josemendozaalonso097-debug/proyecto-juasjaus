@@ -1,15 +1,17 @@
 import React from 'react';
 import { formatEventDate, formatEventTime } from '../../utils/eventos';
+import TooltipBubble from './TooltipBubble';
 
-export default function EventosList({ eventos, isAdmin, onCreate, onEdit, onDelete }) {
+export default function EventosList({ eventos, isAdmin, onCreate, onEdit, onDelete, userId }) {
   return (
-    <section id="eventos-avisos" className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
+    <section id="eventos-avisos" data-tour="events" className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-bold leading-tight tracking-[-0.015em] flex items-center gap-3 text-slate-800 dark:text-white">
           <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-xl">
             <span className="material-symbols-outlined text-primary text-xl">event_note</span>
           </div>
           Eventos y Avisos
+          <TooltipBubble userId={userId} stepId="events" />
         </h3>
         {isAdmin && (
           <button

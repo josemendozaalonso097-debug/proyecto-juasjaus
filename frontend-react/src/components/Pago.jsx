@@ -266,7 +266,11 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
       metodoPago: metodoPago,
       productos: itemsAdquiridos,
       total: total,
-      estado: (metodoPago === 'Tarjeta' || metodoPago === 'Tarjeta Bancaria' || metodoPago === 'Oxxo Pay') ? 'Completado' : 'Pendiente'
+      // El servidor es la fuente de verdad; OXXO queda pendiente hasta que
+      // administración confirme el pago.
+      estado: compraServidor.estado || (
+        (metodoPago === 'Tarjeta' || metodoPago === 'Tarjeta Bancaria') ? 'Completado' : 'Pendiente'
+      )
     };
 
     guardarEnHistorial(compra);
@@ -318,7 +322,7 @@ export default function Pago({ isOpen, onClose, cart, clearCart, mode = 'tienda'
   };
 
   const mostrarConfirmacionCheckout = (metodo) => {
-    const esTarjeta = metodo === 'Tarjeta' || metodo === 'Tarjeta Bancaria' || metodo === 'Oxxo Pay';
+    const esTarjeta = metodo === 'Tarjeta' || metodo === 'Tarjeta Bancaria';
     const titulo = esTarjeta ? "¡Pago Exitoso!" : "¡Comprobante recibido!";
     const mensaje = esTarjeta 
         ? `Tu pago con ${metodo} se procesó correctamente.<br><strong>Estado: Completado</strong>`

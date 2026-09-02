@@ -8,8 +8,10 @@ import TabInventario from '../components/admin/TabInventario';
 import TabNotificaciones from '../components/admin/TabNotificaciones';
 import TabOxxo from '../components/admin/TabOxxo';
 import TabVerificarCompras from '../components/admin/TabVerificarCompras';
+import TabBandeja from '../components/admin/TabBandeja';
 
 const TABS = [
+  { id: 'bandeja',       label: 'Bandeja',          icon: 'inbox' },
   { id: 'stats',         label: 'Estadísticas',   icon: 'bar_chart' },
   { id: 'usuarios',      label: 'Usuarios',        icon: 'group' },
   { id: 'adeudos',       label: 'Adeudos',         icon: 'account_balance_wallet' },
@@ -66,6 +68,7 @@ export default function Admin() {
       </div>
 
       <div className="p-6 max-w-7xl mx-auto">
+        {activeTab === 'bandeja'        && <TabBandeja onNavigateVerification={() => setActiveTab('verificar')} />}
         {activeTab === 'stats'          && <TabEstadisticas />}
         {activeTab === 'usuarios'       && <TabUsuarios />}
         {activeTab === 'adeudos'        && <TabAdeudos />}

@@ -1,9 +1,13 @@
 import React from 'react';
+import TooltipBubble from './TooltipBubble';
 
-export default function MobileQuickActions({ onOpenInfo, onOpenHistory, onOpenOrientacion, onOpenPapeleria }) {
+export default function MobileQuickActions({ onOpenInfo, onOpenHistory, onOpenOrientacion, onOpenPapeleria, onOpenSeguimiento, userId }) {
   return (
-    <section className="mb-5">
-      <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3] mb-3.5">Acciones rápidas</h3>
+    <section data-tour="services" className="mb-5">
+      <div className="mb-3.5 flex items-center">
+        <h3 className="mob-title font-bold text-base text-[#1a1c1d] dark:text-[#f1f1f3]">Acciones rápidas</h3>
+        <TooltipBubble userId={userId} stepId="services" />
+      </div>
       <div className="grid grid-cols-2 gap-3">
 
         <button onClick={onOpenInfo} className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform">
@@ -36,6 +40,14 @@ export default function MobileQuickActions({ onOpenInfo, onOpenHistory, onOpenOr
           </div>
           <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Papelería</p>
           <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Subir documentos</p>
+        </button>
+
+        <button onClick={onOpenSeguimiento} className="mob-card bg-white dark:bg-[#1e2025] border border-slate-100 dark:border-[#3c1e1e]/20 rounded-2xl p-5 text-left cursor-pointer transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-[#005faf]/5 dark:bg-[#005faf]/15 flex items-center justify-center mb-2.5">
+            <span className="material-symbols-outlined text-[#005faf] dark:text-blue-400 text-[20px]">route</span>
+          </div>
+          <p className="mob-title font-bold text-sm text-[#1a1c1d] dark:text-[#f1f1f3] m-0">Seguimiento</p>
+          <p className="mob-sub text-[10px] text-[#8f6f6c] dark:text-[#9b7a78] mt-0.5">Solicitudes y compras</p>
         </button>
 
       </div>
