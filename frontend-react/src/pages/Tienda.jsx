@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkSessionToken } from '../api/auth';
 import { showToast } from '../utils/toast';
 import { useCarrito } from '../components/Carrito';
 
 // Modals and components
-import Sidebar from '../components/Sidebar';
-import Chatbot from '../components/Chatbot';
-import PerfilModal from '../components/PerfilModal';
-import Pago from '../components/Pago';
-import Papeleria from '../components/Papeleria';
-import Productos from '../components/Productos';
 import AppHeader from '../components/AppHeader';
+
+const Sidebar = lazy(() => import('../components/Sidebar'));
+const Chatbot = lazy(() => import('../components/Chatbot'));
+const PerfilModal = lazy(() => import('../components/PerfilModal'));
+const Pago = lazy(() => import('../components/Pago'));
+const Papeleria = lazy(() => import('../components/Papeleria'));
+const Productos = lazy(() => import('../components/Productos'));
 
 export default function Tienda() {
   const navigate = useNavigate();
@@ -505,43 +506,14 @@ export default function Tienda() {
       </div>
 
       {/* ALL MODALS RENDERED HERE */}
-      <Sidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
-        onOpenChatbot={() => setChatbotOpen(true)} 
-      />
-      
-      <Chatbot 
-        isOpen={chatbotOpen} 
-        onClose={() => setChatbotOpen(false)} 
-      />
-
-      <PerfilModal 
-        isOpen={profileOpen} 
-        onClose={() => setProfileOpen(false)} 
-        onProfileUpdate={handleProfileUpdate} 
-      />
-
-      <Pago 
-        isOpen={pagoOpen} 
-        onClose={() => setPagoOpen(false)} 
-        cart={carrito} 
-        clearCart={vaciarCarrito} 
-        mode="tienda" 
-        onPaymentSuccess={handlePaymentSuccess} 
-      />
-
-      <Papeleria 
-        isOpen={papeleriaOpen} 
-        onClose={() => setPapeleriaOpen(false)} 
-      />
-
-      <Productos 
-        isOpen={productosOpen} 
-        onClose={() => setProductosOpen(false)} 
-        categoria={activeCategory} 
-        onAgregarAlCarrito={agregarAlCarrito} 
-      />
+      <Suspense fallback={null}>
+        {sidebarOpen && <Sidebar isOpen onClose={() => setSidebarOpen(false)} onOpenChatbot={() => setChatbotOpen(true)} />}
+        {chatbotOpen && <Chatbot isOpen onClose={() => setChatbotOpen(false)} />}
+        {profileOpen && <PerfilModal isOpen onClose={() => setProfileOpen(false)} onProfileUpdate={handleProfileUpdate} />}
+        {pagoOpen && <Pago isOpen onClose={() => setPagoOpen(false)} cart={carrito} clearCart={vaciarCarrito} mode="tienda" onPaymentSuccess={handlePaymentSuccess} />}
+        {papeleriaOpen && <Papeleria isOpen onClose={() => setPapeleriaOpen(false)} />}
+        {productosOpen && <Productos isOpen onClose={() => setProductosOpen(false)} categoria={activeCategory} onAgregarAlCarrito={agregarAlCarrito} />}
+      </Suspense>
     </>
   );
 }

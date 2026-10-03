@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkSessionToken } from '../api/auth';
 import { showToast } from '../utils/toast';
@@ -6,15 +6,6 @@ import { useAuth } from '../hooks/useAuth';
 import { useEventos } from '../hooks/useEventos';
 import { useFinancial } from '../hooks/useFinancial';
 
-import Sidebar from '../components/Sidebar';
-import Chatbot from '../components/Chatbot';
-import PerfilModal from '../components/PerfilModal';
-import Pago from '../components/Pago';
-import Papeleria from '../components/Papeleria';
-import OrientacionModal from '../components/OrientacionModal';
-import DeudaModal from '../components/DeudaModal';
-import HistorialModal from '../components/HistorialModal';
-import InformacionModal from '../components/InformacionModal';
 import AppHeader from '../components/AppHeader';
 
 import SplashScreen from '../components/principal/SplashScreen';
@@ -23,14 +14,24 @@ import EstadoPago from '../components/principal/EstadoPago';
 import FinancierosPanel from '../components/principal/FinancierosPanel';
 import EventosList from '../components/principal/EventosList';
 import CalendarioEventos from '../components/principal/CalendarioEventos';
-import EventoModal from '../components/principal/EventoModal';
 import MobileCarousel from '../components/principal/MobileCarousel';
 import MobileNextPayment from '../components/principal/MobileNextPayment';
 import MobileQuickActions from '../components/principal/MobileQuickActions';
 import MobileBottomNav from '../components/principal/MobileBottomNav';
 import CuentaActivaCarousel from '../components/principal/CuentaActivaCarousel';
 import GuidedTour from '../components/principal/GuidedTour';
-import SeguimientoModal from '../components/SeguimientoModal';
+
+const Sidebar = lazy(() => import('../components/Sidebar'));
+const Chatbot = lazy(() => import('../components/Chatbot'));
+const PerfilModal = lazy(() => import('../components/PerfilModal'));
+const Pago = lazy(() => import('../components/Pago'));
+const Papeleria = lazy(() => import('../components/Papeleria'));
+const OrientacionModal = lazy(() => import('../components/OrientacionModal'));
+const DeudaModal = lazy(() => import('../components/DeudaModal'));
+const HistorialModal = lazy(() => import('../components/HistorialModal'));
+const InformacionModal = lazy(() => import('../components/InformacionModal'));
+const SeguimientoModal = lazy(() => import('../components/SeguimientoModal'));
+const EventoModal = lazy(() => import('../components/principal/EventoModal'));
 
 const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394272c'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
 
@@ -322,17 +323,19 @@ export default function Principal() {
       </div>
 
       {/* ── MODALS ── */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onOpenChatbot={() => setChatbotOpen(true)} />
-      <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
-      <PerfilModal isOpen={profileOpen} onClose={() => setProfileOpen(false)} onProfileUpdate={loadProfileData} />
-      <Pago isOpen={pagoOpen} onClose={() => setPagoOpen(false)} cart={[]} clearCart={() => {}} mode="principal" onPaymentSuccess={() => { loadProfileData(); setPagoOpen(false); }} />
-      <Papeleria isOpen={papeleriaOpen} onClose={() => setPapeleriaOpen(false)} />
-      <OrientacionModal isOpen={orientacionOpen} onClose={() => setOrientacionOpen(false)} />
-      <DeudaModal isOpen={deudaOpen} onClose={() => setDeudaOpen(false)} pendingCount={pendingCount} />
-      <HistorialModal isOpen={historyOpen} onClose={() => setHistoryOpen(false)} />
-      <SeguimientoModal isOpen={seguimientoOpen} onClose={() => setSeguimientoOpen(false)} />
-      <InformacionModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />
-      <EventoModal {...eventoHandlers} />
+      <Suspense fallback={null}>
+        {sidebarOpen && <Sidebar isOpen onClose={() => setSidebarOpen(false)} onOpenChatbot={() => setChatbotOpen(true)} />}
+        {chatbotOpen && <Chatbot isOpen onClose={() => setChatbotOpen(false)} />}
+        {profileOpen && <PerfilModal isOpen onClose={() => setProfileOpen(false)} onProfileUpdate={loadProfileData} />}
+        {pagoOpen && <Pago isOpen onClose={() => setPagoOpen(false)} cart={[]} clearCart={() => {}} mode="principal" onPaymentSuccess={() => { loadProfileData(); setPagoOpen(false); }} />}
+        {papeleriaOpen && <Papeleria isOpen onClose={() => setPapeleriaOpen(false)} />}
+        {orientacionOpen && <OrientacionModal isOpen onClose={() => setOrientacionOpen(false)} />}
+        {deudaOpen && <DeudaModal isOpen onClose={() => setDeudaOpen(false)} pendingCount={pendingCount} />}
+        {historyOpen && <HistorialModal isOpen onClose={() => setHistoryOpen(false)} />}
+        {seguimientoOpen && <SeguimientoModal isOpen onClose={() => setSeguimientoOpen(false)} />}
+        {infoOpen && <InformacionModal isOpen onClose={() => setInfoOpen(false)} />}
+        {eventoHandlers.eventoModal && <EventoModal {...eventoHandlers} />}
+      </Suspense>
     </>
   );
 }

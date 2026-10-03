@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import TabEstadisticas from '../components/admin/TabEstadisticas';
-import TabUsuarios from '../components/admin/TabUsuarios';
-import TabAdeudos from '../components/admin/TabAdeudos';
-import TabInventario from '../components/admin/TabInventario';
-import TabNotificaciones from '../components/admin/TabNotificaciones';
-import TabOxxo from '../components/admin/TabOxxo';
-import TabVerificarCompras from '../components/admin/TabVerificarCompras';
-import TabBandeja from '../components/admin/TabBandeja';
+const TabEstadisticas = lazy(() => import('../components/admin/TabEstadisticas'));
+const TabUsuarios = lazy(() => import('../components/admin/TabUsuarios'));
+const TabAdeudos = lazy(() => import('../components/admin/TabAdeudos'));
+const TabInventario = lazy(() => import('../components/admin/TabInventario'));
+const TabNotificaciones = lazy(() => import('../components/admin/TabNotificaciones'));
+const TabOxxo = lazy(() => import('../components/admin/TabOxxo'));
+const TabVerificarCompras = lazy(() => import('../components/admin/TabVerificarCompras'));
+const TabBandeja = lazy(() => import('../components/admin/TabBandeja'));
 
 const TABS = [
   { id: 'bandeja',       label: 'Bandeja',          icon: 'inbox' },
@@ -68,14 +68,16 @@ export default function Admin() {
       </div>
 
       <div className="p-6 max-w-7xl mx-auto">
-        {activeTab === 'bandeja'        && <TabBandeja onNavigateVerification={() => setActiveTab('verificar')} />}
-        {activeTab === 'stats'          && <TabEstadisticas />}
-        {activeTab === 'usuarios'       && <TabUsuarios />}
-        {activeTab === 'adeudos'        && <TabAdeudos />}
-        {activeTab === 'inventario'     && <TabInventario />}
-        {activeTab === 'notificaciones' && <TabNotificaciones />}
-        {activeTab === 'oxxo'          && <TabOxxo />}
-        {activeTab === 'verificar'     && <TabVerificarCompras />}
+        <Suspense fallback={<div role="status" className="flex justify-center py-16 text-sm font-bold text-slate-500">Cargando sección…</div>}>
+          {activeTab === 'bandeja'        && <TabBandeja onNavigateVerification={() => setActiveTab('verificar')} />}
+          {activeTab === 'stats'          && <TabEstadisticas />}
+          {activeTab === 'usuarios'       && <TabUsuarios />}
+          {activeTab === 'adeudos'        && <TabAdeudos />}
+          {activeTab === 'inventario'     && <TabInventario />}
+          {activeTab === 'notificaciones' && <TabNotificaciones />}
+          {activeTab === 'oxxo'          && <TabOxxo />}
+          {activeTab === 'verificar'     && <TabVerificarCompras />}
+        </Suspense>
       </div>
     </div>
   );
