@@ -12,6 +12,7 @@ const Principal = lazy(() => import('./pages/Principal'));
 const Tienda = lazy(() => import('./pages/Tienda'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Admin = lazy(() => import('./pages/Admin'));
+const InstitutionFlow = lazy(() => import('./pages/InstitutionFlow'));
 
 function PageLoading() {
   return (
@@ -47,6 +48,7 @@ function App() {
             <Suspense fallback={<PageLoading />}>
               <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/acceso-escuela/*" element={<InstitutionFlow />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
                 <Route path="/principal" element={

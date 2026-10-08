@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
     registerSendOTP,
     registerVerifyOTP,
@@ -1012,6 +1012,12 @@ export default function Login() {
                                         : "Iniciar sesión"}
                                 </button>
                             </form>
+                            <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-center dark:border-slate-700 dark:bg-slate-800/60">
+                                <p className="m-0 text-xs text-slate-500 dark:text-slate-400">¿Eres docente de otro plantel?</p>
+                                <Link to="/acceso-escuela" className="mt-1 inline-flex items-center gap-1 text-sm font-bold text-primary no-underline hover:underline">
+                                    Explora el acceso para instituciones <span className="material-symbols-outlined text-base">arrow_forward</span>
+                                </Link>
+                            </div>
                             <div className="md:hidden flex justify-center mt-6 w-full">
                                 <p className="text-slate-600 dark:text-slate-400 text-sm">
                                     ¿No tienes una cuenta?{" "}
