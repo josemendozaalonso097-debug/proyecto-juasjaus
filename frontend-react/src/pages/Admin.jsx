@@ -9,9 +9,11 @@ const TabNotificaciones = lazy(() => import('../components/admin/TabNotificacion
 const TabOxxo = lazy(() => import('../components/admin/TabOxxo'));
 const TabVerificarCompras = lazy(() => import('../components/admin/TabVerificarCompras'));
 const TabBandeja = lazy(() => import('../components/admin/TabBandeja'));
+const TabInstitutionRequests = lazy(() => import('../components/admin/TabInstitutionRequests'));
 
 const TABS = [
   { id: 'bandeja',       label: 'Bandeja',          icon: 'inbox' },
+  { id: 'planteles',     label: 'Altas de planteles', icon: 'domain_add' },
   { id: 'stats',         label: 'Estadísticas',   icon: 'bar_chart' },
   { id: 'usuarios',      label: 'Usuarios',        icon: 'group' },
   { id: 'adeudos',       label: 'Adeudos',         icon: 'account_balance_wallet' },
@@ -70,6 +72,7 @@ export default function Admin() {
       <div className="p-6 max-w-7xl mx-auto">
         <Suspense fallback={<div role="status" className="flex justify-center py-16 text-sm font-bold text-slate-500">Cargando sección…</div>}>
           {activeTab === 'bandeja'        && <TabBandeja onNavigateVerification={() => setActiveTab('verificar')} />}
+          {activeTab === 'planteles'      && <TabInstitutionRequests />}
           {activeTab === 'stats'          && <TabEstadisticas />}
           {activeTab === 'usuarios'       && <TabUsuarios />}
           {activeTab === 'adeudos'        && <TabAdeudos />}

@@ -34,6 +34,23 @@ export const adminApi = {
 
   sendNotificacion: (data) => req('POST', '/notificaciones', data),
   getInbox: (estado = '') => req('GET', `/inbox${estado && estado !== 'Todos' ? `?estado=${encodeURIComponent(estado)}` : ''}`),
+  getInstitutionRequests: async (status = '') => {
+    const query = status && status !== 'Todos' ? `?status=${encodeURIComponent(status)}` : '';
+    const response = await fetch(`/api/institution-requests/admin${query}`, { headers: authHeaders() });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.detail || 'No se pudieron cargar las solicitudes');
+    return result;
+  },
+  reviewInstitutionRequest: async (id, data) => {
+    const response = await fetch(`/api/institution-requests/admin/${id}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify(data),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.detail || 'No se pudo actualizar la solicitud');
+    return result;
+  },
   updateSolicitud: async (id, data) => {
     const response = await fetch(`/api/solicitudes/admin/${id}`, {
       method: 'PUT',

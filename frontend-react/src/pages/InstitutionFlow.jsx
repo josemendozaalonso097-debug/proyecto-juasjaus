@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { submitInstitutionRequest } from "../api/institutionRequests";
 
 const BASE = "/acceso-escuela";
 
@@ -157,21 +159,44 @@ function Demo() {
 }
 
 function RequestSchool() {
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    setError("");
+    const form = new FormData(event.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    try {
+      await submitInstitutionRequest(payload);
+      setSent(true);
+    } catch (submissionError) {
+      setError(submissionError.message || "No se pudo enviar la solicitud.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  if (sent) return <Shell eyebrow="SOLICITUD RECIBIDA"><div className="rounded-3xl border border-emerald-200 bg-white px-6 py-12 text-center shadow-sm dark:border-emerald-900 dark:bg-slate-900"><span className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"><span className="material-symbols-outlined text-3xl">mark_email_read</span></span><h1 className="mt-5 text-3xl font-black">Ya recibimos la solicitud</h1><p className="mx-auto mt-3 max-w-xl leading-7 text-slate-500 dark:text-slate-400">El equipo administrador revisará la información del plantel. Si se aprueba, se pondrá en contacto con el correo que proporcionaste para coordinar los siguientes pasos.</p><Link to="/login" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold text-white no-underline hover:bg-red-700">Volver al inicio <span className="material-symbols-outlined text-lg">arrow_forward</span></Link></div></Shell>;
   return <Shell eyebrow="INCORPORAR UNA INSTITUCIÓN"><Stepper active={3} />
-    <PageHeading title="Cuéntanos de tu escuela">Este formulario es una maqueta para visualizar la solicitud. Aún no envía ni almacena datos.</PageHeading>
-    <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900">
+    <PageHeading title="Cuéntanos de tu escuela">No necesitas crear una cuenta para solicitar que revisemos tu plantel.</PageHeading>
+    <form onSubmit={handleSubmit} className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900">
+      <label aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden">Sitio web<input name="website" tabIndex={-1} autoComplete="off" /></label>
       <div className="mb-6 flex items-start gap-3 rounded-2xl bg-red-50 p-4 text-sm leading-6 text-red-900 dark:bg-red-950/30 dark:text-red-200"><span className="material-symbols-outlined mt-0.5">domain</span><p className="m-0">Datos de contacto institucional para evaluar una posible implementación del portal.</p></div>
       <div className="grid gap-5 sm:grid-cols-2">
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 sm:col-span-2">Nombre oficial de la escuela<input className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Nombre del plantel" /></label>
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Nombre de contacto<input className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Nombre y apellido" /></label>
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Cargo o función<input className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Docente, dirección, administración…" /></label>
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Correo de contacto<input type="email" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="nombre@escuela.edu.mx" /></label>
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Estado / municipio<input className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Ubicación del plantel" /></label>
-        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 sm:col-span-2">¿Qué te gustaría gestionar desde el portal?<textarea rows="3" className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Avisos, trámites, calendario, servicios…" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 sm:col-span-2">Nombre oficial de la escuela<input name="school_name" required maxLength="200" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Nombre del plantel" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Nombre de contacto<input name="contact_name" required maxLength="120" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Nombre y apellido" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Cargo o función<input name="contact_role" required maxLength="100" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Docente, dirección, administración…" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Correo de contacto<input name="contact_email" type="email" required maxLength="254" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="nombre@escuela.edu.mx" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Estado<input name="state" required maxLength="100" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Estado" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Municipio<input name="municipality" maxLength="100" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Municipio (opcional)" /></label>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 sm:col-span-2">¿Qué te gustaría gestionar desde el portal?<textarea name="requested_modules" maxLength="2000" rows="3" className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 font-medium outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-slate-700 dark:bg-slate-800" placeholder="Avisos, trámites, calendario, servicios…" /></label>
       </div>
-      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between"><Link to={`${BASE}/sin-coincidencias`} className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-500 no-underline hover:bg-slate-50 dark:hover:bg-slate-800"><span className="material-symbols-outlined text-lg">arrow_back</span> Regresar</Link><button type="button" disabled className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold text-white opacity-60">Enviar solicitud <span className="material-symbols-outlined text-lg">send</span></button></div>
-      <p className="mt-4 text-center text-xs text-slate-400">Envío deshabilitado durante esta etapa de diseño.</p>
-    </div>
+      {error && <p role="alert" className="mt-5 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-300">{error}</p>}
+      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between"><Link to={`${BASE}/sin-coincidencias`} className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-slate-500 no-underline hover:bg-slate-50 dark:hover:bg-slate-800"><span className="material-symbols-outlined text-lg">arrow_back</span> Regresar</Link><button type="submit" disabled={submitting} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-extrabold text-white hover:bg-red-700 disabled:cursor-wait disabled:opacity-60">{submitting ? "Enviando…" : "Enviar solicitud"} <span className="material-symbols-outlined text-lg">send</span></button></div>
+      <p className="mt-4 text-center text-xs text-slate-400">Al enviar, aceptas que usemos estos datos para contactarte sobre la solicitud del plantel.</p>
+    </form>
   </Shell>;
 }
 
