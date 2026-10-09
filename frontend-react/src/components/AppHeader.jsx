@@ -1,20 +1,21 @@
-import React from 'react';
+import { createBrandBackground } from '../utils/branding';
 
-export default function AppHeader({ userProfile, profileAvatar, onOpenMenu, onOpenProfile }) {
+export default function AppHeader({ userProfile, profileAvatar, onOpenMenu, onOpenProfile, theme }) {
+  const brandBackground = createBrandBackground(theme || {});
   return (
     <>
-      <header className="hidden lg:flex bg-gradient-to-r from-primary to-red-800/90 backdrop-blur-md bg-opacity-90 text-white items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
+      <header style={brandBackground} className="hidden lg:flex backdrop-blur-md bg-opacity-90 text-white items-center justify-between whitespace-nowrap px-10 py-5 shadow-lg sticky top-0 z-50 border-b border-white/10">
         <button
           type="button"
           onClick={onOpenMenu}
           className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity border-none bg-transparent text-left"
         >
           <span className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-            <img src="/imgs/yameharte.png" alt="Logo CBTis 258" className="h-8 w-auto object-contain" />
+            {theme?.logoUrl && <img src={theme.logoUrl} alt={`Logo ${theme.title || 'institucional'}`} className="h-8 w-auto object-contain" />}
           </span>
           <span>
-            <span className="block text-2xl font-black leading-tight tracking-[-0.015em] text-white">CBTis 258</span>
-            <span className="block text-xs font-semibold text-white/90 uppercase tracking-widest">Un motivo de orgullo</span>
+            <span className="block text-2xl font-black leading-tight tracking-[-0.015em] text-white">{theme?.title || 'CBTis 258'}</span>
+            <span className="block text-xs font-semibold text-white/90 uppercase tracking-widest">{theme?.tagline || 'Un motivo de orgullo'}</span>
           </span>
         </button>
         <button
@@ -30,7 +31,7 @@ export default function AppHeader({ userProfile, profileAvatar, onOpenMenu, onOp
         </button>
       </header>
 
-      <header className="flex lg:hidden fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary to-red-800/95 text-white backdrop-blur-md border-b border-white/15 h-[66px] items-center justify-between px-4 shadow-lg">
+      <header style={brandBackground} className="flex lg:hidden fixed top-0 left-0 right-0 z-50 text-white backdrop-blur-md border-b border-white/15 h-[66px] items-center justify-between px-4 shadow-lg">
         <div className="flex items-center gap-2.5 min-w-0">
           <button
             type="button"
@@ -41,10 +42,10 @@ export default function AppHeader({ userProfile, profileAvatar, onOpenMenu, onOp
             <span className="material-symbols-outlined">menu</span>
           </button>
           <div className="flex items-center gap-2 min-w-0">
-            <img src="/imgs/yameharte.png" alt="Logo CBTis 258" className="w-[30px] h-[30px] object-contain shrink-0" />
+            {theme?.logoUrl && <img src={theme.logoUrl} alt={`Logo ${theme.title || 'institucional'}`} className="w-[30px] h-[30px] object-contain shrink-0" />}
             <div className="min-w-0">
-              <span className="block font-black text-[1.05rem] leading-tight truncate">CBTis 258</span>
-              <span className="block text-[8px] font-semibold uppercase tracking-[0.16em] text-white/75 truncate">Un motivo de orgullo</span>
+              <span className="block font-black text-[1.05rem] leading-tight truncate">{theme?.title || 'CBTis 258'}</span>
+              <span className="block text-[8px] font-semibold uppercase tracking-[0.16em] text-white/75 truncate">{theme?.tagline || 'Un motivo de orgullo'}</span>
             </div>
           </div>
         </div>

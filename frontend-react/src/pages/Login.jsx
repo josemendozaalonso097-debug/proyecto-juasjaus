@@ -11,6 +11,8 @@ import {
 } from "../api/auth";
 import { useAuth } from "../hooks/useAuth";
 import { showToast } from "../utils/toast";
+import { useCustomization } from "../hooks/useCustomization";
+import { createBrandBackground } from "../utils/branding";
 
 const GOOGLE_CLIENT_ID =
     "518151220144-9bvr54odrsmi1lccf27eok450e15tfor.apps.googleusercontent.com";
@@ -24,6 +26,8 @@ function OtpModal({ isOpen, onClose, email, userParams, navigate, onAuthenticate
 
     useEffect(() => {
         if (!isOpen) return;
+        // Reinicializa el código cada vez que se abre el modal.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setOtp(["", "", "", "", "", ""]);
         setTimeLeft(120);
         setTimeout(() => inputRefs.current[0]?.focus(), 100);
@@ -299,38 +303,15 @@ function ForgotModal({ isOpen, onClose, onGoToSignup }) {
     );
 }
 
-// ── SVG de Google ──
-const GoogleSVG = () => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="xMidYMid"
-        viewBox="0 0 256 262"
-        className="w-5 h-5"
-    >
-        <path
-            fill="#4285F4"
-            d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
-        />
-        <path
-            fill="#34A853"
-            d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
-        />
-        <path
-            fill="#FBBC05"
-            d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"
-        />
-        <path
-            fill="#EB4335"
-            d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
-        />
-    </svg>
-);
-
 // ── Página Login Principal ──
 export default function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { getCustomization } = useCustomization();
+    const loginTheme = getCustomization("login");
+    const previewRequested = new URLSearchParams(window.location.search).get("preview") === "1";
     const [isActive, setIsActive] = useState(false);
+    const [previewAllowed, setPreviewAllowed] = useState(false);
     const [showForgot, setShowForgot] = useState(false);
     const [showOtp, setShowOtp] = useState(false);
     const [otpEmail, setOtpEmail] = useState("");
@@ -353,6 +334,21 @@ export default function Login() {
 
     // Auto-redirect si ya hay sesión
     useEffect(() => {
+        if (previewRequested) {
+            const token = localStorage.getItem("access_token");
+            if (!token) return undefined;
+            let active = true;
+            checkSessionToken(token)
+                .then(async (response) => {
+                    if (!response.ok) return;
+                    const user = await response.json();
+                    if (!active) return;
+                    if (user?.rol === "admin") setPreviewAllowed(true);
+                    else navigate("/principal", { replace: true });
+                })
+                .catch(() => {});
+            return () => { active = false; };
+        }
         if (localStorage.getItem("just_registered")) {
             localStorage.removeItem("just_registered");
             return;
@@ -394,7 +390,7 @@ export default function Login() {
             )
             .catch(() => {});
 
-    }, [navigate]);
+    }, [navigate, previewRequested]);
 
     // Fix PC bug (useEffect separado para que SIEMPRE se registre):
     // Si Google abre pestaña nueva en vez de popup, escucha cuando el token
@@ -450,7 +446,7 @@ export default function Login() {
                         // Si esta pestaña fue abierta por el popup de Google (PC),
                         // intentar cerrarla — la pestaña original ya redirigió via storage event
                         if (window.opener || window.history.length <= 1) {
-                            try { window.close(); } catch {}
+                            try { window.close(); } catch { /* El navegador puede bloquear el cierre de la pestaña. */ }
                         }
                         navigate("/principal");
                     }, 300);
@@ -612,9 +608,11 @@ export default function Login() {
     };
 
     return (
-        <div className="login-page bg-background-light dark:bg-background-dark min-h-screen md:flex md:items-center md:justify-center p-0 md:p-4">
+        <div className="login-page bg-background-light dark:bg-background-dark min-h-screen md:flex md:items-center md:justify-center p-0 md:p-4" style={{ backgroundColor: loginTheme.backgroundColor }}>
+            {previewRequested && previewAllowed && <div className="fixed left-1/2 top-3 z-[10000] flex -translate-x-1/2 items-center gap-3 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xl"><span>Vista previa de login — sesión admin conservada</span><button type="button" onClick={() => navigate('/admin?tab=personalizacion')} className="rounded-full bg-white/15 px-3 py-1 hover:bg-white/25">Volver al editor</button></div>}
             <div
                 className={`container-box w-full md:max-w-[1200px] md:min-h-[700px] bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 md:shadow-2xl mx-auto rounded-none md:rounded-xl ${isActive ? "active" : ""}`}
+                style={{ backgroundColor: loginTheme.backgroundColor }}
             >
                 {/* ── SIGN UP ── */}
                 <div className="form-container sign-up sign-up-container bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 px-0 py-0 md:px-16 md:py-8 flex flex-col justify-start md:justify-center">
@@ -643,16 +641,12 @@ export default function Login() {
                         <div className="w-6"></div>
                     </header>
                     {/* Mobile hero */}
-                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8">
-                        <img
-                            alt="Edificio CBTis 258"
-                            className="w-full h-full object-cover brightness-75"
-                            src="/imgs/banner_mobile_new.jpg"
-                        />
+                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8" style={createBrandBackground(loginTheme)}>
+                        {loginTheme.heroImageUrl && <img alt={`Imagen de ${loginTheme.title}`} className="h-full w-full object-cover brightness-75" src={loginTheme.heroImageUrl} />}
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
                         <div className="absolute bottom-6 left-0 right-0 px-6">
                             <h2 className="text-white text-3xl font-black uppercase tracking-wide leading-tight">
-                                UN MOTIVO DE ORGULLO
+                                {loginTheme.tagline || "UN MOTIVO DE ORGULLO"}
                             </h2>
                         </div>
                     </section>
@@ -888,20 +882,16 @@ export default function Login() {
                     <header className="md:hidden flex items-center justify-between px-4 py-4 bg-background-light dark:bg-background-dark sticky top-0 z-50">
                         <div className="w-6"></div>
                         <h1 className="text-xl font-extrabold tracking-tight text-[#0f172a] dark:text-white uppercase">
-                            CBTis 258
+                            {loginTheme.title}
                         </h1>
                         <div className="w-6"></div>
                     </header>
-                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8">
-                        <img
-                            alt="Edificio CBTis 258"
-                            className="w-full h-full object-cover brightness-75"
-                            src="/imgs/mkc.jpg"
-                        />
+                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8" style={createBrandBackground(loginTheme)}>
+                        {loginTheme.heroImageUrl && <img alt={`Imagen de ${loginTheme.title}`} className="h-full w-full object-cover brightness-75" src={loginTheme.heroImageUrl} />}
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
                         <div className="absolute bottom-6 left-0 right-0 px-6">
                             <h2 className="text-white text-3xl font-black uppercase tracking-wide leading-tight">
-                                UN MOTIVO DE ORGULLO
+                                {loginTheme.tagline || "UN MOTIVO DE ORGULLO"}
                             </h2>
                         </div>
                     </section>
@@ -909,8 +899,8 @@ export default function Login() {
                     <div className="px-6 md:px-0 pb-10 md:pb-0">
                         <div className="mb-8 hidden md:flex items-center gap-2">
                             <img
-                                src="/imgs/yameharte.png"
-                                alt="logo"
+                                src={loginTheme.logoUrl || "/imgs/yameharte.png"}
+                                alt={`Logo ${loginTheme.title}`}
                                 className="w-10 h-10 object-contain"
                             />
                         </div>
@@ -919,7 +909,7 @@ export default function Login() {
                                 Iniciar sesión
                             </h1>
                             <p className="text-slate-500 dark:text-slate-400 mb-8 text-center md:text-left">
-                                Accede a tu cuenta institucional
+                                {loginTheme.description || "Accede a tu cuenta institucional"}
                             </p>
                             <div
                                 ref={loginGoogleRef}
@@ -1035,7 +1025,7 @@ export default function Login() {
 
                 {/* ── DESKTOP OVERLAY SLIDER ── */}
                 <div className="overlay-container hidden md:block pointer-events-none">
-                    <div className="overlay bg-primary">
+                    <div className="overlay bg-primary" style={createBrandBackground(loginTheme)}>
                         <div className="absolute inset-0 opacity-10">
                             <svg
                                 height="100%"
@@ -1066,15 +1056,15 @@ export default function Login() {
                         </div>
                         <div className="overlay-panel overlay-left pointer-events-auto">
                             <img
-                                src="/imgs/yameharte.png"
-                                alt="logo"
+                                src={loginTheme.logoUrl || "/imgs/yameharte.png"}
+                                alt={`Logo ${loginTheme.title}`}
                                 className="w-32 h-32 object-contain mb-8 z-10"
                             />
                             <h2 className="text-white text-5xl font-extrabold mb-4 tracking-tight">
-                                CBTis 258
+                                {loginTheme.title}
                             </h2>
                             <p className="text-white/90 text-xl font-medium mb-12 tracking-widest uppercase">
-                                Un motivo de orgullo
+                                {loginTheme.tagline}
                             </p>
                             <div className="w-full max-w-xs space-y-4">
                                 <p className="text-white/80 text-sm">
@@ -1090,15 +1080,15 @@ export default function Login() {
                         </div>
                         <div className="overlay-panel overlay-right pointer-events-auto">
                             <img
-                                src="/imgs/yameharte.png"
-                                alt="logo"
+                                src={loginTheme.logoUrl || "/imgs/yameharte.png"}
+                                alt={`Logo ${loginTheme.title}`}
                                 className="w-32 h-32 object-contain mb-8 z-10"
                             />
                             <h2 className="text-white text-5xl font-extrabold mb-4 tracking-tight">
-                                CBTis 258
+                                {loginTheme.title}
                             </h2>
                             <p className="text-white/90 text-xl font-medium mb-12 tracking-widest uppercase">
-                                Un motivo de orgullo
+                                {loginTheme.tagline}
                             </p>
                             <div className="w-full max-w-xs space-y-4">
                                 <p className="text-white/80 text-sm">

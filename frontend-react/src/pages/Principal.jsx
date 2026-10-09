@@ -5,6 +5,7 @@ import { showToast } from '../utils/toast';
 import { useAuth } from '../hooks/useAuth';
 import { useEventos } from '../hooks/useEventos';
 import { useFinancial } from '../hooks/useFinancial';
+import { useCustomization } from '../hooks/useCustomization';
 
 import AppHeader from '../components/AppHeader';
 
@@ -49,6 +50,12 @@ const getFormattedDate = () => new Date().toLocaleDateString('es-MX', {
 export default function Principal() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { getCustomization } = useCustomization();
+  const cbtisTheme = getCustomization('cbtis');
+  const financeTheme = getCustomization('finanzas');
+  const visibleSections = cbtisTheme.sections || [];
+  const financeSections = financeTheme.sections || [];
+  const hasFinancialServices = ['tramites', 'seguimiento', 'orientacion', 'tienda'].some((section) => visibleSections.includes(section)) && financeSections.length > 0;
 
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
@@ -117,7 +124,7 @@ export default function Principal() {
       console.error('Error parseando datos de sesión:', e);
       navigate('/login');
     }
-  }, [navigate, updateFinancialStatus]);
+  }, [navigate, updateFinancialStatus, setDeudaOpen]);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -182,7 +189,7 @@ export default function Principal() {
       <GuidedTour userId={userProfile?.id} />
 
       {/* ── DESKTOP LAYOUT ── */}
-      <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative">
+      <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative" style={{ backgroundColor: cbtisTheme.backgroundColor }}>
         <div className="mesh-bg" aria-hidden="true" />
 
         <AppHeader
@@ -190,27 +197,30 @@ export default function Principal() {
           profileAvatar={profileAvatar}
           onOpenMenu={() => setSidebarOpen(true)}
           onOpenProfile={() => setProfileOpen(true)}
+          theme={cbtisTheme}
         />
 
         <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-[1280px]">
+          {isAdmin && <div className="mb-5 flex justify-end"><button type="button" onClick={() => navigate('/admin?tab=personalizacion')} className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-2.5 text-sm font-bold text-primary shadow-sm transition hover:bg-primary/5 dark:bg-slate-900"><span className="material-symbols-outlined text-lg">palette</span>Personalizar portal</button></div>}
           <DesktopWelcomeBanner
             userProfile={userProfile}
             profileAvatar={profileAvatar}
             pendingCount={pendingCount}
             greeting={greeting}
             formattedDate={formattedDate}
+            theme={cbtisTheme}
           />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2 flex flex-col gap-8">
-              <EstadoPago
+              {visibleSections.includes('pagos') && <EstadoPago
                 pendingCount={pendingCount}
                 userId={userProfile?.id}
                 onOpenInfo={() => setInfoOpen(true)}
                 onOpenHistory={() => setHistoryOpen(true)}
-              />
+              />}
             </div>
             <div className="flex flex-col gap-8">
-              <CuentaActivaCarousel
+              {visibleSections.includes('pagos') && <CuentaActivaCarousel
                 userProfile={userProfile}
                 nextPaymentDateText={nextPaymentDateText}
                 nextPaymentDateColor={nextPaymentDateColor}
@@ -219,29 +229,30 @@ export default function Principal() {
                 onOpenInfo={() => setInfoOpen(true)}
                 onViewEvents={() => scrollToSection('eventos-avisos')}
                 variant="desktop"
-              />
-              <FinancierosPanel
+              />}
+              {hasFinancialServices && <FinancierosPanel
                 onOpenPapeleria={() => setPapeleriaOpen(true)}
                 onOpenOrientacion={() => setOrientacionOpen(true)}
                 onOpenSeguimiento={() => setSeguimientoOpen(true)}
                 onNavigateTienda={() => navigate('/tienda')}
                 userId={userProfile?.id}
-              />
-              <EventosList
+                theme={financeTheme}
+              />}
+              {visibleSections.includes('eventos') && <EventosList
                 eventos={eventoHandlers.eventos}
                 userId={userProfile?.id}
                 isAdmin={isAdmin}
                 onCreate={eventoHandlers.openCreateEvento}
                 onEdit={eventoHandlers.openEditEvento}
                 onDelete={eventoHandlers.handleDeleteEvento}
-              />
-              <CalendarioEventos
+              />}
+              {visibleSections.includes('eventos') && <CalendarioEventos
                 eventos={eventoHandlers.eventos}
                 isAdmin={isAdmin}
                 onCreate={eventoHandlers.openCreateEvento}
                 onEdit={eventoHandlers.openEditEvento}
                 onDelete={eventoHandlers.handleDeleteEvento}
-              />
+              />}
             </div>
           </div>
         </main>
@@ -265,23 +276,26 @@ export default function Principal() {
       </div>
 
       {/* ── MOBILE LAYOUT ── */}
-      <div className="mobile-only block lg:hidden min-h-screen bg-[#f9f9fb] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display">
+      <div className="mobile-only block lg:hidden min-h-screen bg-[#f9f9fb] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display" style={{ backgroundColor: cbtisTheme.backgroundColor }}>
         <AppHeader
           userProfile={userProfile}
           profileAvatar={profileAvatar}
           onOpenMenu={() => setSidebarOpen(true)}
           onOpenProfile={() => setProfileOpen(true)}
+          theme={cbtisTheme}
         />
 
         <div className="mobile-main-content px-5 pt-[80px]">
+          {isAdmin && <button type="button" onClick={() => navigate('/admin?tab=personalizacion')} className="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/20 bg-white px-4 py-3 text-sm font-bold text-primary shadow-sm dark:bg-slate-900"><span className="material-symbols-outlined text-lg">palette</span>Personalizar portal</button>}
           <MobileWelcomeBanner
             userProfile={userProfile}
             profileAvatar={profileAvatar}
             pendingCount={pendingCount}
             greeting={greeting}
             formattedDate={formattedDate}
+            theme={cbtisTheme}
           />
-          <MobileCarousel
+          {visibleSections.includes('eventos') && <MobileCarousel
             pendingCount={pendingCount}
             eventos={eventoHandlers.eventos}
             isAdmin={isAdmin}
@@ -289,14 +303,14 @@ export default function Principal() {
             onCreate={eventoHandlers.openCreateEvento}
             onEdit={eventoHandlers.openEditEvento}
             onDelete={eventoHandlers.handleDeleteEvento}
-          />
-          <MobileNextPayment
+          />}
+          {visibleSections.includes('pagos') && <MobileNextPayment
             pendingCount={pendingCount}
             nextPaymentDateText={nextPaymentDateText}
             nextPaymentDateColor={nextPaymentDateColor}
             userId={userProfile?.id}
-          />
-          <CuentaActivaCarousel
+          />}
+          {visibleSections.includes('pagos') && <CuentaActivaCarousel
             userProfile={userProfile}
             nextPaymentDateText={nextPaymentDateText}
             nextPaymentDateColor={nextPaymentDateColor}
@@ -305,20 +319,22 @@ export default function Principal() {
             onOpenInfo={() => setInfoOpen(true)}
             onViewEvents={() => scrollToSection('eventos-avisos')}
             variant="mobile"
-          />
-          <MobileQuickActions
+          />}
+          {hasFinancialServices && <MobileQuickActions
             onOpenInfo={() => setInfoOpen(true)}
             onOpenHistory={() => setHistoryOpen(true)}
             onOpenOrientacion={() => setOrientacionOpen(true)}
             onOpenPapeleria={() => setPapeleriaOpen(true)}
             onOpenSeguimiento={() => setSeguimientoOpen(true)}
             userId={userProfile?.id}
-          />
+            sections={financeSections}
+          />}
         </div>
 
         <MobileBottomNav
           onOpenSidebar={() => setSidebarOpen(true)}
           onNavigateTienda={() => navigate('/tienda?splash=1')}
+          showStore={hasFinancialServices && visibleSections.includes('tienda') && financeSections.includes('tienda')}
         />
       </div>
 

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { CustomizationProvider } from './context/CustomizationContext';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppErrorBoundary from './components/AppErrorBoundary';
@@ -44,9 +45,10 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <Router>
-            <NetworkStatus />
-            <Suspense fallback={<PageLoading />}>
-              <Routes>
+            <CustomizationProvider>
+              <NetworkStatus />
+              <Suspense fallback={<PageLoading />}>
+                <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/acceso-escuela/*" element={<InstitutionFlow />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
@@ -71,8 +73,9 @@ function App() {
 
                 <Route path="/" element={<Navigate to={getHomeRedirect()} replace />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
+                </Routes>
+              </Suspense>
+            </CustomizationProvider>
           </Router>
         </ThemeProvider>
       </AuthProvider>

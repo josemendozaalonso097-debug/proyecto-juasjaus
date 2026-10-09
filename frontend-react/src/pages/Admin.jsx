@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const TabEstadisticas = lazy(() => import('../components/admin/TabEstadisticas'));
 const TabUsuarios = lazy(() => import('../components/admin/TabUsuarios'));
@@ -10,10 +10,12 @@ const TabOxxo = lazy(() => import('../components/admin/TabOxxo'));
 const TabVerificarCompras = lazy(() => import('../components/admin/TabVerificarCompras'));
 const TabBandeja = lazy(() => import('../components/admin/TabBandeja'));
 const TabInstitutionRequests = lazy(() => import('../components/admin/TabInstitutionRequests'));
+const TabCustomization = lazy(() => import('../components/admin/TabCustomization'));
 
 const TABS = [
   { id: 'bandeja',       label: 'Bandeja',          icon: 'inbox' },
   { id: 'planteles',     label: 'Altas de planteles', icon: 'domain_add' },
+  { id: 'personalizacion', label: 'Personalización', icon: 'palette' },
   { id: 'stats',         label: 'Estadísticas',   icon: 'bar_chart' },
   { id: 'usuarios',      label: 'Usuarios',        icon: 'group' },
   { id: 'adeudos',       label: 'Adeudos',         icon: 'account_balance_wallet' },
@@ -25,7 +27,8 @@ const TABS = [
 
 export default function Admin() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('stats');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(location.search).get('tab') === 'personalizacion' ? 'personalizacion' : 'stats');
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -73,6 +76,7 @@ export default function Admin() {
         <Suspense fallback={<div role="status" className="flex justify-center py-16 text-sm font-bold text-slate-500">Cargando sección…</div>}>
           {activeTab === 'bandeja'        && <TabBandeja onNavigateVerification={() => setActiveTab('verificar')} />}
           {activeTab === 'planteles'      && <TabInstitutionRequests />}
+          {activeTab === 'personalizacion' && <TabCustomization />}
           {activeTab === 'stats'          && <TabEstadisticas />}
           {activeTab === 'usuarios'       && <TabUsuarios />}
           {activeTab === 'adeudos'        && <TabAdeudos />}

@@ -1,67 +1,48 @@
-import React from 'react';
 import TooltipBubble from './TooltipBubble';
+import { createBrandBackground } from '../../utils/branding';
 
-export default function FinancierosPanel({ onOpenPapeleria, onOpenOrientacion, onNavigateTienda, onOpenSeguimiento, userId }) {
+const SERVICE_ROWS = [
+  { id: 'seguimiento', label: 'Seguimiento', icon: 'route', onClick: 'onOpenSeguimiento', accent: '#2563eb' },
+  { id: 'tramites', label: 'Subir Papelería', icon: 'draw', onClick: 'onOpenPapeleria', accent: '#ea580c' },
+  { id: 'orientacion', label: 'Orientación', icon: 'psychology', onClick: 'onOpenOrientacion', accent: '#0f766e' },
+];
+
+export default function FinancierosPanel({ onOpenPapeleria, onOpenOrientacion, onNavigateTienda, onOpenSeguimiento, userId, theme }) {
+  const selectedSections = theme?.sections || ['seguimiento', 'tramites', 'orientacion', 'tienda'];
+  const callbacks = { onOpenSeguimiento, onOpenPapeleria, onOpenOrientacion };
+  const rows = SERVICE_ROWS.filter((item) => selectedSections.includes(item.id));
+
   return (
-    <section data-tour="services" className="bg-white dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-slate-100 dark:border-slate-700 p-8">
-      <h3 className="text-xl font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-3 text-slate-800 dark:text-white">
-        <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-          <span className="material-symbols-outlined text-purple-500 text-xl">storefront</span>
+    <section data-tour="services" className="overflow-hidden rounded-2xl border bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:bg-slate-800 dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] dark:border-slate-700" style={{ backgroundColor: theme?.backgroundColor || '#f5f3ff', borderColor: `${theme?.primaryColor || '#7c3aed'}44` }}>
+      <div className="p-5 text-white" style={createBrandBackground(theme || {})}>
+        <div className="flex items-center gap-3">
+          {theme?.logoUrl ? <img src={theme.logoUrl} alt="" className="h-10 w-10 rounded-lg bg-white/90 object-contain p-1" /> : <span className="material-symbols-outlined rounded-xl bg-white/15 p-2 text-xl">account_balance</span>}
+          <div className="min-w-0">
+            <h3 className="truncate text-xl font-black leading-tight">{theme?.title || 'Financieros'}</h3>
+            <p className="mt-1 text-xs font-semibold text-white/80">{theme?.tagline || 'Servicios escolares y pagos'}</p>
+          </div>
+          <TooltipBubble userId={userId} stepId="services" />
         </div>
-        Financieros
-        <TooltipBubble userId={userId} stepId="services" />
-      </h3>
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">Adquiere productos escolares o realiza tus trámites.</p>
-      <ul className="space-y-4 mb-6">
-        <li>
-          <button
-            onClick={onOpenSeguimiento}
-            className="w-full flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all group cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-xl">route</span>
-              </div>
-              <span className="text-base font-bold text-slate-700 dark:text-slate-200">Seguimiento</span>
-            </div>
-            <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-blue-500 transition-colors">arrow_forward</span>
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={onOpenPapeleria}
-            className="w-full flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-orange-200 dark:hover:border-orange-500/30 hover:shadow-md transition-all group cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-2.5 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-xl">draw</span>
-              </div>
-              <span className="text-base font-bold text-slate-700 dark:text-slate-200">Subir Papelería</span>
-            </div>
-            <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-orange-500 transition-colors">arrow_forward</span>
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={onOpenOrientacion}
-            className="w-full flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/30 hover:shadow-md transition-all group cursor-pointer text-left"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-2.5 bg-teal-100 dark:bg-teal-900/30 rounded-lg text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-xl">psychology</span>
-              </div>
-              <span className="text-base font-bold text-slate-700 dark:text-slate-200">Orientación</span>
-            </div>
-            <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-teal-500 transition-colors">arrow_forward</span>
-          </button>
-        </li>
-      </ul>
-      <button
-        onClick={onNavigateTienda}
-        className="w-full flex cursor-pointer items-center justify-center h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm"
-      >
-        Ingresar a Tienda
-      </button>
+      </div>
+      <div className="p-6">
+        {theme?.catalogImageUrl && <img src={theme.catalogImageUrl} alt="Libros, uniformes o productos escolares" className="mb-5 h-32 w-full rounded-xl object-cover" />}
+        <p className="mb-5 text-sm font-medium text-slate-500 dark:text-slate-400">{theme?.description || 'Adquiere productos escolares o realiza tus trámites.'}</p>
+        <ul className="mb-5 space-y-3">
+          {rows.map((item) => (
+            <li key={item.id}>
+              <button onClick={callbacks[item.onClick]} className="group flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4 text-left transition-all hover:bg-white hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700">
+                <span className="flex items-center gap-4">
+                  <span className="rounded-lg p-2.5" style={{ backgroundColor: `${item.accent}18`, color: item.accent }}><span className="material-symbols-outlined text-xl">{item.icon}</span></span>
+                  <span className="text-base font-bold text-slate-700 dark:text-slate-200">{item.label}</span>
+                </span>
+                <span className="material-symbols-outlined text-slate-300 transition-colors group-hover:text-primary">arrow_forward</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        {selectedSections.includes('tienda') && <button onClick={onNavigateTienda} className="w-full cursor-pointer rounded-xl py-3 text-sm font-bold text-white transition-opacity hover:opacity-90" style={createBrandBackground(theme || {})}>Ingresar a Tienda</button>}
+        {!rows.length && !selectedSections.includes('tienda') && <p className="rounded-xl bg-slate-50 p-4 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">Los servicios están ocultos por configuración administrativa.</p>}
+      </div>
     </section>
   );
 }
