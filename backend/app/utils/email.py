@@ -14,11 +14,11 @@ async def send_email(to_email: str, subject: str, html_content: str):
         html_content: Contenido HTML del correo
     """
     if not settings.MAIL_USERNAME or not settings.MAIL_PASSWORD:
-        print("⚠️ Email no configurado. Saltando envío.")
+        print("⚠️ SMTP no configurado completamente. Se omitió el envío de correo.")
         return False
     
     message = MIMEMultipart("alternative")
-    message["From"] = settings.MAIL_FROM
+    message["From"] = settings.MAIL_FROM or settings.MAIL_USERNAME
     message["To"] = to_email
     message["Subject"] = subject
     

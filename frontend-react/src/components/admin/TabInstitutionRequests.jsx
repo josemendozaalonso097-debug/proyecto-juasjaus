@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { adminApi } from '../../api/admin';
 import { showToast } from '../../utils/toast';
 
-const FILTERS = ['Pendiente', 'En revisión', 'Aprobada', 'Rechazada', 'Todos'];
+const FILTERS = ['Pendiente', 'En revisión', 'Requiere corrección', 'Aprobada', 'Rechazada', 'Todos'];
 
 function dateLabel(value) {
   if (!value) return 'Fecha no disponible';
@@ -31,9 +31,14 @@ export default function TabInstitutionRequests() {
   }, [load]);
 
   const review = async (item, status) => {
+    const asksForChanges = status === 'Requiere corrección' || status === 'Rechazada';
+    const review_note = asksForChanges
+      ? window.prompt(status === 'Rechazada' ? 'Escribe el motivo del rechazo (opcional):' : '¿Qué información o ajuste se necesita? (opcional):')
+      : '';
+    if (review_note === null) return;
     setUpdating(item.id);
     try {
-      await adminApi.reviewInstitutionRequest(item.id, { status });
+      await adminApi.reviewInstitutionRequest(item.id, { status, review_note: review_note || null });
       showToast(status === 'Aprobada' ? 'Solicitud aprobada. Recuerda dar de alta el entorno del plantel.' : 'Solicitud actualizada', 'success');
       await load();
     } catch (error) {
@@ -96,6 +101,9 @@ export default function TabInstitutionRequests() {
                   <div className="flex shrink-0 flex-wrap gap-2">
                     <button type="button" disabled={updating === item.id} onClick={() => review(item, 'Aprobada')} className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50">
                       <span className="material-symbols-outlined text-lg">check_circle</span>Aprobar plantel
+                    </button>
+                    <button type="button" disabled={updating === item.id} onClick={() => review(item, 'Requiere corrección')} className="inline-flex items-center gap-1.5 rounded-xl border border-amber-200 px-4 py-2.5 text-sm font-bold text-amber-800 hover:bg-amber-50 disabled:opacity-50 dark:border-amber-900 dark:text-amber-300 dark:hover:bg-amber-950/30">
+                      <span className="material-symbols-outlined text-lg">edit_note</span>Pedir información
                     </button>
                     <button type="button" disabled={updating === item.id} onClick={() => review(item, 'Rechazada')} className="inline-flex items-center gap-1.5 rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/30">
                       <span className="material-symbols-outlined text-lg">cancel</span>Rechazar
