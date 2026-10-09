@@ -55,6 +55,7 @@ export default function Principal() {
   const financeTheme = getCustomization('finanzas');
   const visibleSections = cbtisTheme.sections || [];
   const financeSections = financeTheme.sections || [];
+  const mobileActionSections = [...new Set([...financeSections, ...(visibleSections.includes('pagos') ? ['pagos'] : [])])];
   const hasFinancialServices = ['tramites', 'seguimiento', 'orientacion', 'tienda'].some((section) => visibleSections.includes(section)) && financeSections.length > 0;
 
   const [loading, setLoading] = useState(true);
@@ -189,7 +190,7 @@ export default function Principal() {
       <GuidedTour userId={userProfile?.id} />
 
       {/* ── DESKTOP LAYOUT ── */}
-      <div className="hidden lg:flex flex-col min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative" style={{ backgroundColor: cbtisTheme.backgroundColor }}>
+      <div className="hidden lg:flex flex-col min-h-screen bg-[var(--brand-background)] dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 relative" style={{ '--brand-background': cbtisTheme.backgroundColor }}>
         <div className="mesh-bg" aria-hidden="true" />
 
         <AppHeader
@@ -276,7 +277,7 @@ export default function Principal() {
       </div>
 
       {/* ── MOBILE LAYOUT ── */}
-      <div className="mobile-only block lg:hidden min-h-screen bg-[#f9f9fb] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display" style={{ backgroundColor: cbtisTheme.backgroundColor }}>
+      <div className="mobile-only block lg:hidden min-h-screen bg-[var(--brand-background)] dark:bg-[#121316] pb-[88px] relative text-slate-900 dark:text-slate-100 font-display" style={{ '--brand-background': cbtisTheme.backgroundColor }}>
         <AppHeader
           userProfile={userProfile}
           profileAvatar={profileAvatar}
@@ -320,14 +321,14 @@ export default function Principal() {
             onViewEvents={() => scrollToSection('eventos-avisos')}
             variant="mobile"
           />}
-          {hasFinancialServices && <MobileQuickActions
+          {(hasFinancialServices || mobileActionSections.includes('pagos')) && <MobileQuickActions
             onOpenInfo={() => setInfoOpen(true)}
             onOpenHistory={() => setHistoryOpen(true)}
             onOpenOrientacion={() => setOrientacionOpen(true)}
             onOpenPapeleria={() => setPapeleriaOpen(true)}
             onOpenSeguimiento={() => setSeguimientoOpen(true)}
             userId={userProfile?.id}
-            sections={financeSections}
+            sections={mobileActionSections}
           />}
         </div>
 
