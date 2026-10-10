@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useCustomization } from '../../hooks/useCustomization';
 import { createBrandBackground } from '../../utils/branding';
 import { showToast } from '../../utils/toast';
+
 
 const SURFACES = [
   { id: 'cbtis', title: 'Portal CBTis', subtitle: 'Identidad general de la página principal', icon: 'school' },
@@ -13,6 +14,7 @@ const SECTIONS = [
   ['tramites', 'Trámites'], ['seguimiento', 'Seguimiento'], ['orientacion', 'Orientación'],
 ];
 const EMPTY = { title: '', tagline: '', description: '', logoUrl: '', heroImageUrl: '', catalogImageUrl: '', primaryColor: '#f20d0d', secondaryColor: '#6e0404', backgroundColor: '#f8f5f5', colorStyle: 'gradient', sections: [] };
+const PREVIEW_CHANNEL = 'cbtis-login-preview';
 
 function ImageField({ label, value, onChange }) {
   const onUpload = (event) => {
@@ -24,7 +26,7 @@ function ImageField({ label, value, onChange }) {
       return;
     }
     if (file.size > 700 * 1024) {
-      showToast('La imagen debe pesar 700 KB o menos para guardarla en la configuración.', 'warning');
+      showToast('La imagen debe pesar 700 KB o menos para la vista temporal.', 'warning');
       event.target.value = '';
       return;
     }
@@ -51,31 +53,79 @@ function ImageField({ label, value, onChange }) {
 }
 
 export default function TabCustomization() {
-  const { getCustomization, updateCustomization } = useCustomization();
+  const { getCustomization, updateCustomization, resetCustomization } = useCustomization();
   const [surface, setSurface] = useState('cbtis');
   const [drafts, setDrafts] = useState({});
   const [saving, setSaving] = useState(false);
-  const form = drafts[surface] || { ...EMPTY, ...getCustomization(surface) };
+  const form = useMemo(() => drafts[surface] || { ...EMPTY, ...getCustomization(surface) }, [drafts, surface, getCustomization]);
+  const liveStateRef = useRef({ surface, form });
+  const channelRef = useRef(null);
+  const pendingPreviewsRef = useRef(new Set());
+  const activePreviewsRef = useRef(new Set());
+
+  useEffect(() => {
+    liveStateRef.current = { surface, form };
+  }, [surface, form]);
+
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return undefined;
+    const channel = new BroadcastChannel(PREVIEW_CHANNEL);
+    channelRef.current = channel;
+    channel.onmessage = (event) => {
+      const previewId = event.data?.previewId;
+      if (event.data?.type === 'LOGIN_PREVIEW_REQUEST' && previewId && pendingPreviewsRef.current.has(previewId) && liveStateRef.current.surface === 'login') {
+        pendingPreviewsRef.current.delete(previewId);
+        activePreviewsRef.current.add(previewId);
+        channel.postMessage({ type: 'LOGIN_PREVIEW_THEME', previewId, theme: liveStateRef.current.form });
+      } else if (event.data?.type === 'LOGIN_PREVIEW_CLOSED' && previewId) {
+        pendingPreviewsRef.current.delete(previewId);
+        activePreviewsRef.current.delete(previewId);
+      }
+    };
+    return () => {
+      channel.close();
+      channelRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (surface === 'login') {
+      activePreviewsRef.current.forEach((previewId) => {
+        channelRef.current?.postMessage({ type: 'LOGIN_PREVIEW_THEME', previewId, theme: form });
+      });
+    }
+  }, [surface, form]);
+
   const change = (field, value) => setDrafts((current) => ({
     ...current,
     [surface]: { ...(current[surface] || { ...EMPTY, ...getCustomization(surface) }), [field]: value },
   }));
   const toggleSection = (id) => change('sections', form.sections.includes(id) ? form.sections.filter((item) => item !== id) : [...form.sections, id]);
 
-  const handleSave = async (event) => {
+  const handleApply = (event) => {
     event.preventDefault();
     setSaving(true);
     try {
-      await updateCustomization(surface, form);
-      showToast('Personalización guardada. Ya se aplicará al abrir la página.', 'success');
+      updateCustomization(surface, form);
+      showToast('Cambios aplicados temporalmente. Al recargar, volverá el diseño base CBTis.', 'success');
     } catch (error) {
-      showToast(error.message || 'No se pudo guardar la personalización.', 'error');
+      showToast(error.message || 'No se pudieron aplicar los cambios.', 'error');
     } finally {
       setSaving(false);
     }
   };
 
-  const previewLogin = () => window.open('/login?preview=1', '_blank', 'noopener,noreferrer');
+  const handleReset = () => {
+    const base = resetCustomization(surface);
+    setDrafts((current) => ({ ...current, [surface]: base }));
+    showToast(`Diseño base de ${SURFACES.find((item) => item.id === surface)?.title || 'la página'} restaurado.`, 'success');
+  };
+
+  const previewLogin = () => {
+    const previewId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    pendingPreviewsRef.current.add(previewId);
+    window.open(`/login?preview=1&previewId=${encodeURIComponent(previewId)}`, '_blank', 'noopener,noreferrer');
+  };
   const selectedSurface = SURFACES.find((item) => item.id === surface);
 
   return (
@@ -84,8 +134,8 @@ export default function TabCustomization() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Branding del portal</p>
-            <h2 className="mt-1 text-2xl font-black text-slate-900 dark:text-white">Personalización</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">Configura una sola plantilla reutilizable. Los cambios se guardan en el servidor y solo los administradores pueden editarlos.</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900 dark:text-white">Personalización temporal</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">Prueba una plantilla reutilizable para CBTis, Financieros o el login. Los cambios viven solo en esta sesión del navegador; no se guardan en el servidor y al recargar vuelve el diseño base CBTis.</p>
           </div>
           {surface === 'login' && <button type="button" onClick={previewLogin} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white hover:bg-slate-700 dark:bg-white dark:text-slate-900"><span className="material-symbols-outlined text-lg">open_in_new</span>Previsualizar login en otra pestaña</button>}
         </div>
@@ -101,11 +151,11 @@ export default function TabCustomization() {
         ))}
       </div>
 
-      <form onSubmit={handleSave} className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <form onSubmit={handleApply} className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6 rounded-3xl bg-white p-6 shadow-sm dark:bg-slate-900">
           <div>
             <h3 className="text-lg font-black text-slate-900 dark:text-white">{selectedSurface?.title}</h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Nombre, elementos visuales, colores y secciones que mostrará esta parte del portal.</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Edita nombre, identidad visual y secciones para probar la plantilla. Los cambios no sobreviven a una recarga.</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -143,7 +193,8 @@ export default function TabCustomization() {
           </fieldset>}
 
           <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-5 dark:border-slate-800">
-            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-black text-white shadow-lg shadow-primary/20 hover:opacity-90 disabled:opacity-60"><span className="material-symbols-outlined text-lg">save</span>{saving ? 'Guardando…' : 'Guardar cambios'}</button>
+            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-black text-white shadow-lg shadow-primary/20 hover:opacity-90 disabled:opacity-60"><span className="material-symbols-outlined text-lg">palette</span>{saving ? 'Aplicando…' : 'Aplicar temporalmente'}</button>
+            <button type="button" onClick={handleReset} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"><span className="material-symbols-outlined text-lg">restart_alt</span>Restablecer valores base</button>
             {surface === 'login' && <button type="button" onClick={previewLogin} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"><span className="material-symbols-outlined text-lg">visibility</span>Ver login sin cerrar sesión</button>}
           </div>
         </div>
@@ -157,7 +208,7 @@ export default function TabCustomization() {
             {form.heroImageUrl && <img src={form.heroImageUrl} alt="Vista previa de banner" className="mt-4 h-32 w-full rounded-xl object-cover" />}
           </div>
           <div className="space-y-3 p-4">
-            <p className="text-xs font-black uppercase tracking-wider text-slate-400">Vista previa</p>
+            <p className="text-xs font-black uppercase tracking-wider text-slate-400">Vista previa temporal</p>
             <p className="text-sm text-slate-600 dark:text-slate-300">{form.description || 'La descripción breve se mostrará en la página seleccionada.'}</p>
             <div className="flex flex-wrap gap-2">{form.sections.map((id) => <span key={id} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{SECTIONS.find(([key]) => key === id)?.[1] || id}</span>)}</div>
           </div>

@@ -1,14 +1,10 @@
-import json
 import re
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy.orm import Session
 
-from ..database import get_db
 from ..dependencies import get_current_user
-from ..models.site_customization import SiteCustomization
 from ..models.user import User
 
 router = APIRouter(prefix="/customization", tags=["Personalización"])
@@ -106,32 +102,19 @@ def _surface_or_404(surface: str) -> str:
 
 
 @router.get("/{surface}")
-async def get_customization(surface: str, db: Session = Depends(get_db)):
+async def get_customization(surface: str):
     surface = _surface_or_404(surface)
-    row = db.query(SiteCustomization).filter(SiteCustomization.surface == surface).first()
-    if not row:
-        return DEFAULTS[surface]
-    try:
-        saved = json.loads(row.config_json)
-    except (TypeError, json.JSONDecodeError):
-        return DEFAULTS[surface]
-    return {**DEFAULTS[surface], **saved}
+    # Los valores guardados durante el prototipo no deben volver a publicarse.
+    return DEFAULTS[surface]
 
 
 @router.put("/{surface}")
 async def save_customization(
     surface: str,
     payload: CustomizationPayload,
-    db: Session = Depends(get_db),
     admin: User = Depends(_require_admin),
 ):
     surface = _surface_or_404(surface)
-    data = payload.model_dump()
-    row = db.query(SiteCustomization).filter(SiteCustomization.surface == surface).first()
-    if row:
-        row.config_json = json.dumps(data, ensure_ascii=False)
-    else:
-        row = SiteCustomization(surface=surface, config_json=json.dumps(data, ensure_ascii=False))
-        db.add(row)
-    db.commit()
-    return data
+    # Conservamos validación y permiso de admin por compatibilidad de API,
+    # pero no almacenamos la personalización entre cargas del proyecto.
+    return payload.model_dump()

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
     registerSendOTP,
@@ -308,10 +308,11 @@ export default function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
     const { getCustomization } = useCustomization();
-    const loginTheme = getCustomization("login");
     const previewRequested = new URLSearchParams(window.location.search).get("preview") === "1";
+    const previewId = new URLSearchParams(window.location.search).get("previewId");
     const [isActive, setIsActive] = useState(false);
     const [previewAllowed, setPreviewAllowed] = useState(false);
+    const [previewTheme, setPreviewTheme] = useState(null);
     const [showForgot, setShowForgot] = useState(false);
     const [showOtp, setShowOtp] = useState(false);
     const [otpEmail, setOtpEmail] = useState("");
@@ -331,6 +332,17 @@ export default function Login() {
     const [regSemestre, setRegSemestre] = useState("");
     const [regLoading, setRegLoading] = useState(false);
     const [showRegPwd, setShowRegPwd] = useState(false);
+
+    const baseLoginTheme = getCustomization("login");
+    const loginTheme = useMemo(
+        () => previewRequested && previewAllowed && previewTheme
+            ? { ...baseLoginTheme, ...previewTheme }
+            : baseLoginTheme,
+        [baseLoginTheme, previewAllowed, previewRequested, previewTheme],
+    );
+    const isCustomPreview = previewRequested && previewAllowed && Boolean(previewTheme);
+    const signupHeroImage = isCustomPreview ? loginTheme.heroImageUrl : "/imgs/banner_mobile_new.jpg";
+    const loginHeroImage = isCustomPreview ? loginTheme.heroImageUrl : "/imgs/mkc.jpg";
 
     // Auto-redirect si ya hay sesión
     useEffect(() => {
@@ -391,6 +403,34 @@ export default function Login() {
             .catch(() => {});
 
     }, [navigate, previewRequested]);
+
+    // La pestaña de login de prueba recibe el borrador del administrador por
+    // BroadcastChannel; nada se escribe en localStorage ni en el servidor.
+    useEffect(() => {
+        if (!previewRequested || !previewId || typeof BroadcastChannel === "undefined") return undefined;
+        const channel = new BroadcastChannel("cbtis-login-preview");
+        channel.onmessage = (event) => {
+            if (event.data?.type === "LOGIN_PREVIEW_THEME" && event.data.previewId === previewId && event.data.theme) {
+                setPreviewTheme(event.data.theme);
+            }
+        };
+        channel.postMessage({ type: "LOGIN_PREVIEW_REQUEST", previewId });
+        const closePreview = () => channel.postMessage({ type: "LOGIN_PREVIEW_CLOSED", previewId });
+        window.addEventListener("beforeunload", closePreview);
+        return () => {
+            window.removeEventListener("beforeunload", closePreview);
+            closePreview();
+            channel.close();
+        };
+    }, [previewId, previewRequested]);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        root.style.setProperty("--color-primary", loginTheme.primaryColor || "#f20d0d");
+        root.style.setProperty("--color-primary-dark", loginTheme.secondaryColor || "#6e0404");
+        root.style.setProperty("--color-primary-darker", loginTheme.secondaryColor || "#6e0404");
+        root.style.setProperty("--color-primary-gradient", loginTheme.primaryColor || "#f20d0d");
+    }, [loginTheme]);
 
     // Fix PC bug (useEffect separado para que SIEMPRE se registre):
     // Si Google abre pestaña nueva en vez de popup, escucha cuando el token
@@ -608,11 +648,10 @@ export default function Login() {
     };
 
     return (
-        <div className="login-page bg-background-light dark:bg-background-dark min-h-screen md:flex md:items-center md:justify-center p-0 md:p-4" style={{ backgroundColor: loginTheme.backgroundColor }}>
+        <div className="login-page bg-background-light dark:bg-background-dark min-h-screen md:flex md:items-center md:justify-center p-0 md:p-4">
             {previewRequested && previewAllowed && <div className="fixed left-1/2 top-3 z-[10000] flex -translate-x-1/2 items-center gap-3 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xl"><span>Vista previa de login — sesión admin conservada</span><button type="button" onClick={() => navigate('/admin?tab=personalizacion')} className="rounded-full bg-white/15 px-3 py-1 hover:bg-white/25">Volver al editor</button></div>}
             <div
                 className={`container-box w-full md:max-w-[1200px] md:min-h-[700px] bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 md:shadow-2xl mx-auto rounded-none md:rounded-xl ${isActive ? "active" : ""}`}
-                style={{ backgroundColor: loginTheme.backgroundColor }}
             >
                 {/* ── SIGN UP ── */}
                 <div className="form-container sign-up sign-up-container bg-background-light dark:bg-background-dark md:bg-white md:dark:bg-slate-900 px-0 py-0 md:px-16 md:py-8 flex flex-col justify-start md:justify-center">
@@ -637,12 +676,12 @@ export default function Login() {
                                 />
                             </svg>
                         </button>
-                        <h1 className="text-xl font-extrabold tracking-tight text-[#0f172a] dark:text-white"></h1>
+                        <h1 className="text-xl font-extrabold tracking-tight text-[#0f172a] dark:text-white">Crear cuenta</h1>
                         <div className="w-6"></div>
                     </header>
                     {/* Mobile hero */}
-                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8" style={createBrandBackground(loginTheme)}>
-                        {loginTheme.heroImageUrl && <img alt={`Imagen de ${loginTheme.title}`} className="h-full w-full object-cover brightness-75" src={loginTheme.heroImageUrl} />}
+                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8" style={isCustomPreview ? createBrandBackground(loginTheme) : undefined}>
+                        {signupHeroImage && <img alt={isCustomPreview ? `Imagen de ${loginTheme.title}` : "Edificio CBTis 258"} className="h-full w-full object-cover brightness-75" src={signupHeroImage} />}
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
                         <div className="absolute bottom-6 left-0 right-0 px-6">
                             <h2 className="text-white text-3xl font-black uppercase tracking-wide leading-tight">
@@ -753,12 +792,14 @@ export default function Login() {
                                             placeholder="••••••••"
                                             required
                                         />
-                                        <i
-                                            className={`fa-solid ${showRegPwd ? "fa-eye-slash" : "fa-eye"} absolute right-4 top-[14px] text-slate-400 cursor-pointer hover:text-primary`}
-                                            onClick={() =>
-                                                setShowRegPwd(!showRegPwd)
-                                            }
-                                        />
+                                        <button
+                                            type="button"
+                                            aria-label={showRegPwd ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                            onClick={() => setShowRegPwd((visible) => !visible)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 border-0 bg-transparent p-1 text-slate-400 hover:text-primary cursor-pointer"
+                                        >
+                                            <i aria-hidden="true" className={`fa-solid ${showRegPwd ? "fa-eye-slash" : "fa-eye"}`} />
+                                        </button>
                                     </div>
                                 </div>
                                 {/* Rol */}
@@ -865,12 +906,13 @@ export default function Login() {
                             <div className="md:hidden flex justify-center mt-6 w-full">
                                 <p className="text-slate-600 dark:text-slate-400 text-sm">
                                     ¿Ya tienes una cuenta?{" "}
-                                    <a
-                                        className="text-primary font-bold hover:underline ml-1 cursor-pointer"
+                                    <button
+                                        type="button"
+                                        className="border-0 bg-transparent text-primary font-bold hover:underline ml-1 cursor-pointer"
                                         onClick={() => setIsActive(false)}
                                     >
                                         Inicia sesión
-                                    </a>
+                                    </button>
                                 </p>
                             </div>
                         </div>
@@ -886,8 +928,8 @@ export default function Login() {
                         </h1>
                         <div className="w-6"></div>
                     </header>
-                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8" style={createBrandBackground(loginTheme)}>
-                        {loginTheme.heroImageUrl && <img alt={`Imagen de ${loginTheme.title}`} className="h-full w-full object-cover brightness-75" src={loginTheme.heroImageUrl} />}
+                    <section className="md:hidden relative w-full h-64 overflow-hidden mb-8" style={isCustomPreview ? createBrandBackground(loginTheme) : undefined}>
+                        {loginHeroImage && <img alt={isCustomPreview ? `Imagen de ${loginTheme.title}` : "Edificio CBTis 258"} className="h-full w-full object-cover brightness-75" src={loginHeroImage} />}
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
                         <div className="absolute bottom-6 left-0 right-0 px-6">
                             <h2 className="text-white text-3xl font-black uppercase tracking-wide leading-tight">
@@ -976,20 +1018,23 @@ export default function Login() {
                                             placeholder="Contraseña"
                                             required
                                         />
-                                        <i
-                                            className={`fa-solid ${showLoginPwd ? "fa-eye-slash" : "fa-eye"} absolute right-4 text-slate-400 cursor-pointer hover:text-primary`}
-                                            onClick={() =>
-                                                setShowLoginPwd(!showLoginPwd)
-                                            }
-                                        />
+                                        <button
+                                            type="button"
+                                            aria-label={showLoginPwd ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                            onClick={() => setShowLoginPwd((visible) => !visible)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 border-0 bg-transparent p-1 text-slate-400 hover:text-primary cursor-pointer"
+                                        >
+                                            <i aria-hidden="true" className={`fa-solid ${showLoginPwd ? "fa-eye-slash" : "fa-eye"}`} />
+                                        </button>
                                     </div>
                                     <div className="text-right mt-1">
-                                        <a
-                                            className="text-primary text-sm font-medium hover:underline cursor-pointer"
+                                        <button
+                                            type="button"
+                                            className="border-0 bg-transparent p-0 text-primary text-sm font-medium hover:underline cursor-pointer"
                                             onClick={() => setShowForgot(true)}
                                         >
                                             ¿Olvidaste tu contraseña?
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                                 <button
@@ -1011,12 +1056,13 @@ export default function Login() {
                             <div className="md:hidden flex justify-center mt-6 w-full">
                                 <p className="text-slate-600 dark:text-slate-400 text-sm">
                                     ¿No tienes una cuenta?{" "}
-                                    <a
-                                        className="text-primary font-bold hover:underline ml-1 cursor-pointer"
+                                    <button
+                                        type="button"
+                                        className="border-0 bg-transparent text-primary font-bold hover:underline ml-1 cursor-pointer"
                                         onClick={() => setIsActive(true)}
                                     >
                                         Regístrate
-                                    </a>
+                                    </button>
                                 </p>
                             </div>
                         </div>
@@ -1025,7 +1071,7 @@ export default function Login() {
 
                 {/* ── DESKTOP OVERLAY SLIDER ── */}
                 <div className="overlay-container hidden md:block pointer-events-none">
-                    <div className="overlay bg-primary" style={createBrandBackground(loginTheme)}>
+                    <div className="overlay bg-primary" style={isCustomPreview ? createBrandBackground(loginTheme) : undefined}>
                         <div className="absolute inset-0 opacity-10">
                             <svg
                                 height="100%"
