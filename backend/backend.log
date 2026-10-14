@@ -18771,3 +18771,27 @@ sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper[User(users)]
 2026-10-12 14:23:30,992 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
 2026-10-12 14:23:30,992 - app.main - INFO - 🔐 CORS configurado de forma segura.
 2026-10-12 14:23:30,992 - app.main - INFO - ============================================================
+2026-10-12 14:24:22,904 - app.main - INFO - ============================================================
+2026-10-12 14:24:22,904 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-10-12 14:24:22,904 - app.main - INFO - ============================================================
+2026-10-12 14:24:22,911 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-10-12 14:24:22,911 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-10-12 14:24:22,911 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-10-12 14:24:22,911 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-10-12 14:24:22,911 - app.main - INFO - ============================================================
+2026-10-13 03:32:08,516 - app.main - INFO - ============================================================
+2026-10-13 03:32:08,517 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-10-13 03:32:08,517 - app.main - INFO - ============================================================
+2026-10-13 03:32:08,619 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-10-13 03:32:08,619 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-10-13 03:32:08,619 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-10-13 03:32:08,619 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-10-13 03:32:08,619 - app.main - INFO - ============================================================
+2026-10-14 13:47:54,609 - app.main - INFO - ============================================================
+2026-10-14 13:47:54,610 - app.main - INFO - 🚀 FASTAPI SERVER STARTING
+2026-10-14 13:47:54,610 - app.main - INFO - ============================================================
+2026-10-14 13:47:54,618 - app.main - INFO - 📍 API URL: http://localhost:8000
+2026-10-14 13:47:54,618 - app.main - INFO - 📚 Docs: http://localhost:8000/docs
+2026-10-14 13:47:54,618 - app.main - INFO - 🌐 Frontend: http://127.0.0.1:5501
+2026-10-14 13:47:54,618 - app.main - INFO - 🔐 CORS configurado de forma segura.
+2026-10-14 13:47:54,618 - app.main - INFO - ============================================================
